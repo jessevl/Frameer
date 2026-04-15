@@ -18,7 +18,7 @@ interface ModalProps {
   showCloseButton?: boolean;
   /** Force full-screen on mobile (default: true for lg/xl sizes) */
   mobileFullScreen?: boolean;
-  /** Custom z-index (default: 200, above MobileSheet which is 150) */
+  /** Custom z-index (default: 260, above the mobile drawer layer) */
   zIndex?: number;
 }
 
@@ -32,7 +32,7 @@ const Modal: React.FC<ModalProps> = ({
   hideHeader = false,
   showCloseButton = true,
   mobileFullScreen,
-  zIndex = 200,
+  zIndex = 260,
 }) => {
   // Animate on mount
   const [mounted, setMounted] = useState(false);
@@ -84,7 +84,7 @@ const Modal: React.FC<ModalProps> = ({
   if (useFullScreen) {
     return createPortal(
       <div 
-        className={`fixed inset-0 flex flex-col bg-[var(--color-surface-secondary)] transition-all duration-300 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+        className={`fixed inset-0 flex flex-col bg-[var(--color-surface-secondary)] transition-all duration-300 eink-shell-surface-secondary ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
         style={{ 
           paddingTop: 'env(safe-area-inset-top)',
           paddingBottom: 'env(safe-area-inset-bottom)',
@@ -100,7 +100,7 @@ const Modal: React.FC<ModalProps> = ({
           {showCloseButton && (
             <button
               onClick={onClose}
-              className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--color-surface-hover)] text-[var(--color-text-secondary)] transition-colors"
+              className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--color-surface-hover)] text-[var(--color-text-secondary)] transition-colors eink-header-button"
               aria-label="Close"
             >
               <XIcon className="w-4 h-4" />
@@ -115,7 +115,7 @@ const Modal: React.FC<ModalProps> = ({
 
         {/* Footer - fixed at bottom */}
         {footer && (
-          <div className="flex-shrink-0 px-4 py-4 border-t border-[var(--color-border-default)] flex gap-2 justify-end bg-[var(--color-surface-secondary)]">
+          <div className="flex-shrink-0 px-4 py-4 border-t border-[var(--color-border-default)] flex gap-2 justify-end bg-[var(--color-surface-secondary)] eink-shell-surface-secondary">
             {footer}
           </div>
         )}
@@ -127,12 +127,12 @@ const Modal: React.FC<ModalProps> = ({
   // Standard centered modal (desktop and small mobile modals)
   return createPortal(
     <div 
-      className={`fixed inset-0 flex items-center justify-center transition-all duration-300 ${mounted ? 'bg-black/30 backdrop-blur-[3px]' : 'bg-black/0 backdrop-blur-0'}`}
+      className={`fixed inset-0 flex items-center justify-center transition-all duration-300 eink-modal-backdrop ${mounted ? 'bg-black/30 backdrop-blur-[3px]' : 'bg-black/0 backdrop-blur-0'}`}
       style={{ zIndex, transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)' }}
       onClick={onClose}
     >
       <div
-        className={`relative bg-[var(--color-surface-secondary)] rounded-xl w-full ${sizeClasses[size]} mx-4 shadow-2xl shadow-black/20 dark:shadow-black/40 border border-[var(--color-border-subtle)] transform transition-all duration-300 ${mounted ? 'opacity-100 scale-100' : 'opacity-0 scale-[0.95]'}`}
+        className={`relative bg-[var(--color-surface-secondary)] rounded-xl w-full ${sizeClasses[size]} mx-4 shadow-2xl shadow-black/20 dark:shadow-black/40 border border-[var(--color-border-subtle)] transform transition-all duration-300 eink-shell-surface-secondary eink-modal-surface-secondary ${mounted ? 'opacity-100 scale-100' : 'opacity-0 scale-[0.95]'}`}
         style={{ transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)' }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -140,7 +140,7 @@ const Modal: React.FC<ModalProps> = ({
         {showCloseButton && (
           <button
             onClick={onClose}
-            className="absolute top-3 right-3 z-20 w-7 h-7 flex items-center justify-center rounded-full bg-[var(--color-surface-tertiary)] hover:bg-[var(--color-surface-hover)] text-[var(--color-text-secondary)] transition-colors"
+            className="absolute top-3 right-3 z-20 w-7 h-7 flex items-center justify-center rounded-full bg-[var(--color-surface-tertiary)] hover:bg-[var(--color-surface-hover)] text-[var(--color-text-secondary)] transition-colors eink-header-button"
             aria-label="Close"
           >
             <XIcon className="w-4 h-4" />

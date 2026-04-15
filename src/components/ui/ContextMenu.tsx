@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { cn } from '@frameer/lib/design-system';
+import { ChevronRight } from 'lucide-react';
+import ToggleTile from './ToggleTile';
 
 export interface ContextMenuItem {
   id: string;
@@ -10,6 +12,10 @@ export interface ContextMenuItem {
   variant?: 'default' | 'danger';
   disabled?: boolean;
   divider?: boolean;
+  /** When true, renders as a toggle tile showing on/off state */
+  toggled?: boolean;
+  /** Submenu items — renders as an expandable section */
+  children?: ContextMenuItem[];
 }
 
 interface ContextMenuProps {
@@ -33,34 +39,105 @@ export const ContextMenuContent: React.FC<{
   /** Use larger touch-friendly sizing (for mobile sheets) */
   touchFriendly?: boolean;
 }> = ({ items, onItemClick, className, touchFriendly = false }) => {
+  const [expandedSubmenu, setExpandedSubmenu] = useState<string | null>(null);
+
+  // Separate toggle items from regular items for 2-column layout
+  const toggleItems = items.filter(i => i.toggled !== undefined);
+  const regularItems = items.filter(i => i.toggled === undefined);
+
+  const renderRegularItem = (item: ContextMenuItem, index: number, arr: ContextMenuItem[]) => {
+    const hasSubmenu = item.children && item.children.length > 0;
+    const isExpanded = expandedSubmenu === item.id;
+
+    return (
+      <React.Fragment key={item.id || index}>
+        {item.divider && index > 0 && (
+          <div className={cn("h-px bg-[var(--color-border-default)] mx-1", touchFriendly ? "my-2" : "my-1")} />
+        )}
+        <button
+          onClick={() => {
+            if (hasSubmenu) {
+              setExpandedSubmenu(isExpanded ? null : item.id);
+            } else {
+              onItemClick?.(item);
+            }
+          }}
+          disabled={item.disabled}
+          className={cn(
+            'w-full text-left flex items-center transition-colors rounded-md',
+            touchFriendly ? 'px-4 py-3.5 text-base gap-4' : 'px-3 py-2 text-sm gap-3',
+            item.disabled
+              ? 'opacity-50 cursor-not-allowed'
+              : 'hover:bg-[var(--color-surface-hover)] active:bg-[var(--color-surface-hover)]',
+            item.variant === 'danger'
+              ? 'text-[var(--color-state-error)]'
+              : 'text-[var(--color-text-primary)]'
+          )}
+        >
+          {item.icon && (
+            <span className={cn("flex-shrink-0 flex items-center justify-center", touchFriendly ? "w-5 h-5" : "w-4 h-4")}>{item.icon}</span>
+          )}
+          <span className="flex-1">{item.label}</span>
+          {hasSubmenu && (
+            <ChevronRight className={cn("w-3.5 h-3.5 text-[var(--color-text-tertiary)] transition-transform", isExpanded && "rotate-90")} />
+          )}
+        </button>
+        {/* Submenu children */}
+        {hasSubmenu && isExpanded && (
+          <div className="ml-6 border-l border-[var(--color-border-default)]">
+            {item.children!.map((child, ci) => (
+              <button
+                key={child.id || ci}
+                onClick={() => onItemClick?.(child)}
+                disabled={child.disabled}
+                className={cn(
+                  'w-full text-left flex items-center transition-colors rounded-md',
+                  touchFriendly ? 'px-4 py-3 text-base gap-4' : 'px-3 py-1.5 text-sm gap-3',
+                  child.disabled
+                    ? 'opacity-50 cursor-not-allowed'
+                    : 'hover:bg-[var(--color-surface-hover)]',
+                  child.variant === 'danger'
+                    ? 'text-[var(--color-state-error)]'
+                    : 'text-[var(--color-text-primary)]'
+                )}
+              >
+                {child.icon && (
+                  <span className="flex-shrink-0 flex items-center justify-center w-4 h-4">{child.icon}</span>
+                )}
+                <span className="flex-1">{child.label}</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </React.Fragment>
+    );
+  };
+
   return (
     <div className={cn("flex flex-col overflow-y-auto max-h-[inherit]", className)}>
-      {items.map((item, index) => (
-        <React.Fragment key={item.id || index}>
-          {item.divider && index > 0 && (
-            <div className={cn("h-px bg-[var(--color-border-default)] mx-1", touchFriendly ? "my-2" : "my-1")} />
+      {/* Toggle tiles in 2-column grid */}
+      {toggleItems.length > 0 && (
+        <>
+          <div className={cn("grid gap-1.5 px-2 py-1", toggleItems.length > 1 ? "grid-cols-2" : "grid-cols-1")}>
+            {toggleItems.map((item) => (
+              <ToggleTile
+                key={item.id}
+                active={!!item.toggled}
+                onClick={() => onItemClick?.(item)}
+                label={item.label}
+                icon={item.icon}
+                disabled={item.disabled}
+              />
+            ))}
+          </div>
+          {regularItems.length > 0 && (
+            <div className="h-px bg-[var(--color-border-default)] mx-1 my-1" />
           )}
-          <button
-            onClick={() => onItemClick?.(item)}
-            disabled={item.disabled}
-            className={cn(
-              'w-full text-left flex items-center transition-colors rounded-md',
-              touchFriendly ? 'px-4 py-3.5 text-base gap-4' : 'px-3 py-2 text-sm gap-3',
-              item.disabled
-                ? 'opacity-50 cursor-not-allowed'
-                : 'hover:bg-[var(--color-surface-hover)] active:bg-[var(--color-surface-hover)]',
-              item.variant === 'danger'
-                ? 'text-[var(--color-state-error)]'
-                : 'text-[var(--color-text-primary)]'
-            )}
-          >
-            {item.icon && (
-              <span className={cn("flex-shrink-0 flex items-center justify-center", touchFriendly ? "w-5 h-5" : "w-4 h-4")}>{item.icon}</span>
-            )}
-            <span className="flex-1">{item.label}</span>
-          </button>
-        </React.Fragment>
-      ))}
+        </>
+      )}
+
+      {/* Regular items */}
+      {regularItems.map((item, index) => renderRegularItem(item, index, regularItems))}
     </div>
   );
 };

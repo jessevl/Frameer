@@ -7,6 +7,8 @@ export { default as Button } from "./Button";
 export { default as Input } from "./Input";
 export { default as Textarea } from "./Textarea";
 export { default as Toggle } from "./Toggle";
+export { default as ThemeInitializer } from "./ThemeInitializer";
+export type { ThemeInitializerProps, ThemeMode, ThemeVariant, AccentColor } from "./ThemeInitializer";
 export { default as Checkbox } from "./Checkbox";
 export { default as ColorPicker } from "./ColorPicker";
 export { default as EmojiPicker } from "./EmojiPicker";
@@ -56,6 +58,8 @@ export { default as EmptyState } from "./EmptyState";
 export { default as SectionHeader } from "./SectionHeader";
 export { default as ContextMenu, ContextMenuContent } from "./ContextMenu";
 export type { ContextMenuItem } from "./ContextMenu";
+export { default as ToggleTile, toggleTileStyles } from "./ToggleTile";
+export type { ToggleTileProps } from "./ToggleTile";
 
 // Dropdown
 export { default as Dropdown, DropdownItem } from "./Dropdown";
@@ -76,20 +80,20 @@ export type { ToastType } from "./Toast";
 
 // Settings UI Primitives
 export {
-	SettingsToggle,
-	SettingsToggleRow,
-	SegmentedControl,
-	SliderRow,
-	SettingsSectionHeader,
-	SettingsSeparator,
-	SettingsCard,
-	SettingsStatusMessage,
-	SettingsCollapsible,
-	SettingsSaveButton,
-	SettingsActionButton,
-	SettingsNumberInput,
-	formatBytes,
-	sliderClass,
-	settingsInputClass,
+  SettingsToggle,
+  SettingsToggleRow,
+  SegmentedControl,
+  SliderRow,
+  SettingsSectionHeader,
+  SettingsSeparator,
+  SettingsCard,
+  SettingsStatusMessage,
+  SettingsCollapsible,
+  SettingsSaveButton,
+  SettingsActionButton,
+  SettingsNumberInput,
+  formatBytes,
+  sliderClass,
+  settingsInputClass,
 } from "./SettingsUI";
 export type { SegmentOption } from "./SettingsUI";

@@ -6,7 +6,7 @@
  * Tracks navigation position using history.state to know when back/forward is possible.
  */
 import React from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import { cn } from '@frameer/lib/design-system';
 
 const NAV_INDEX_KEY = '__navIndex';
@@ -111,7 +111,7 @@ export const NavigationHistoryButtons: React.FC<NavigationHistoryButtonsProps> =
   className,
   size = 'sm',
 }) => {
-  const { canGoBack, canGoForward, goBack, goForward } = useNavigationHistory();
+  const { canGoBack, goBack } = useNavigationHistory();
   
   const iconSize = size === 'sm' ? 16 : 20;
   const buttonSize = size === 'sm' ? 'w-8 h-8' : 'w-9 h-9';
@@ -131,20 +131,6 @@ export const NavigationHistoryButtons: React.FC<NavigationHistoryButtonsProps> =
         )}
       >
         <ChevronLeft size={iconSize} strokeWidth={1.75} />
-      </button>
-      <button
-        onClick={goForward}
-        disabled={!canGoForward}
-        title="Go forward"
-        className={cn(
-          'flex items-center justify-center rounded-full transition-all',
-          buttonSize,
-          canGoForward 
-            ? 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-secondary)]' 
-            : 'text-[var(--color-text-disabled)] cursor-not-allowed'
-        )}
-      >
-        <ChevronRight size={iconSize} strokeWidth={1.75} />
       </button>
     </div>
   );

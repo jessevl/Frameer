@@ -7,11 +7,13 @@ import { useIsMobile } from '@frameer/hooks/useMobileDetection';
 export interface NavItemProps {
   icon?: React.ReactNode;
   label: string;
+  subtitle?: React.ReactNode;
   badge?: React.ReactNode;
   isActive?: boolean;
   onClick?: () => void;
   className?: string;
   compact?: boolean;
+  einkMode?: boolean;
 }
 
 /**
@@ -29,13 +31,27 @@ export interface NavItemProps {
 const NavItem: React.FC<NavItemProps> = ({
   icon,
   label,
+  subtitle,
   badge,
   isActive = false,
   onClick,
   className,
   compact = false,
+  einkMode = false,
 }) => {
   const isMobile = useIsMobile();
+
+  const stateClass = einkMode
+    ? cn(
+        'eink-expanded-sidebar-item border border-transparent bg-transparent shadow-none',
+        isActive
+          ? 'eink-expanded-sidebar-item-active text-[var(--color-text-primary)]'
+          : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
+      )
+    : cn(
+        isActive && 'glass-item text-[var(--color-text-primary)]',
+        !isActive && 'glass-item-subtle text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
+      );
   
   return (
     <button
@@ -45,14 +61,9 @@ const NavItem: React.FC<NavItemProps> = ({
         'group w-full flex items-center',
         compact ? 'gap-2' : 'gap-3',
         // Larger padding on mobile for better touch targets, increased vertical padding
-        isMobile ? 'px-4 py-3 text-base' : 'px-3 py-1.5 text-sm',
+        isMobile ? 'px-4 py-3 text-base' : (subtitle ? 'px-3 py-2 text-sm' : 'px-3 py-1.5 text-sm'),
         'rounded-lg font-medium transition-all text-left',
-        
-        // Active state - macOS glassy effect
-        isActive && 'glass-item text-[var(--color-text-primary)]',
-        
-        // Inactive state - subtle hover
-        !isActive && 'glass-item-subtle text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]',
+        stateClass,
         
         // Custom overrides
         className
@@ -61,14 +72,19 @@ const NavItem: React.FC<NavItemProps> = ({
     >
       {/* Icon */}
       {icon && (
-        <span className="flex-shrink-0">
+        <span className={cn("flex-shrink-0", subtitle ? "self-center" : undefined)}>
           {icon}
         </span>
       )}
 
-      {/* Label */}
-      <span className="flex-1">
-        {label}
+      {/* Label + Subtitle */}
+      <span className={cn("flex-1", subtitle ? "flex flex-col gap-0" : "")}>
+        <span>{label}</span>
+        {subtitle && (
+          <span className="text-[11px] font-normal leading-tight text-[var(--color-text-tertiary)] opacity-80">
+            {subtitle}
+          </span>
+        )}
       </span>
 
       {/* Badge */}

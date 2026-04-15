@@ -24,6 +24,8 @@ export interface IconPickerProps {
   allowClear?: boolean;
   /** Color to preview icons with (hex) */
   previewColor?: string;
+  /** Compact mode for use in tight spaces like dropdown menus */
+  compact?: boolean;
 }
 
 // Type for Lucide icon components
@@ -141,6 +143,7 @@ const IconPicker: React.FC<IconPickerProps> = ({
   className,
   allowClear = true,
   previewColor,
+  compact = false,
 }) => {
   const [activeCategory, setActiveCategory] = useState<string>('Popular');
   const [searchQuery, setSearchQuery] = useState('');
@@ -183,8 +186,8 @@ const IconPicker: React.FC<IconPickerProps> = ({
 
   return (
     <div className={cn('flex flex-col', className)}>
-      {/* Search bar - sleek and modern */}
-      <div className="relative mb-3">
+      {/* Search bar */}
+      <div className={cn("relative", compact ? "mb-1" : "mb-3")}>
         <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-tertiary)] pointer-events-none" />
         <input
           ref={searchRef}
@@ -192,13 +195,16 @@ const IconPicker: React.FC<IconPickerProps> = ({
           placeholder="Search icons..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-9 pr-3 py-2 text-sm rounded-xl border border-[var(--color-border-default)] bg-[var(--color-surface-inset)] text-[var(--color-text-primary)] placeholder-[var(--color-text-tertiary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive-ring)]/30 focus:border-[var(--color-interactive-border)] transition-all"
+          className={cn(
+            "w-full pl-9 pr-3 text-sm rounded-xl border border-[var(--color-border-default)] bg-[var(--color-surface-inset)] text-[var(--color-text-primary)] placeholder-[var(--color-text-tertiary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive-ring)]/30 focus:border-[var(--color-interactive-border)] transition-all",
+            compact ? "py-1.5" : "py-2"
+          )}
         />
       </div>
 
-      {/* Category pills - horizontal scroll */}
+      {/* Category pills - flush against grid in compact mode */}
       {!searchQuery && (
-        <div className="flex gap-1 mb-3 overflow-x-auto pb-1 scrollbar-none">
+        <div className={cn("flex gap-1 overflow-x-auto scrollbar-none", compact ? "mb-0 pb-0.5" : "mb-3 pb-1")}>
           {categories.map((category) => (
             <button
               key={category}
@@ -224,8 +230,8 @@ const IconPicker: React.FC<IconPickerProps> = ({
         </div>
       )}
 
-      {/* Clear icon button - always visible above grid */}
-      {allowClear && selectedIcon && (
+      {/* Clear icon button — only shown outside of compact mode */}
+      {allowClear && selectedIcon && !compact && (
         <button
           type="button"
           onClick={() => onChange(null)}
@@ -236,15 +242,17 @@ const IconPicker: React.FC<IconPickerProps> = ({
         </button>
       )}
 
-      {/* Icon grid - compact and dense */}
+      {/* Icon grid */}
       <div 
         ref={gridRef}
-        className="grid grid-cols-10 gap-0.5 max-h-[240px] overflow-y-auto p-1 bg-[var(--color-surface-inset)] rounded-xl"
+        className={cn(
+          "grid gap-0.5 overflow-y-auto p-1 bg-[var(--color-surface-inset)] rounded-xl",
+          compact ? "grid-cols-8 max-h-[160px]" : "grid-cols-10 max-h-[240px]"
+        )}
       >
-        
         {filteredIcons.map((iconName) => {
-          const IconComponent = getIconComponent(iconName);
-          if (!IconComponent) return null;
+          const IconComp = getIconComponent(iconName);
+          if (!IconComp) return null;
           
           const isSelected = iconName === selectedIcon;
           const wasJustSelected = isSelected && justSelectedIcon === iconName;
@@ -264,24 +272,34 @@ const IconPicker: React.FC<IconPickerProps> = ({
               aria-pressed={isSelected}
               title={iconName.replace(/([A-Z])/g, ' $1').trim()}
             >
-              <IconComponent 
+              <IconComp 
                 className={cn('w-[18px] h-[18px]', wasJustSelected && 'icon-bounce')}
                 style={{ color: isSelected ? previewColor || '#3b82f6' : iconColor }}
               />
             </button>
           );
         })}
+
+        {/* Remove icon — as last grid cell in compact mode */}
+        {compact && allowClear && selectedIcon && (
+          <button
+            type="button"
+            onClick={() => onChange(null)}
+            className="aspect-square flex items-center justify-center rounded-lg transition-all hover:bg-red-100 dark:hover:bg-red-900/30 group"
+            title="Remove icon"
+          >
+            <ClearIcon className="w-[18px] h-[18px] text-[var(--color-text-tertiary)] group-hover:text-[var(--color-state-error,#ef4444)]" />
+          </button>
+        )}
       </div>
       
       {/* Empty state */}
       {filteredIcons.length === 0 && (
         <div className="flex flex-col items-center justify-center py-8 text-[var(--color-text-tertiary)]">
           <LucideIcons.SearchX className="w-8 h-8 mb-2 opacity-50" />
-          <span className="text-sm">No icons match "{searchQuery}"</span>
+          <span className="text-sm">No icons match &ldquo;{searchQuery}&rdquo;</span>
         </div>
       )}
-
-
     </div>
   );
 };

@@ -43,61 +43,51 @@ const emptyStateConfig = {
     icon: <Inbox className="w-16 h-16" />,
     title: 'Inbox Zero! 🎉',
     description: 'All caught up. Capture tasks here quickly, then organize them later.',
-    gradient: 'from-gray-400 to-gray-500',
   },
   today: {
     icon: <CalendarDays className="w-16 h-16" />,
     title: 'Nothing due today',
     description: "You're all clear! Schedule tasks or focus on your long-term goals.",
-    gradient: 'from-blue-400 to-blue-500',
   },
   upcoming: {
     icon: <CalendarRange className="w-16 h-16" />,
     title: 'No scheduled tasks',
     description: 'Add due dates to your tasks to see them here and stay organized.',
-    gradient: 'from-rose-400 to-red-500',
   },
   all: {
     icon: <ListTodo className="w-16 h-16" />,
     title: 'No tasks yet',
     description: 'Create your first task to get started with organizing your work.',
-    gradient: 'from-violet-400 to-purple-500',
   },
   completed: {
     icon: <CheckCircle2 className="w-16 h-16" />,
     title: 'No completed tasks yet',
     description: 'Check off some tasks to see them here. You got this!',
-    gradient: 'from-emerald-400 to-green-500',
   },
   tasks: {
     icon: <ListTodo className="w-16 h-16" />,
     title: 'No tasks in this collection',
     description: 'Add tasks to organize work within this task collection.',
-    gradient: 'from-violet-400 to-purple-500',
   },
   pages: {
     icon: <FileText className="w-16 h-16" />,
     title: 'No pages yet',
     description: 'Create your first note, collection, or whiteboard to get started.',
-    gradient: 'from-cyan-400 to-blue-500',
   },
   collection: {
     icon: <Folder className="w-16 h-16" />,
     title: 'This collection is empty',
     description: 'Add notes, collections, or whiteboards here to organize your content.',
-    gradient: 'from-amber-400 to-orange-500',
   },
   search: {
     icon: <Sparkles className="w-16 h-16" />,
     title: 'No results found',
     description: 'Try different search terms or use the command palette to create new items.',
-    gradient: 'from-pink-400 to-rose-500',
   },
   custom: {
     icon: <Pencil className="w-16 h-16" />,
     title: 'Nothing here yet',
     description: 'Get started by creating something new.',
-    gradient: 'from-gray-400 to-gray-500',
   },
 };
 
@@ -119,21 +109,17 @@ export const SmartEmptyState: React.FC<SmartEmptyStateProps> = ({
       'flex flex-col items-center justify-center py-16 px-8 text-center',
       className
     )}>
-      {/* Gradient icon container */}
-      <div className={cn(
-        'relative mb-6 p-6 rounded-3xl',
-        'bg-gradient-to-br opacity-80',
-        config.gradient
-      )}>
+      {/* Accent-colored icon container */}
+      <div className="relative mb-6 p-6 rounded-3xl opacity-80"
+        style={{ background: 'linear-gradient(135deg, var(--color-accent-primary), var(--color-accent-emphasis))' }}
+      >
         <div className="text-white/90">
           {icon || config.icon}
         </div>
         {/* Subtle glow effect */}
-        <div className={cn(
-          'absolute inset-0 rounded-3xl blur-2xl opacity-30',
-          'bg-gradient-to-br',
-          config.gradient
-        )} />
+        <div className="absolute inset-0 rounded-3xl blur-2xl opacity-30"
+          style={{ background: 'linear-gradient(135deg, var(--color-accent-primary), var(--color-accent-emphasis))' }}
+        />
       </div>
 
       {/* Title */}

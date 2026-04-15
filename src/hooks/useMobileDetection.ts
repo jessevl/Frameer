@@ -3,13 +3,19 @@
  * @description Responsive detection hooks for mobile, tablet, and desktop layouts
  * @app SHARED - Core responsive infrastructure
  * 
- * Provides reactive hooks that respond to viewport changes and device capabilities.
- * Uses CSS media queries for accurate, SSR-safe detection.
+ * Provides reactive hooks that respond to viewport changes, orientation, and
+ * device capabilities.
+ *
+ * Layout policy:
+ * - Phones always use mobile layouts, regardless of orientation.
+ * - Desktop devices always use desktop layouts, regardless of window width.
+ * - Tablets use mobile layouts in portrait and desktop layouts in landscape.
+ * - Use useIsTabletDevice() when you need tablet device detection regardless of layout.
  * 
- * Breakpoints (aligned with Tailwind):
- * - Mobile: < 768px (md breakpoint)
- * - Tablet: 768px - 1023px
- * - Desktop: >= 1024px (lg breakpoint)
+ * Viewport breakpoints (aligned with Tailwind, retained for pure media queries):
+ * - Mobile viewport: < 768px (md breakpoint)
+ * - Tablet viewport: 768px - 1023px
+ * - Desktop viewport: >= 1024px (lg breakpoint)
  * 
  * Usage:
  * ```tsx
@@ -61,12 +67,80 @@ const QUERIES = {
   mobile: maxWidth(BREAKPOINTS.md),           // < 768px
   tablet: betweenWidth(BREAKPOINTS.md, BREAKPOINTS.lg), // 768px - 1023px
   desktop: minWidth(BREAKPOINTS.lg),          // >= 1024px
+  landscape: '(orientation: landscape)',
   touch: '(hover: none) and (pointer: coarse)',
   mouse: '(hover: hover) and (pointer: fine)',
   standalone: '(display-mode: standalone)',
   reducedMotion: '(prefers-reduced-motion: reduce)',
   darkMode: '(prefers-color-scheme: dark)',
 } as const;
+
+type NavigatorWithUserAgentData = Navigator & {
+  userAgentData?: {
+    mobile?: boolean;
+  };
+};
+
+const subscribeToViewportChanges = (callback: () => void) => {
+  window.addEventListener('resize', callback, { passive: true });
+  window.addEventListener('orientationchange', callback);
+  return () => {
+    window.removeEventListener('resize', callback);
+    window.removeEventListener('orientationchange', callback);
+  };
+};
+
+const getDeviceSnapshot = () => {
+  if (typeof window === 'undefined' || typeof navigator === 'undefined') {
+    return {
+      isLandscape: false,
+      isPhone: false,
+      isTablet: false,
+    };
+  }
+
+  const navigatorWithUAData = navigator as NavigatorWithUserAgentData;
+  const ua = (navigator.userAgent || '').toLowerCase();
+  const platform = (navigator.platform || '').toLowerCase();
+  const maxTouchPoints = navigator.maxTouchPoints || 0;
+  const screenWidth = window.screen?.width || window.innerWidth || 0;
+  const screenHeight = window.screen?.height || window.innerHeight || 0;
+  const shortestScreenSide = Math.min(screenWidth, screenHeight);
+  const uaDataMobile = navigatorWithUAData.userAgentData?.mobile === true;
+  const isLandscape = window.matchMedia
+    ? window.matchMedia(QUERIES.landscape).matches
+    : window.innerWidth > window.innerHeight;
+
+  const isIPad = ua.includes('ipad') || (platform === 'macintel' && maxTouchPoints > 1);
+  const isAndroid = ua.includes('android');
+  const isAndroidPhone = isAndroid && (ua.includes('mobile') || uaDataMobile);
+  const isAndroidTablet = isAndroid && !isAndroidPhone;
+  const isIPhone = ua.includes('iphone') || ua.includes('ipod');
+  const isWindowsPhone = ua.includes('windows phone');
+  const isAmazonTablet = /silk|kindle|kfot|kftt|kfjwa|kfsowi/.test(ua);
+  const isGenericTablet = /tablet|playbook/.test(ua);
+
+  const isPhone = isIPhone || isWindowsPhone || isAndroidPhone || uaDataMobile;
+  const isTablet = maxTouchPoints > 0 && (
+    isIPad
+    || isAndroidTablet
+    || isAmazonTablet
+    || isGenericTablet
+    || (!isPhone && shortestScreenSide >= BREAKPOINTS.tablet && shortestScreenSide < BREAKPOINTS.lg)
+  );
+
+  return {
+    isLandscape,
+    isPhone,
+    isTablet,
+  };
+};
+
+const useDeviceSnapshot = (selector: (snapshot: ReturnType<typeof getDeviceSnapshot>) => boolean): boolean => {
+  const subscribe = useCallback((callback: () => void) => subscribeToViewportChanges(callback), []);
+  const getSnapshot = useCallback(() => selector(getDeviceSnapshot()), [selector]);
+  return useSyncExternalStore(subscribe, getSnapshot, () => false);
+};
 
 // ============================================================================
 // CORE HOOK: useMediaQuery
@@ -106,24 +180,57 @@ export function useMediaQuery(query: string): boolean {
 // ============================================================================
 
 /**
- * Returns true when viewport is mobile size (< 768px)
+ * Returns true when the current device should use the mobile layout.
+ * Phones always match; tablets match only in portrait.
  */
 export function useIsMobile(): boolean {
-  return useMediaQuery(QUERIES.mobile);
+  const isPhoneDevice = useIsPhoneDevice();
+  const isTabletDevice = useIsTabletDevice();
+  const isLandscape = useIsLandscapeOrientation();
+  return isPhoneDevice || (isTabletDevice && !isLandscape);
 }
 
 /**
- * Returns true when viewport is tablet size (768px - 1023px)
+ * Returns true when a tablet should use the mobile layout.
+ * This is tablet portrait mode, not generic tablet device detection.
  */
 export function useIsTablet(): boolean {
-  return useMediaQuery(QUERIES.tablet);
+  const isTabletDevice = useIsTabletDevice();
+  const isLandscape = useIsLandscapeOrientation();
+  return isTabletDevice && !isLandscape;
 }
 
 /**
- * Returns true when viewport is desktop size (>= 1024px)
+ * Returns true for phone-class devices regardless of orientation.
+ */
+export function useIsPhoneDevice(): boolean {
+  return useDeviceSnapshot((snapshot) => snapshot.isPhone);
+}
+
+/**
+ * Returns true for physical tablet-class devices regardless of layout mode or viewport size.
+ * This prevents narrow desktop windows from being treated as tablets.
+ */
+export function useIsTabletDevice(): boolean {
+  return useDeviceSnapshot((snapshot) => snapshot.isTablet);
+}
+
+/**
+ * Returns true when the current device is in landscape orientation.
+ */
+export function useIsLandscapeOrientation(): boolean {
+  return useDeviceSnapshot((snapshot) => snapshot.isLandscape);
+}
+
+/**
+ * Returns true when the current device should use the desktop layout.
+ * Desktop devices always match; tablets match in landscape.
  */
 export function useIsDesktop(): boolean {
-  return useMediaQuery(QUERIES.desktop);
+  const isPhoneDevice = useIsPhoneDevice();
+  const isTabletDevice = useIsTabletDevice();
+  const isLandscape = useIsLandscapeOrientation();
+  return !isPhoneDevice && (!isTabletDevice || isLandscape);
 }
 
 /**
@@ -138,49 +245,6 @@ export function useIsTouch(): boolean {
  */
 export function useIsMouse(): boolean {
   return useMediaQuery(QUERIES.mouse);
-}
-
-/**
- * Returns true when app is running in Tauri desktop wrapper
- * Detection is synchronous since __TAURI__ is set before any JS runs
- */
-export function useIsTauri(): boolean {
-  const detectTauri = () => {
-    if (typeof window === 'undefined') return false;
-    if ('__TAURI__' in window) return true;
-    const ua = navigator.userAgent || '';
-    return ua.toLowerCase().includes('tauri');
-  };
-
-  const [isTauri, setIsTauri] = useState(detectTauri);
-
-  useEffect(() => {
-    setIsTauri(detectTauri());
-  }, []);
-
-  return isTauri;
-}
-
-/**
- * Returns true when app is running in Tauri on macOS
- */
-export function useIsTauriMacOS(): boolean {
-  const detectTauriMacOS = () => {
-    if (typeof window === 'undefined') return false;
-    const isTauri = '__TAURI__' in window || (navigator.userAgent || '').toLowerCase().includes('tauri');
-    if (!isTauri) return false;
-    const platform = (navigator.platform || '').toLowerCase();
-    const ua = (navigator.userAgent || '').toLowerCase();
-    return platform.includes('mac') || ua.includes('mac os');
-  };
-
-  const [isTauriMacOS, setIsTauriMacOS] = useState(detectTauriMacOS);
-
-  useEffect(() => {
-    setIsTauriMacOS(detectTauriMacOS());
-  }, []);
-
-  return isTauriMacOS;
 }
 
 /**
@@ -202,12 +266,18 @@ export function usePrefersReducedMotion(): boolean {
 // ============================================================================
 
 export interface ResponsiveState {
-  /** Viewport < 768px */
+  /** Current device uses the mobile layout */
   isMobile: boolean;
-  /** Viewport 768px - 1023px */
+  /** Current device is a tablet in portrait/mobile layout mode */
   isTablet: boolean;
-  /** Viewport >= 1024px */
+  /** Current device uses the desktop layout */
   isDesktop: boolean;
+  /** Physical phone device regardless of orientation */
+  isPhoneDevice: boolean;
+  /** Physical tablet device regardless of orientation */
+  isTabletDevice: boolean;
+  /** Current orientation is landscape */
+  isLandscape: boolean;
   /** Touch is primary input (phones, tablets) */
   isTouch: boolean;
   /** Mouse/trackpad is primary input */
@@ -216,7 +286,7 @@ export interface ResponsiveState {
   isStandalone: boolean;
   /** User prefers reduced motion */
   prefersReducedMotion: boolean;
-  /** Mobile or tablet (touch-first layout) */
+  /** Current device uses the mobile layout (phone or tablet portrait) */
   isMobileOrTablet: boolean;
   /** Current viewport width in pixels */
   viewportWidth: number;
@@ -231,9 +301,12 @@ export interface ResponsiveState {
  * @returns ResponsiveState object with all responsive flags
  */
 export function useResponsive(): ResponsiveState {
-  const isMobile = useMediaQuery(QUERIES.mobile);
-  const isTablet = useMediaQuery(QUERIES.tablet);
-  const isDesktop = useMediaQuery(QUERIES.desktop);
+  const isMobile = useIsMobile();
+  const isTablet = useIsTablet();
+  const isDesktop = useIsDesktop();
+  const isPhoneDevice = useIsPhoneDevice();
+  const isTabletDevice = useIsTabletDevice();
+  const isLandscape = useIsLandscapeOrientation();
   const isTouch = useMediaQuery(QUERIES.touch);
   const isMouse = useMediaQuery(QUERIES.mouse);
   const isStandalone = useMediaQuery(QUERIES.standalone);
@@ -254,6 +327,9 @@ export function useResponsive(): ResponsiveState {
     isMobile,
     isTablet,
     isDesktop,
+    isPhoneDevice,
+    isTabletDevice,
+    isLandscape,
     isTouch,
     isMouse,
     isStandalone,
