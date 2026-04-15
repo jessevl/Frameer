@@ -73,3 +73,23 @@ export { SmartEmptyState, CompactEmptyState } from "./SmartEmptyState";
 // Toast
 export { ToastContainer, useToastStore, toastSuccess, toastError, toastWarning, toastInfo, toastSuccessWithAction } from "./Toast";
 export type { ToastType } from "./Toast";
+
+// Settings UI Primitives
+export {
+	SettingsToggle,
+	SettingsToggleRow,
+	SegmentedControl,
+	SliderRow,
+	SettingsSectionHeader,
+	SettingsSeparator,
+	SettingsCard,
+	SettingsStatusMessage,
+	SettingsCollapsible,
+	SettingsSaveButton,
+	SettingsActionButton,
+	SettingsNumberInput,
+	formatBytes,
+	sliderClass,
+	settingsInputClass,
+} from "./SettingsUI";
+export type { SegmentOption } from "./SettingsUI";
