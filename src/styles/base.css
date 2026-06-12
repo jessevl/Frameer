@@ -307,6 +307,65 @@ html.dark, body.dark {
   border-color: rgba(255, 255, 255, 0.1);
 }
 
+/* Icon button inside a glass panel — transparent by default, glassy on hover/active.
+   Does NOT set a default color; each use-site sets its own base text color. */
+.glass-header-btn {
+  border: 1px solid transparent;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.glass-header-btn:hover {
+  background: rgba(255, 255, 255, 0.55);
+  border-color: rgba(0, 0, 0, 0.05);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 2px 6px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  color: var(--color-text-primary);
+}
+
+.dark .glass-header-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.09);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.18),
+    0 2px 6px rgba(0, 0, 0, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  color: var(--color-text-primary);
+}
+
+/* Elevated/active glass state — panel open or non-default setting applied */
+.glass-header-btn-active {
+  background: rgba(255, 255, 255, 0.68);
+  border-color: rgba(0, 0, 0, 0.07);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.06),
+    0 3px 8px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  color: var(--color-interactive-text-strong);
+}
+
+.glass-header-btn-active:hover {
+  background: rgba(255, 255, 255, 0.78);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.dark .glass-header-btn-active {
+  background: rgba(255, 255, 255, 0.13);
+  border-color: rgba(255, 255, 255, 0.13);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.22),
+    0 3px 8px rgba(0, 0, 0, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  color: var(--color-interactive-text-strong);
+}
+
+.dark .glass-header-btn-active:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
 /* =============================================================================
    PAPER SURFACE - Main content area with subtle depth
    Provides a "floating paper" effect for the main content area.
@@ -408,6 +467,10 @@ html.dark, body.dark {
 .theme-eink .glass-panel,
 .theme-eink .glass-panel-nav,
 .theme-eink .glass-button,
+.theme-eink .glass-header-btn,
+.theme-eink .glass-header-btn:hover,
+.theme-eink .glass-header-btn-active,
+.theme-eink .glass-header-btn-active:hover,
 .theme-eink .paper-surface,
 .theme-eink .card-accent-hover,
 .theme-eink .card-accent-hover:hover,
@@ -431,6 +494,13 @@ html.dark, body.dark {
 .theme-eink .glass-item-subtle {
   background: var(--color-surface-primary) !important;
   border: 1px solid var(--color-border-default) !important;
+}
+
+.theme-eink .glass-header-btn,
+.theme-eink .glass-header-btn-active {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
 }
 
 .theme-eink .glass-item {

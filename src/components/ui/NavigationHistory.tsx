@@ -123,11 +123,9 @@ export const NavigationHistoryButtons: React.FC<NavigationHistoryButtonsProps> =
         disabled={!canGoBack}
         title="Go back"
         className={cn(
-          'flex items-center justify-center rounded-full transition-all',
+          'flex items-center justify-center rounded-full glass-header-btn text-[var(--color-text-tertiary)]',
           buttonSize,
-          canGoBack 
-            ? 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-secondary)]' 
-            : 'text-[var(--color-text-disabled)] cursor-not-allowed'
+          !canGoBack && 'opacity-40 pointer-events-none'
         )}
       >
         <ChevronLeft size={iconSize} strokeWidth={1.75} />
