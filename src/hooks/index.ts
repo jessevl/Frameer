@@ -4,3 +4,4 @@ export { useLongPress } from "./useLongPress";
 export type { LongPressOptions, LongPressResult } from "./useLongPress";
 export { useAutoSave } from "./useAutoSave";
 export { useHydration } from "./useHydration";
+export { useHorizontalScrollArrows } from "./useHorizontalScrollArrows";

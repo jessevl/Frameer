@@ -1,21 +1,23 @@
 /**
  * @file HorizontalScrollContainer.tsx
  * @description Reusable horizontal scroll container with navigation arrows
- * @app SHARED - Used by sidebar pinned items, home favorites, etc.
- * 
+ * @app SHARED - Used by sidebar pinned items, home favorites, kanban board, etc.
+ *
  * Features:
  * - Hidden scrollbar with smooth scrolling
  * - Left/right navigation arrows that fade in/out
  * - Arrows only show when there's more content to scroll
  * - Smooth scroll animation when clicking arrows
- * 
+ *
  * Used by:
  * - UnifiedSidebar (pinned items)
  * - FavoritesSection (home page)
+ * - RecentPagesGallery (home page)
  */
-import React, { useRef, useState, useCallback, useEffect } from 'react';
+import React, { useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@frameer/lib/design-system';
+import { useHorizontalScrollArrows } from '@frameer/hooks/useHorizontalScrollArrows';
 
 interface HorizontalScrollContainerProps {
   /** Content to render inside the scroll container */
@@ -44,48 +46,20 @@ const HorizontalScrollContainer: React.FC<HorizontalScrollContainerProps> = ({
   showArrows = true,
 }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(false);
+  const { canScrollLeft, canScrollRight, handleScrollBy } = useHorizontalScrollArrows(scrollRef);
 
-  const updateScrollState = useCallback(() => {
-    const container = scrollRef.current;
-    if (!container) return;
-    const { scrollLeft, scrollWidth, clientWidth } = container;
-    setCanScrollLeft(scrollLeft > 2);
-    setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 2);
-  }, []);
-
-  const handleScrollBy = useCallback((direction: 'left' | 'right') => {
-    const container = scrollRef.current;
-    if (!container) return;
-    const amount = Math.max(120, container.clientWidth * 0.6);
-    container.scrollBy({ left: direction === 'left' ? -amount : amount, behavior: 'smooth' });
-  }, []);
-
-  useEffect(() => {
-    updateScrollState();
-    const container = scrollRef.current;
-    if (!container) return;
-    
-    const resizeObserver = new ResizeObserver(() => updateScrollState());
-    resizeObserver.observe(container);
-    
-    return () => resizeObserver.disconnect();
-  }, [updateScrollState, children]);
-
-  const arrowClasses = arrowSize === 'sm' 
-    ? 'w-6 h-6 p-1' 
+  const arrowClasses = arrowSize === 'sm'
+    ? 'w-6 h-6 p-1'
     : 'w-8 h-8 p-1.5';
-  
-  const iconClasses = arrowSize === 'sm' 
-    ? 'w-4 h-4' 
+
+  const iconClasses = arrowSize === 'sm'
+    ? 'w-4 h-4'
     : 'w-5 h-5';
 
   return (
     <div className={cn("relative overflow-visible", className)}>
       <div
         ref={scrollRef}
-        onScroll={updateScrollState}
         className={cn(
           "overflow-x-auto overflow-y-visible scrollbar-hide scroll-smooth touch-pan-x",
           scrollClassName
