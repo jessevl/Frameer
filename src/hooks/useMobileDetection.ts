@@ -120,7 +120,19 @@ const getDeviceSnapshot = () => {
   const isAmazonTablet = /silk|kindle|kfot|kftt|kfjwa|kfsowi/.test(ua);
   const isGenericTablet = /tablet|playbook/.test(ua);
 
-  const isPhone = isIPhone || isWindowsPhone || isAndroidPhone || uaDataMobile;
+  // A foldable phone's *current* physical screen can grow well past normal
+  // phone dimensions once unfolded, while the OS/browser's "mobile" UA hint
+  // (legacy UA string and userAgentData.mobile alike) can stay stuck on its
+  // folded-state value — this has been observed specifically in installed
+  // PWAs/WebAPKs, which don't always get the same live UA-CH renegotiation
+  // on a fold-state change that an ordinary browser tab does. The physical
+  // screen dimensions, in contrast, come straight from the OS window
+  // manager via the normal resize/orientationchange events and stay
+  // reliable either way, so a screen that's currently tablet-sized or
+  // larger wins over a possibly-stale UA "mobile" signal.
+  const isCurrentlyLargeScreen = shortestScreenSide >= BREAKPOINTS.tablet;
+
+  const isPhone = !isCurrentlyLargeScreen && (isIPhone || isWindowsPhone || isAndroidPhone || uaDataMobile);
   const isTablet = maxTouchPoints > 0 && (
     isIPad
     || isAndroidTablet
