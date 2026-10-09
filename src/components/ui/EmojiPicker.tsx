@@ -41,7 +41,7 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
   className,
   allowClear = true,
 }) => {
-  const [activeCategory, setActiveCategory] = useState<string>(Object.keys(EMOJI_CATEGORIES)[0]);
+  const [activeCategory, setActiveCategory] = useState<string>(Object.keys(EMOJI_CATEGORIES)[0] ?? "");
 
   const categories = Object.keys(EMOJI_CATEGORIES);
   const emojis = EMOJI_CATEGORIES[activeCategory as keyof typeof EMOJI_CATEGORIES] || [];

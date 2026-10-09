@@ -340,6 +340,9 @@
 
 /* State colors in dark mode (the rest follows the Drift tokens) */
 .dark {
+  /* White on the dark-mode coral-strong is 3.7:1; the dark canvas on it is 4.8:1 (text needs 4.5:1). */
+  --color-button-primary-text: var(--paper);
+
   --color-amber-hint: rgba(251, 191, 36, 0.1);
   --color-amber-accent: #f59e0b;
   --color-amber-border: rgba(251, 191, 36, 0.3);

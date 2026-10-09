@@ -179,7 +179,7 @@ const MobileSheet: React.FC<MobileSheetProps> = ({
     if (preventSwipeClose) return;
     
     // Track the start position
-    touchStartYRef.current = e.targetTouches[0].clientY;
+    touchStartYRef.current = e.targetTouches[0]?.clientY ?? null;
     swipeOffsetRef.current = 0;
     isSwipingRef.current = false;
     // Don't set isSwiping state yet - wait for actual movement
@@ -189,7 +189,8 @@ const MobileSheet: React.FC<MobileSheetProps> = ({
   const onTouchMove = useCallback((e: React.TouchEvent) => {
     if (touchStartYRef.current === null) return;
     
-    const currentTouchY = e.targetTouches[0].clientY;
+    const currentTouchY = e.targetTouches[0]?.clientY;
+    if (currentTouchY === undefined) return;
     const diff = currentTouchY - touchStartYRef.current;
     
     // Only consider it a swipe if moved more than 10px (distinguish tap from swipe)

@@ -55,7 +55,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     };
   }
 
-  componentDidCatch(error: Error, reactErrorInfo: ErrorInfo): void {
+  override componentDidCatch(error: Error, reactErrorInfo: ErrorInfo): void {
     const { onError, context } = this.props;
     
     // Log the error
@@ -83,7 +83,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     window.location.href = '/';
   };
 
-  render(): ReactNode {
+  override render(): ReactNode {
     const { hasError, error, errorInfo } = this.state;
     const { children, fallback, showActions = true } = this.props;
 
@@ -117,7 +117,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
           </p>
 
           {/* Error details (dev mode) */}
-          {process.env.NODE_ENV !== "production" && error && (
+          {!import.meta.env.PROD && error && (
             <details className="mb-6 text-left">
               <summary className="cursor-pointer text-sm text-[var(--color-text-secondary)]
                                 flex items-center gap-2 justify-center hover:text-[var(--color-text-primary)]">

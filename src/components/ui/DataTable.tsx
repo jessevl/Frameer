@@ -187,7 +187,7 @@ export function DataTable<T>({
       // Extract numeric value from width
       const match = col.width.match(/(\d+)/);
       if (match) {
-        total += parseInt(match[1], 10);
+        total += parseInt(match[1] ?? "100", 10);
       } else {
         total += 100; // Default for flex columns
       }
