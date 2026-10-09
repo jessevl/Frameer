@@ -3,11 +3,11 @@
  * @description Centralized design tokens, utilities, and semantic styling
  * @app SHARED - Design foundation used by all components
  * 
- * This file contains all semantic design tokens for Planneer:
+ * This file contains the semantic class tokens of the Drift design system:
  * - Semantic color classes (priority colors, status colors, etc.)
  * - Typography classes and component styles
  * - The `cn()` utility for combining Tailwind classes
- * - `priorityClasses()` helper for task priority styling
+ * - `getPriorityColor()` for task priority styling
  * 
  * THEMING SYSTEM:
  * Colors are defined as CSS custom properties in globals.css using the @theme directive.
@@ -236,61 +236,6 @@ export const borders = {
 } as const;
 
 // ============================================================================
-// SHADOWS (Deprecated - Use borders instead)
-// ============================================================================
-
-export const shadows = {
-  none: 'shadow-none',
-  sm: 'shadow-none', // Replaced with borders
-  md: 'shadow-none', // Replaced with borders
-  lg: 'shadow-none', // Replaced with borders
-  xl: 'shadow-none', // Replaced with borders
-  '2xl': 'shadow-none', // Replaced with borders
-  inner: 'shadow-none', // Replaced with borders
-} as const;
-
-// ============================================================================
-// GLASS MORPHISM (Deprecated - Use solid backgrounds)
-// ============================================================================
-
-export const glass = {
-  // Deprecated: Use solid backgrounds instead
-  opacity: {
-    subtle: {
-      light: 'bg-white',
-      dark: 'dark:bg-[#0d1117]',  // GitHub: canvas-default
-    },
-    light: {
-      light: 'bg-white',
-      dark: 'dark:bg-[#0d1117]',  // GitHub: canvas-default
-    },
-    medium: {
-      light: 'bg-white',
-      dark: 'dark:bg-[#0d1117]',  // GitHub: canvas-default
-    },
-    heavy: {
-      light: 'bg-white',
-      dark: 'dark:bg-[#0d1117]',  // GitHub: canvas-default
-    },
-  },
-
-  // Deprecated: No blur effects
-  blur: {
-    sm: '',
-    md: '',
-    lg: '',
-    xl: '',
-    '2xl': '',
-  },
-
-  // Use subtle borders instead - GitHub themed
-  border: {
-    light: 'border border-gray-200 dark:border-[#30363d]',   // GitHub: border-default
-    medium: 'border border-gray-300 dark:border-[#484f58]',  // GitHub: border-muted
-  },
-} as const;
-
-// ============================================================================
 // TRANSITIONS
 // ============================================================================
 
@@ -379,29 +324,6 @@ export const cn = (...classes: (string | undefined | null | false)[]) => {
  */
 export const getPriorityColor = (priority: 1 | 2 | 3 | 4) => {
   const key = `p${priority}` as keyof typeof colors.priority;
-  return colors.priority[key];
-};
-
-/**
- * Get priority classes by string name (legacy API compatibility)
- * Supports: 'high', 'medium', 'low', 'none' OR 'p1', 'p2', 'p3', 'p4'
- */
-export const priorityClasses = (priority?: string) => {
-  if (!priority) return colors.priority.p4;
-  
-  // Map legacy names to new priority system
-  const priorityMap: Record<string, keyof typeof colors.priority> = {
-    'high': 'p1',
-    'medium': 'p2',
-    'low': 'p3',
-    'none': 'p4',
-    'p1': 'p1',
-    'p2': 'p2',
-    'p3': 'p3',
-    'p4': 'p4',
-  };
-  
-  const key = priorityMap[priority.toLowerCase()] || 'p4';
   return colors.priority[key];
 };
 

@@ -8,7 +8,7 @@ export { default as Input } from "./Input";
 export { default as Textarea } from "./Textarea";
 export { default as Toggle } from "./Toggle";
 export { default as ThemeInitializer } from "./ThemeInitializer";
-export type { ThemeInitializerProps, ThemeMode, ThemeVariant, AccentColor } from "./ThemeInitializer";
+export type { ThemeInitializerProps, ThemeMode } from "./ThemeInitializer";
 export { default as Checkbox } from "./Checkbox";
 export { default as ColorPicker } from "./ColorPicker";
 export { default as EmojiPicker } from "./EmojiPicker";

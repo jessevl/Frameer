@@ -188,7 +188,7 @@ html.dark, body.dark {
 
 /* =============================================================================
    GLASS EFFECTS
-   Reeder/Planneer-inspired macOS glass morphism styles
+   Reeder/Drift-inspired macOS glass morphism styles
    ============================================================================= */
 
 /* Active nav item / selection - macOS-style glass effect */
@@ -1038,7 +1038,7 @@ h3, .h3 {
    SHELL SURFACE
    Shared glass panel styling for floating panels and shell surfaces.
    Border-radius is NOT set here — each app sets it per-component
-   (Planneer: rounded-[22px], Informeer: rounded-[26px]).
+   (Drift: rounded-[22px], Informeer: rounded-[26px]).
    ============================================================================= */
 
 .shell-surface {
