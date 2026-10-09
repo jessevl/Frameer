@@ -84,6 +84,9 @@ const Modal: React.FC<ModalProps> = ({
   if (useFullScreen) {
     return createPortal(
       <div 
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
         className={`fixed inset-0 flex flex-col bg-[var(--color-surface-secondary)] transition-all duration-300 eink-shell-surface-secondary ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
         style={{ 
           paddingTop: 'env(safe-area-inset-top)',
@@ -132,6 +135,9 @@ const Modal: React.FC<ModalProps> = ({
       onClick={onClose}
     >
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
         className={`relative bg-[var(--color-surface-secondary)] rounded-xl w-full ${sizeClasses[size]} mx-4 shadow-2xl shadow-black/20 dark:shadow-black/40 border border-[var(--color-border-subtle)] transform transition-all duration-300 eink-shell-surface-secondary eink-modal-surface-secondary ${mounted ? 'opacity-100 scale-100' : 'opacity-0 scale-[0.95]'}`}
         style={{ transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)' }}
         onClick={(e) => e.stopPropagation()}
