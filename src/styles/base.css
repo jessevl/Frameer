@@ -806,19 +806,22 @@ html.dark, body.dark {
   text-wrap: pretty;
 }
 
-h1, .h1 {
-  letter-spacing: -0.025em;
-  line-height: 1.1;
-}
+/* Heading defaults sit in the base layer, so utilities (`tracking-*`, `leading-*`) on a heading win over them. */
+@layer base {
+  h1, .h1 {
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+  }
 
-h2, .h2 {
-  letter-spacing: -0.02em;
-  line-height: 1.2;
-}
+  h2, .h2 {
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
 
-h3, .h3 {
-  letter-spacing: -0.015em;
-  line-height: 1.3;
+  h3, .h3 {
+    letter-spacing: -0.015em;
+    line-height: 1.3;
+  }
 }
 
 .prose-body {
