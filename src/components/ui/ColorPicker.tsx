@@ -3,10 +3,21 @@
 import React from 'react';
 import { cn } from '@frameer/lib/design-system';
 
+/** A named swatch: a soft fill with a stroke of the same hue. `value` is what `onChange` reports. */
+export interface ColorOption {
+  value: string;
+  label: string;
+  /** Any CSS color, including `var(--token)`. */
+  fill: string;
+  stroke: string;
+}
+
 export interface ColorPickerProps {
   selectedColor: string;
   onChange: (color: string) => void;
   colors?: string[];
+  /** Named swatches (fill and stroke). When set they replace `colors`: round buttons labelled "Color <label>" in a radio group. */
+  options?: ColorOption[];
   className?: string;
 }
 
@@ -44,8 +55,36 @@ const ColorPicker: React.FC<ColorPickerProps> = ({
   selectedColor,
   onChange,
   colors = DEFAULT_COLORS,
+  options,
   className,
 }) => {
+  if (options) {
+    return (
+      <div role="radiogroup" aria-label="Color" className={cn('flex flex-wrap gap-2', className)}>
+        {options.map((option) => {
+          const isSelected = option.value === selectedColor;
+          return (
+            <button
+              key={option.value}
+              type="button"
+              role="radio"
+              aria-checked={isSelected}
+              aria-label={`Color ${option.label}`}
+              title={option.label}
+              onClick={() => onChange(option.value)}
+              className="h-[30px] w-[30px] rounded-full transition-shadow duration-[120ms] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent-primary)]"
+              style={{
+                backgroundColor: option.fill,
+                boxShadow: isSelected
+                  ? `inset 0 0 0 2px ${option.stroke}, 0 0 0 2px var(--color-surface-primary), 0 0 0 4px var(--color-text-primary)`
+                  : `inset 0 0 0 2px ${option.stroke}`,
+              }}
+            />
+          );
+        })}
+      </div>
+    );
+  }
   return (
     <div className={cn('grid grid-cols-9 gap-2', className)}>
       {colors.map((color) => {
