@@ -135,6 +135,7 @@ function usePhoneWidth(): boolean {
   );
 }
 
+// The listbox carries no label of its own: the combobox that controls it has one, and a second label with the same text would make getByLabel ambiguous.
 const MENU_MAX = 320;
 const MARGIN = 8;
 const TYPE_AHEAD_MS = 700;
@@ -305,7 +306,6 @@ const SelectRoot: React.FC<SelectProps> = ({
       ref={menu}
       id={listId}
       role="listbox"
-      aria-label={aria['aria-label']}
       onMouseDown={(e) => e.preventDefault()}
       className="overflow-y-auto overscroll-contain p-1"
       style={phone ? { maxHeight: '60vh' } : { maxHeight: pos?.maxHeight ?? MENU_MAX }}
