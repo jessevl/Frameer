@@ -4,7 +4,7 @@
  * @app SHARED - Can be used anywhere in the app
  */
 import React from 'react';
-import { X, AlertTriangle, RefreshCw } from 'lucide-react';
+import { ChromeIcon } from './ChromeIcons';
 
 interface ErrorBannerProps {
   message: string;
@@ -22,7 +22,7 @@ export const ErrorBanner: React.FC<ErrorBannerProps> = ({
   return (
     <div className="bg-[var(--color-state-error)]/10 border-b border-[var(--color-state-error)]/30 px-4 py-3">
       <div className="flex items-start gap-3 max-w-4xl mx-auto">
-        <AlertTriangle className="w-5 h-5 text-[var(--color-state-error)] flex-shrink-0 mt-0.5" />
+        <ChromeIcon name="alertTriangle" className="w-5 h-5 text-[var(--color-state-error)] flex-shrink-0 mt-0.5" />
         
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-[var(--color-state-error)]">
@@ -43,7 +43,7 @@ export const ErrorBanner: React.FC<ErrorBannerProps> = ({
                        text-[var(--color-state-error)] bg-[var(--color-state-error)]/10
                        hover:bg-[var(--color-state-error)]/20 rounded-md transition-colors"
             >
-              <RefreshCw className="w-3.5 h-3.5" />
+              <ChromeIcon name="refresh" className="w-3.5 h-3.5" />
               Retry
             </button>
           )}
@@ -55,7 +55,7 @@ export const ErrorBanner: React.FC<ErrorBannerProps> = ({
                        rounded transition-colors"
               aria-label="Dismiss error"
             >
-              <X className="w-4 h-4" />
+              <ChromeIcon name="close" className="w-4 h-4" />
             </button>
           )}
         </div>

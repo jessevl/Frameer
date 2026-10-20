@@ -36,7 +36,7 @@
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { X } from 'lucide-react';
+import { ChromeIcon } from './ChromeIcons';
 import { usePrefersReducedMotion } from '@frameer/hooks/useMobileDetection';
 import { IconButton } from '@frameer/components/ui';
 
@@ -335,7 +335,7 @@ const MobileSheet: React.FC<MobileSheetProps> = ({
                 size="sm"
                 aria-label="Close"
               >
-                <X className="w-5 h-5" />
+                <ChromeIcon name="close" className="w-5 h-5" />
               </IconButton>
             )}
           </div>

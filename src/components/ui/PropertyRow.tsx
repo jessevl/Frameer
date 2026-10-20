@@ -11,7 +11,7 @@
  * - Active state highlighting (blue)
  */
 import React from 'react';
-import { ChevronRight } from 'lucide-react';
+import { ChromeIcon } from './ChromeIcons';
 import { cn } from '@frameer/lib/design-system';
 
 export interface PropertyRowProps {
@@ -80,7 +80,7 @@ const PropertyRow: React.FC<PropertyRowProps> = ({
           Empty
         </span>
       )}
-      <ChevronRight className="w-3.5 h-3.5 opacity-20 group-hover:opacity-40 transition-opacity" />
+      <ChromeIcon name="chevronRight" className="w-3.5 h-3.5 opacity-20 group-hover:opacity-40 transition-opacity" />
     </div>
   </button>
 );

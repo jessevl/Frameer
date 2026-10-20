@@ -13,7 +13,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { create } from 'zustand';
 import { XIcon } from '@frameer/components/common/Icons';
-import { CheckCircle, AlertCircle, Info, AlertTriangle, Undo2 } from 'lucide-react';
+import { ChromeIcon, type ChromeIconName } from './ChromeIcons';
 import { useIsMobile } from '@frameer/hooks/useMobileDetection';
 
 // ============================================================================
@@ -148,28 +148,28 @@ export function toastSuccessWithAction(
 
 const typeConfig = {
   success: {
-    icon: CheckCircle,
+    icon: 'checkCircle' as ChromeIconName,
     bgClass: 'bg-[var(--color-success)]/10',
     borderClass: 'border border-[var(--color-success)]/15',
     iconClass: 'text-[var(--color-success)]',
     textClass: 'text-[var(--color-success)]',
   },
   error: {
-    icon: AlertCircle,
+    icon: 'alertCircle' as ChromeIconName,
     bgClass: 'bg-[var(--color-danger)]/10',
     borderClass: 'border border-[var(--color-danger)]/15',
     iconClass: 'text-[var(--color-danger)]',
     textClass: 'text-[var(--color-danger)]',
   },
   warning: {
-    icon: AlertTriangle,
+    icon: 'alertTriangle' as ChromeIconName,
     bgClass: 'bg-[var(--color-warning)]/10',
     borderClass: 'border border-[var(--color-warning)]/15',
     iconClass: 'text-[var(--color-warning)]',
     textClass: 'text-[var(--color-warning)]',
   },
   info: {
-    icon: Info,
+    icon: 'info' as ChromeIconName,
     bgClass: 'bg-[var(--color-accent-muted)]',
     borderClass: 'border border-[var(--color-accent-emphasis)]/15',
     iconClass: 'text-[var(--color-accent-fg)]',
@@ -185,7 +185,6 @@ interface ToastItemComponentProps {
 const ToastItemComponent: React.FC<ToastItemComponentProps> = ({ toast, onRemove }) => {
   const [isExiting, setIsExiting] = useState(false);
   const config = typeConfig[toast.type];
-  const IconComponent = config.icon;
 
   const handleRemove = useCallback(() => {
     setIsExiting(true);
@@ -207,7 +206,7 @@ const ToastItemComponent: React.FC<ToastItemComponentProps> = ({ toast, onRemove
         toast-enter
       `}
     >
-      <IconComponent size={18} className={config.iconClass} strokeWidth={1.75} />
+      <ChromeIcon name={config.icon} size={18} className={config.iconClass} strokeWidth={1.75} />
       
       <span className={`flex-1 text-sm font-medium ${config.textClass}`}>
         {toast.message}
@@ -222,7 +221,7 @@ const ToastItemComponent: React.FC<ToastItemComponentProps> = ({ toast, onRemove
             ${config.textClass}
           `}
         >
-          <Undo2 size={14} />
+          <ChromeIcon name="undo" size={14} />
           Undo
         </button>
       )}

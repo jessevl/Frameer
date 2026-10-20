@@ -6,7 +6,7 @@
  * Tracks navigation position using history.state to know when back/forward is possible.
  */
 import React from 'react';
-import { ChevronLeft } from 'lucide-react';
+import { ChromeIcon } from './ChromeIcons';
 import { cn } from '@frameer/lib/design-system';
 
 const NAV_INDEX_KEY = '__navIndex';
@@ -128,7 +128,7 @@ export const NavigationHistoryButtons: React.FC<NavigationHistoryButtonsProps> =
           !canGoBack && 'opacity-40 pointer-events-none'
         )}
       >
-        <ChevronLeft size={iconSize} strokeWidth={1.75} />
+        <ChromeIcon name="chevronLeft" size={iconSize} strokeWidth={1.75} />
       </button>
     </div>
   );

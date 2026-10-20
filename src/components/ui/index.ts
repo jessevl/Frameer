@@ -15,6 +15,8 @@ export type { ColorOption, ColorPickerProps } from "./ColorPicker";
 export { default as EmojiPicker } from "./EmojiPicker";
 export { default as IconPicker } from "./IconPicker";
 export { default as LucideIcon } from "./LucideIcon";
+export { ChromeIcon, ChromeIconsProvider, useChromeIconStyle } from "./ChromeIcons";
+export type { ChromeIconName, ChromeIconComponent, ChromeIconProps, ChromeIconsConfig, ChromeIconStyle } from "./ChromeIcons";
 
 // Layout Components
 export { default as Card } from "./Card";

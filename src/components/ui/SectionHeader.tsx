@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronDown, ChevronRight, Plus } from 'lucide-react';
+import { ChromeIcon } from './ChromeIcons';
 import { Label } from './Typography';
 
 interface SectionHeaderProps {
@@ -37,9 +37,9 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
       {isCollapsible && (
         <button className="p-0.5 rounded hover:bg-[var(--color-surface-hover)]">
           {isExpanded ? (
-            <ChevronDown className="w-4 h-4 text-[var(--color-text-tertiary)]" />
+            <ChromeIcon name="chevronDown" className="w-4 h-4 text-[var(--color-text-tertiary)]" />
           ) : (
-            <ChevronRight className="w-4 h-4 text-[var(--color-text-tertiary)]" />
+            <ChromeIcon name="chevronRight" className="w-4 h-4 text-[var(--color-text-tertiary)]" />
           )}
         </button>
       )}
@@ -71,7 +71,7 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
           className="ml-auto p-1 rounded-full hover:bg-[var(--color-surface-hover)] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors flex items-center justify-center"
           aria-label={`Add item to ${label}`}
         >
-          <Plus size={14} strokeWidth={2.5} />
+          <ChromeIcon name="plus" size={14} strokeWidth={2.5} />
         </button>
       )}
     </div>

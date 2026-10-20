@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { cn } from '@frameer/lib/design-system';
-import { ChevronRight } from 'lucide-react';
+import { ChromeIcon } from './ChromeIcons';
 import ToggleTile from './ToggleTile';
 
 export interface ContextMenuItem {
@@ -85,7 +85,7 @@ export const ContextMenuContent: React.FC<{
           <span className="flex-1">{item.label}</span>
           {item.shortcut && <span className="flex-shrink-0 font-mono text-[10.5px] text-[var(--color-text-secondary)]">{item.shortcut}</span>}
           {hasSubmenu && (
-            <ChevronRight className={cn("w-3.5 h-3.5 text-[var(--color-text-tertiary)] transition-transform", isExpanded && "rotate-90")} />
+            <ChromeIcon name="chevronRight" className={cn("w-3.5 h-3.5 text-[var(--color-text-tertiary)] transition-transform", isExpanded && "rotate-90")} />
           )}
         </button>
         {/* Submenu children */}

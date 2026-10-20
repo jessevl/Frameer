@@ -13,7 +13,7 @@
  * and consistent iconography.
  */
 import React, { memo } from 'react';
-import { WifiOff, AlertTriangle, Info, AlertCircle } from 'lucide-react';
+import { ChromeIcon, type ChromeIconName } from './ChromeIcons';
 
 export type StatusBannerVariant = 'offline' | 'warning' | 'info' | 'error';
 
@@ -35,7 +35,7 @@ interface StatusBannerProps {
 
 const variantConfig = {
   offline: {
-    icon: WifiOff,
+    icon: 'wifiOff' as ChromeIconName,
     containerClass: 'bg-[var(--color-surface-tertiary)]/80 border-[var(--color-border-default)]',
     iconClass: 'text-[var(--color-text-tertiary)]',
     titleClass: 'text-[var(--color-text-secondary)]',
@@ -43,7 +43,7 @@ const variantConfig = {
     actionClass: 'text-[var(--color-text-secondary)] bg-[var(--color-surface-hover)] hover:bg-[var(--color-surface-hover)]/80',
   },
   warning: {
-    icon: AlertTriangle,
+    icon: 'alertTriangle' as ChromeIconName,
     containerClass: 'bg-[var(--color-state-warning)]/10 border-[var(--color-state-warning)]/30',
     iconClass: 'text-[var(--color-state-warning)]',
     titleClass: 'text-[var(--color-state-warning)]',
@@ -51,7 +51,7 @@ const variantConfig = {
     actionClass: 'text-[var(--color-state-warning)] bg-[var(--color-state-warning)]/10 hover:bg-[var(--color-state-warning)]/20',
   },
   info: {
-    icon: Info,
+    icon: 'info' as ChromeIconName,
     containerClass: 'bg-[var(--color-accent-muted)] border-[var(--color-accent-emphasis)]/30',
     iconClass: 'text-[var(--color-accent-fg)]',
     titleClass: 'text-[var(--color-accent-fg)]',
@@ -59,7 +59,7 @@ const variantConfig = {
     actionClass: 'text-[var(--color-accent-fg)] bg-[var(--color-accent-muted)] hover:bg-[var(--color-accent-emphasis)]/20',
   },
   error: {
-    icon: AlertCircle,
+    icon: 'alertCircle' as ChromeIconName,
     containerClass: 'bg-[var(--color-state-error)]/10 border-[var(--color-state-error)]/30',
     iconClass: 'text-[var(--color-state-error)]',
     titleClass: 'text-[var(--color-state-error)]',
@@ -96,7 +96,6 @@ export const StatusBanner = memo<StatusBannerProps>(function StatusBanner({
   className = '',
 }) {
   const config = variantConfig[variant];
-  const Icon = config.icon;
 
   return (
     <div 
@@ -104,7 +103,7 @@ export const StatusBanner = memo<StatusBannerProps>(function StatusBanner({
       role="status"
       aria-live="polite"
     >
-      <Icon className={`w-5 h-5 flex-shrink-0 mt-0.5 ${config.iconClass}`} />
+      <ChromeIcon name={config.icon} className={`w-5 h-5 flex-shrink-0 mt-0.5 ${config.iconClass}`} />
       
       <div className="flex-1 min-w-0">
         <p className={`text-sm font-medium ${config.titleClass}`}>

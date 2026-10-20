@@ -15,7 +15,7 @@
  * - RecentPagesGallery (home page)
  */
 import React, { useRef } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChromeIcon } from './ChromeIcons';
 import { cn } from '@frameer/lib/design-system';
 import { useHorizontalScrollArrows } from '@frameer/hooks/useHorizontalScrollArrows';
 
@@ -89,7 +89,7 @@ const HorizontalScrollContainer: React.FC<HorizontalScrollContainerProps> = ({
           )}
           aria-label="Scroll left"
         >
-          <ChevronLeft className={iconClasses} />
+          <ChromeIcon name="chevronLeft" className={iconClasses} />
         </button>
       )}
 
@@ -112,7 +112,7 @@ const HorizontalScrollContainer: React.FC<HorizontalScrollContainerProps> = ({
           )}
           aria-label="Scroll right"
         >
-          <ChevronRight className={iconClasses} />
+          <ChromeIcon name="chevronRight" className={iconClasses} />
         </button>
       )}
     </div>

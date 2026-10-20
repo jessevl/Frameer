@@ -15,6 +15,7 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { cn } from '@frameer/lib/design-system';
 import * as LucideIcons from 'lucide-react';
+import { ChromeIcon, chromeClass, useChromeIconStyle } from './ChromeIcons';
 
 export interface IconPickerProps {
   selectedIcon: string | null;
@@ -37,7 +38,7 @@ export interface IconPickerProps {
 }
 
 // Type for Lucide icon components
-type IconComponent = React.FC<{ className?: string; style?: React.CSSProperties }>;
+type IconComponent = React.FC<{ className?: string; style?: React.CSSProperties; strokeWidth?: number }>;
 
 // Expanded curated icon set - ~250 icons
 const ICON_CATEGORIES: Record<string, string[]> = {
@@ -161,6 +162,7 @@ const IconPicker: React.FC<IconPickerProps> = ({
   searchPlaceholder = 'Search icons...',
   initialQuery = '',
 }) => {
+  const iconStyle = useChromeIconStyle();
   const [activeCategory, setActiveCategory] = useState<string>('Popular');
   const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [justSelectedIcon, setJustSelectedIcon] = useState<string | null>(null);
@@ -197,14 +199,12 @@ const IconPicker: React.FC<IconPickerProps> = ({
   };
 
   const iconColor = previewColor || '#6b7280';
-  const ClearIcon = LucideIcons.X;
-  const SearchIcon = LucideIcons.Search;
 
   return (
     <div className={cn('flex flex-col', className)}>
       {/* Search bar */}
       <div className={cn("relative", compact ? "mb-1" : "mb-3")}>
-        <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-tertiary)] pointer-events-none" />
+        <ChromeIcon name="search" className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-tertiary)] pointer-events-none" />
         <input
           ref={searchRef}
           type="text"
@@ -253,7 +253,7 @@ const IconPicker: React.FC<IconPickerProps> = ({
           onClick={() => onChange(null)}
           className="flex items-center gap-2 mb-3 px-3 py-1.5 text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-danger)] hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all group"
         >
-          <ClearIcon className="w-4 h-4" />
+          <ChromeIcon name="close" className="w-4 h-4" />
           <span>Remove icon (use color only)</span>
         </button>
       )}
@@ -291,7 +291,8 @@ const IconPicker: React.FC<IconPickerProps> = ({
               title={iconName.replace(/([A-Z])/g, ' $1').trim()}
             >
               <IconComp 
-                className={cn(roomy ? 'w-5 h-5' : 'w-[18px] h-[18px]', wasJustSelected && 'icon-bounce')}
+                className={chromeClass(iconStyle, cn(roomy ? 'w-5 h-5' : 'w-[18px] h-[18px]', wasJustSelected && 'icon-bounce'))}
+                strokeWidth={iconStyle.strokeWidth}
                 style={{ color: isSelected ? previewColor || '#3b82f6' : iconColor }}
               />
             </button>
@@ -306,7 +307,7 @@ const IconPicker: React.FC<IconPickerProps> = ({
             className="aspect-square flex items-center justify-center rounded-lg transition-all hover:bg-red-100 dark:hover:bg-red-900/30 group"
             title="Remove icon"
           >
-            <ClearIcon className="w-[18px] h-[18px] text-[var(--color-text-tertiary)] group-hover:text-[var(--color-state-error,#ef4444)]" />
+            <ChromeIcon name="close" className="w-[18px] h-[18px] text-[var(--color-text-tertiary)] group-hover:text-[var(--color-state-error,#ef4444)]" />
           </button>
         )}
       </div>
@@ -314,7 +315,7 @@ const IconPicker: React.FC<IconPickerProps> = ({
       {/* Empty state */}
       {filteredIcons.length === 0 && (
         <div className="flex flex-col items-center justify-center py-8 text-[var(--color-text-tertiary)]">
-          <LucideIcons.SearchX className="w-8 h-8 mb-2 opacity-50" />
+          <ChromeIcon name="searchEmpty" className="w-8 h-8 mb-2 opacity-50" />
           <span className="text-sm">No icons match &ldquo;{searchQuery}&rdquo;</span>
         </div>
       )}

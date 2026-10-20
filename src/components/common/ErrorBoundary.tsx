@@ -7,7 +7,7 @@
  * a fallback UI instead of crashing the whole app.
  */
 import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { AlertTriangle, RefreshCw, Home, Bug } from 'lucide-react';
+import { ChromeIcon } from '../ui/ChromeIcons';
 import { logError, toErrorInfo, ErrorInfo as ErrorInfoType } from '@frameer/lib/errors';
 
 interface ErrorBoundaryProps {
@@ -103,7 +103,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
           {/* Icon */}
           <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-red-100 dark:bg-red-900/30 
                         flex items-center justify-center">
-            <AlertTriangle className="w-8 h-8 text-red-500 dark:text-red-400" />
+            <ChromeIcon name="alertTriangle" className="w-8 h-8 text-red-500 dark:text-red-400" />
           </div>
 
           {/* Title */}
@@ -121,7 +121,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             <details className="mb-6 text-left">
               <summary className="cursor-pointer text-sm text-[var(--color-text-secondary)]
                                 flex items-center gap-2 justify-center hover:text-[var(--color-text-primary)]">
-                <Bug className="w-4 h-4" />
+                <ChromeIcon name="bug" className="w-4 h-4" />
                 Error details
               </summary>
               <pre className="mt-2 p-3 bg-[var(--color-surface-secondary)] rounded-md 
@@ -141,7 +141,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
                          bg-[var(--color-interactive-bg-strong)] text-white rounded-md hover:brightness-110
                          transition-colors font-medium"
               >
-                <RefreshCw className="w-4 h-4" />
+                <ChromeIcon name="refresh" className="w-4 h-4" />
                 Try Again
               </button>
               
@@ -152,7 +152,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
                          rounded-md hover:bg-[var(--color-surface-tertiary)]
                          transition-colors font-medium"
               >
-                <Home className="w-4 h-4" />
+                <ChromeIcon name="home" className="w-4 h-4" />
                 Go Home
               </button>
             </div>

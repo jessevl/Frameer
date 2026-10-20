@@ -8,7 +8,7 @@
 
 import React, { useState } from 'react';
 import { cn } from '@frameer/lib/design-system';
-import { Loader2, Check, AlertCircle, ChevronDown } from 'lucide-react';
+import { ChromeIcon } from './ChromeIcons';
 
 export const sliderClass = [
   'settings-slider h-2 w-full cursor-pointer appearance-none rounded-full border border-[var(--color-border-default)] bg-[var(--color-surface-tertiary)]',
@@ -188,7 +188,7 @@ export const SettingsStatusMessage: React.FC<{
         : 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-300',
     )}
   >
-    {type === 'error' ? <AlertCircle size={14} /> : <Check size={14} />}
+    {type === 'error' ? <ChromeIcon name="alertCircle" size={14} /> : <ChromeIcon name="check" size={14} />}
     {message}
   </div>
 );
@@ -214,7 +214,8 @@ export const SettingsCollapsible: React.FC<{
             <p className="mt-0.5 text-xs text-[var(--color-text-tertiary)]">{description}</p>
           )}
         </div>
-        <ChevronDown
+        <ChromeIcon
+          name="chevronDown"
           size={16}
           className={cn(
             'text-[var(--color-text-tertiary)] transition-transform',
@@ -247,7 +248,7 @@ export const SettingsSaveButton: React.FC<{
       'disabled:cursor-not-allowed disabled:opacity-50',
     )}
   >
-    {saving ? <Loader2 size={14} className="animate-spin" /> : success ? <Check size={14} /> : null}
+    {saving ? <ChromeIcon name="loader" size={14} className="animate-spin" /> : success ? <ChromeIcon name="check" size={14} /> : null}
     {saving ? 'Saving…' : success ? 'Saved!' : label}
   </button>
 );
@@ -275,7 +276,7 @@ export const SettingsActionButton: React.FC<{
       className,
     )}
   >
-    {loading ? (loadingIcon || <Loader2 size={14} className="animate-spin" />) : icon}
+    {loading ? (loadingIcon || <ChromeIcon name="loader" size={14} className="animate-spin" />) : icon}
     {label}
   </button>
 );

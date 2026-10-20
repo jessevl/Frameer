@@ -23,6 +23,7 @@ import React from 'react';
 import { cn } from '@frameer/lib/design-system';
 import { ICON_STROKE_WIDTH, ICON_SIZE_CLASSES, type IconSize } from '@frameer/lib/iconUtils';
 import type { LucideIcon, LucideProps } from 'lucide-react';
+import { chromeClass, useChromeIconStyle } from './ChromeIcons';
 
 export interface IconProps extends Omit<LucideProps, 'size'> {
   /** The Lucide icon component to render */
@@ -48,10 +49,11 @@ export const Icon: React.FC<IconProps> = ({
   strokeWidth = ICON_STROKE_WIDTH,
   ...props
 }) => {
+  const iconStyle = useChromeIconStyle();
   return (
     <IconComponent
-      className={cn(ICON_SIZE_CLASSES[size], className)}
-      strokeWidth={strokeWidth}
+      className={chromeClass(iconStyle, cn(ICON_SIZE_CLASSES[size], className))}
+      strokeWidth={iconStyle.strokeWidth ?? strokeWidth}
       {...props}
     />
   );
