@@ -26,6 +26,14 @@ export interface IconPickerProps {
   previewColor?: string;
   /** Compact mode for use in tight spaces like dropdown menus */
   compact?: boolean;
+  /** Columns of the icon grid (default 8 compact, 10 otherwise). */
+  columns?: number;
+  /** Taller cells (42px) and 20px icons, for a picker that is the main content of a popover. */
+  roomy?: boolean;
+  /** Placeholder of the search field. */
+  searchPlaceholder?: string;
+  /** Text typed into the search field when it opens. */
+  initialQuery?: string;
 }
 
 // Type for Lucide icon components
@@ -33,6 +41,10 @@ type IconComponent = React.FC<{ className?: string; style?: React.CSSProperties 
 
 // Expanded curated icon set - ~250 icons
 const ICON_CATEGORIES: Record<string, string[]> = {
+  'Money': [
+    'Wallet', 'Coins', 'PiggyBank', 'Receipt', 'BarChart3', 'Calculator', 'CreditCard', 'Banknote',
+    'DollarSign', 'Euro', 'PoundSterling', 'Landmark', 'HandCoins', 'BadgeDollarSign', 'TrendingUp', 'Percent',
+  ],
   'Popular': [
     'Star', 'Heart', 'Bookmark', 'Flag', 'Zap', 'Flame', 'Sparkles', 'Crown',
     'Target', 'Gem', 'Award', 'Trophy', 'Medal', 'CircleDot', 'Asterisk', 'Hash',
@@ -83,7 +95,7 @@ const ICON_CATEGORIES: Record<string, string[]> = {
   'Home & Life': [
     'Home', 'House', 'Building2', 'Castle', 'Church', 'School', 'Hospital',
     'DoorOpen', 'DoorClosed', 'Key', 'KeyRound', 'Lock', 'LockOpen', 'Unlock',
-    'Sofa', 'Armchair', 'Bed', 'Bath', 'Shower', 'Lamp', 'LampDesk', 'Fan',
+    'Hammer', 'Ruler', 'PaintBucket', 'Wrench', 'Sofa', 'Armchair', 'Bed', 'Bath', 'Shower', 'Lamp', 'LampDesk', 'Fan',
     'Utensils', 'ChefHat', 'CookingPot', 'Refrigerator', 'Microwave', 'Coffee',
     'Wine', 'Beer', 'Martini', 'GlassWater', 'Cup', 'Milk', 'IceCream2',
     'Shirt', 'Baby', 'Accessibility', 'PersonStanding', 'Users', 'UserCircle',
@@ -144,9 +156,13 @@ const IconPicker: React.FC<IconPickerProps> = ({
   allowClear = true,
   previewColor,
   compact = false,
+  columns,
+  roomy = false,
+  searchPlaceholder = 'Search icons...',
+  initialQuery = '',
 }) => {
   const [activeCategory, setActiveCategory] = useState<string>('Popular');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [justSelectedIcon, setJustSelectedIcon] = useState<string | null>(null);
   const searchRef = useRef<HTMLInputElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
@@ -161,10 +177,10 @@ const IconPicker: React.FC<IconPickerProps> = ({
     
     // Search across all categories
     const query = searchQuery.toLowerCase();
+    // A word that names a category ("money") lists that category first, then the icons whose name matches.
+    const named = Object.entries(ICON_CATEGORIES).filter(([category]) => category.toLowerCase().includes(query)).flatMap(([, icons]) => icons);
     const allIcons = [...new Set(Object.values(ICON_CATEGORIES).flat())];
-    return allIcons.filter(name => 
-      name.toLowerCase().includes(query)
-    );
+    return [...new Set([...named, ...allIcons.filter(name => name.toLowerCase().includes(query))])];
   }, [activeCategory, searchQuery]);
 
   // Auto-focus search on mount
@@ -192,7 +208,7 @@ const IconPicker: React.FC<IconPickerProps> = ({
         <input
           ref={searchRef}
           type="text"
-          placeholder="Search icons..."
+          placeholder={searchPlaceholder}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className={cn(
@@ -247,8 +263,10 @@ const IconPicker: React.FC<IconPickerProps> = ({
         ref={gridRef}
         className={cn(
           "grid gap-0.5 overflow-y-auto p-1 bg-[var(--color-surface-inset)] rounded-xl",
-          compact ? "grid-cols-8 max-h-[160px]" : "grid-cols-10 max-h-[240px]"
+          columns === undefined && (compact ? "grid-cols-8 max-h-[160px]" : "grid-cols-10 max-h-[240px]"),
+          columns !== undefined && (roomy ? "max-h-[260px]" : "max-h-[200px]")
         )}
+        style={columns !== undefined ? { gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` } : undefined}
       >
         {filteredIcons.map((iconName) => {
           const IconComp = getIconComponent(iconName);
@@ -263,7 +281,7 @@ const IconPicker: React.FC<IconPickerProps> = ({
               type="button"
               onClick={() => handleIconSelect(iconName)}
               className={cn(
-                'aspect-square flex items-center justify-center rounded-lg transition-all',
+                roomy ? 'h-[42px] flex items-center justify-center rounded-[10px] transition-all' : 'aspect-square flex items-center justify-center rounded-lg transition-all',
                 isSelected
                   ? 'bg-[var(--color-interactive-bg)] ring-2 ring-[var(--color-interactive-ring)] ring-inset scale-110 z-10'
                   : 'hover:bg-[var(--color-surface-secondary)] hover:scale-105'
@@ -273,7 +291,7 @@ const IconPicker: React.FC<IconPickerProps> = ({
               title={iconName.replace(/([A-Z])/g, ' $1').trim()}
             >
               <IconComp 
-                className={cn('w-[18px] h-[18px]', wasJustSelected && 'icon-bounce')}
+                className={cn(roomy ? 'w-5 h-5' : 'w-[18px] h-[18px]', wasJustSelected && 'icon-bounce')}
                 style={{ color: isSelected ? previewColor || '#3b82f6' : iconColor }}
               />
             </button>
