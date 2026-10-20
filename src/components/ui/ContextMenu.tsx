@@ -16,6 +16,10 @@ export interface ContextMenuItem {
   toggled?: boolean;
   /** Submenu items — renders as an expandable section */
   children?: ContextMenuItem[];
+  /** Right-aligned quiet shortcut text, in the mono face (e.g. "F2"). */
+  shortcut?: string;
+  /** Drawn in the row of quick icon actions at the top (icon over a small label) instead of the list. */
+  quick?: boolean;
 }
 
 interface ContextMenuProps {
@@ -42,8 +46,9 @@ export const ContextMenuContent: React.FC<{
   const [expandedSubmenu, setExpandedSubmenu] = useState<string | null>(null);
 
   // Separate toggle items from regular items for 2-column layout
-  const toggleItems = items.filter(i => i.toggled !== undefined);
-  const regularItems = items.filter(i => i.toggled === undefined);
+  const toggleItems = items.filter(i => i.toggled !== undefined && !i.quick);
+  const quickItems = items.filter(i => i.quick);
+  const regularItems = items.filter(i => i.toggled === undefined && !i.quick);
 
   const renderRegularItem = (item: ContextMenuItem, index: number, arr: ContextMenuItem[]) => {
     const hasSubmenu = item.children && item.children.length > 0;
@@ -78,6 +83,7 @@ export const ContextMenuContent: React.FC<{
             <span className={cn("flex-shrink-0 flex items-center justify-center", touchFriendly ? "w-5 h-5" : "w-4 h-4")}>{item.icon}</span>
           )}
           <span className="flex-1">{item.label}</span>
+          {item.shortcut && <span className="flex-shrink-0 font-mono text-[10.5px] text-[var(--color-text-secondary)]">{item.shortcut}</span>}
           {hasSubmenu && (
             <ChevronRight className={cn("w-3.5 h-3.5 text-[var(--color-text-tertiary)] transition-transform", isExpanded && "rotate-90")} />
           )}
@@ -115,6 +121,32 @@ export const ContextMenuContent: React.FC<{
 
   return (
     <div className={cn("flex flex-col overflow-y-auto max-h-[inherit]", className)}>
+      {/* Quick actions: one row of icons with small labels, above the list */}
+      {quickItems.length > 0 && (
+        <div
+          role="group"
+          className="mb-1 grid gap-0.5 border-b border-[var(--color-border-default)] pb-1"
+          style={{ gridTemplateColumns: `repeat(${quickItems.length}, minmax(0, 1fr))` }}
+        >
+          {quickItems.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => onItemClick?.(item)}
+              disabled={item.disabled}
+              className={cn(
+                'flex flex-col items-center gap-1 rounded-[10px] px-1 py-1.5 text-[10.5px] font-medium transition-colors',
+                item.disabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[var(--color-surface-hover)]',
+                item.variant === 'danger' ? 'text-[var(--color-state-error)]' : 'text-[var(--color-text-primary)]'
+              )}
+            >
+              {item.icon && <span className="flex h-4 w-4 items-center justify-center">{item.icon}</span>}
+              <span className="max-w-full truncate">{item.label}</span>
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Toggle tiles in 2-column grid */}
       {toggleItems.length > 0 && (
         <>

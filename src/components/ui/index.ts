@@ -11,6 +11,7 @@ export { default as ThemeInitializer } from "./ThemeInitializer";
 export type { ThemeInitializerProps, ThemeMode } from "./ThemeInitializer";
 export { default as Checkbox } from "./Checkbox";
 export { default as ColorPicker } from "./ColorPicker";
+export type { ColorOption, ColorPickerProps } from "./ColorPicker";
 export { default as EmojiPicker } from "./EmojiPicker";
 export { default as IconPicker } from "./IconPicker";
 export { default as LucideIcon } from "./LucideIcon";
