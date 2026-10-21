@@ -9,11 +9,12 @@
  * Used in conjunction with IconPicker for displaying selected icons.
  * 
  * Standard stroke width (1.75) is applied for visual consistency.
+ * The Lucide catalogue loads on demand (lib/lucideCatalogue.ts), so the icon appears a moment after first use.
  */
 import React from 'react';
-import * as LucideIcons from 'lucide-react';
 import { chromeClass, useChromeIconStyle } from './ChromeIcons';
 import { ICON_STROKE_WIDTH } from '@frameer/lib/iconUtils';
+import { lucideIconByName, useLucideCatalogue } from '@frameer/lib/lucideCatalogue';
 
 export interface LucideIconProps {
   /** The name of the Lucide icon (e.g., 'Star', 'Heart', 'Folder') */
@@ -43,9 +44,15 @@ const LucideIcon: React.FC<LucideIconProps> = ({
   strokeWidth = ICON_STROKE_WIDTH,
 }) => {
   const iconStyle = useChromeIconStyle();
-   
-  const IconComponent = (LucideIcons as any)[name];
-  
+  const catalogue = useLucideCatalogue();
+
+  // Until the catalogue is in, an empty svg of the same size holds the place, so nothing shifts when the drawing arrives.
+  if (!catalogue) {
+    return <svg className={chromeClass(iconStyle, className)} style={style} width={size} height={size} viewBox="0 0 24 24" aria-hidden="true" />;
+  }
+
+  const IconComponent = lucideIconByName(catalogue, name);
+
   if (!IconComponent) {
     // Fallback to a default icon or null
     return null;

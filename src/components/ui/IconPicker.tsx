@@ -14,8 +14,8 @@
  */
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { cn } from '@frameer/lib/design-system';
-import * as LucideIcons from 'lucide-react';
 import { ChromeIcon, chromeClass, useChromeIconStyle } from './ChromeIcons';
+import { lucideIconByName, useLucideCatalogue } from '@frameer/lib/lucideCatalogue';
 
 export interface IconPickerProps {
   selectedIcon: string | null;
@@ -36,9 +36,6 @@ export interface IconPickerProps {
   /** Text typed into the search field when it opens. */
   initialQuery?: string;
 }
-
-// Type for Lucide icon components
-type IconComponent = React.FC<{ className?: string; style?: React.CSSProperties; strokeWidth?: number }>;
 
 // Expanded curated icon set - ~250 icons
 const ICON_CATEGORIES: Record<string, string[]> = {
@@ -140,13 +137,6 @@ const ICON_CATEGORIES: Record<string, string[]> = {
   ],
 };
 
-// Get icon component by name
-const getIconComponent = (name: string): IconComponent | null => {
-   
-  const icon = (LucideIcons as any)[name];
-  return icon || null;
-};
-
 /**
  * IconPicker - Modern icon selection component with Lucide icons
  */
@@ -163,6 +153,8 @@ const IconPicker: React.FC<IconPickerProps> = ({
   initialQuery = '',
 }) => {
   const iconStyle = useChromeIconStyle();
+  // The drawings come from the lazily loaded catalogue; each cell holds its place with an empty svg until then.
+  const catalogue = useLucideCatalogue();
   const [activeCategory, setActiveCategory] = useState<string>('Popular');
   const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [justSelectedIcon, setJustSelectedIcon] = useState<string | null>(null);
@@ -269,8 +261,8 @@ const IconPicker: React.FC<IconPickerProps> = ({
         style={columns !== undefined ? { gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` } : undefined}
       >
         {filteredIcons.map((iconName) => {
-          const IconComp = getIconComponent(iconName);
-          if (!IconComp) return null;
+          const IconComp = lucideIconByName(catalogue, iconName);
+          if (catalogue && !IconComp) return null;
           
           const isSelected = iconName === selectedIcon;
           const wasJustSelected = isSelected && justSelectedIcon === iconName;
@@ -290,11 +282,15 @@ const IconPicker: React.FC<IconPickerProps> = ({
               aria-pressed={isSelected}
               title={iconName.replace(/([A-Z])/g, ' $1').trim()}
             >
-              <IconComp 
-                className={chromeClass(iconStyle, cn(roomy ? 'w-5 h-5' : 'w-[18px] h-[18px]', wasJustSelected && 'icon-bounce'))}
-                strokeWidth={iconStyle.strokeWidth}
-                style={{ color: isSelected ? previewColor || '#3b82f6' : iconColor }}
-              />
+              {IconComp ? (
+                <IconComp
+                  className={chromeClass(iconStyle, cn(roomy ? 'w-5 h-5' : 'w-[18px] h-[18px]', wasJustSelected && 'icon-bounce'))}
+                  strokeWidth={iconStyle.strokeWidth}
+                  style={{ color: isSelected ? previewColor || '#3b82f6' : iconColor }}
+                />
+              ) : (
+                <svg className={roomy ? 'w-5 h-5' : 'w-[18px] h-[18px]'} viewBox="0 0 24 24" aria-hidden="true" />
+              )}
             </button>
           );
         })}

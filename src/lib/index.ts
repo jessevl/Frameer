@@ -5,3 +5,4 @@ export * from "./haptics";
 export * from "./errors";
 export * from "./config";
 export * from "./iconUtils";
+export * from "./lucideCatalogue";
