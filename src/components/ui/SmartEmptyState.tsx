@@ -7,18 +7,7 @@
 import React from 'react';
 import { cn } from '@frameer/lib/design-system';
 import Button from './Button';
-import { 
-  Inbox, 
-  CalendarDays, 
-  CalendarRange, 
-  CheckCircle2, 
-  FileText, 
-  Folder, 
-  Pencil,
-  Sparkles,
-  ListTodo,
-  Plus,
-} from 'lucide-react';
+import { ChromeIcon } from './ChromeIcons';
 
 interface SmartEmptyStateProps {
   type: 'inbox' | 'today' | 'upcoming' | 'all' | 'completed' | 'tasks' | 'pages' | 'collection' | 'search' | 'custom';
@@ -40,52 +29,52 @@ interface SmartEmptyStateProps {
 
 const emptyStateConfig = {
   inbox: {
-    icon: <Inbox className="w-16 h-16" />,
+    icon: <ChromeIcon name="inbox" className="w-16 h-16" />,
     title: 'Inbox Zero! 🎉',
     description: 'All caught up. Capture tasks here quickly, then organize them later.',
   },
   today: {
-    icon: <CalendarDays className="w-16 h-16" />,
+    icon: <ChromeIcon name="calendarDays" className="w-16 h-16" />,
     title: 'Nothing due today',
     description: "You're all clear! Schedule tasks or focus on your long-term goals.",
   },
   upcoming: {
-    icon: <CalendarRange className="w-16 h-16" />,
+    icon: <ChromeIcon name="calendarRange" className="w-16 h-16" />,
     title: 'No scheduled tasks',
     description: 'Add due dates to your tasks to see them here and stay organized.',
   },
   all: {
-    icon: <ListTodo className="w-16 h-16" />,
+    icon: <ChromeIcon name="listTodo" className="w-16 h-16" />,
     title: 'No tasks yet',
     description: 'Create your first task to get started with organizing your work.',
   },
   completed: {
-    icon: <CheckCircle2 className="w-16 h-16" />,
+    icon: <ChromeIcon name="checkCircle" className="w-16 h-16" />,
     title: 'No completed tasks yet',
     description: 'Check off some tasks to see them here. You got this!',
   },
   tasks: {
-    icon: <ListTodo className="w-16 h-16" />,
+    icon: <ChromeIcon name="listTodo" className="w-16 h-16" />,
     title: 'No tasks in this collection',
     description: 'Add tasks to organize work within this task collection.',
   },
   pages: {
-    icon: <FileText className="w-16 h-16" />,
+    icon: <ChromeIcon name="fileText" className="w-16 h-16" />,
     title: 'No pages yet',
     description: 'Create your first note, collection, or whiteboard to get started.',
   },
   collection: {
-    icon: <Folder className="w-16 h-16" />,
+    icon: <ChromeIcon name="folder" className="w-16 h-16" />,
     title: 'This collection is empty',
     description: 'Add notes, collections, or whiteboards here to organize your content.',
   },
   search: {
-    icon: <Sparkles className="w-16 h-16" />,
+    icon: <ChromeIcon name="sparkles" className="w-16 h-16" />,
     title: 'No results found',
     description: 'Try different search terms or use the command palette to create new items.',
   },
   custom: {
-    icon: <Pencil className="w-16 h-16" />,
+    icon: <ChromeIcon name="pencil" className="w-16 h-16" />,
     title: 'Nothing here yet',
     description: 'Get started by creating something new.',
   },
@@ -142,7 +131,7 @@ export const SmartEmptyState: React.FC<SmartEmptyStateProps> = ({
               onClick={onAction}
               className="gap-2"
             >
-              <Plus size={16} />
+              <ChromeIcon name="plus" size={16} />
               {actionLabel}
             </Button>
           )}

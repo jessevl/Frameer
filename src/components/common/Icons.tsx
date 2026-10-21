@@ -14,15 +14,12 @@
  * - Priority: FlagIcon and priority-related icons
  * 
  * All icons accept a `className` prop for styling with Tailwind.
+ * The ones a chrome icon exists for (home, inbox, chevrons, close, plus, check, search) are drawn through `ChromeIcon`, so an app's `ChromeIconsProvider` swaps them for its own set; the rest are plain SVGs.
  */
 import React from 'react';
+import { ChromeIcon } from '../ui/ChromeIcons';
 
-export const HomeIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-    <polyline points="9 22 9 12 15 12 15 22" />
-  </svg>
-);
+export const HomeIcon: React.FC<{ className?: string }> = ({ className }) => <ChromeIcon name="home" className={className} />;
 
 export const SettingsIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -50,11 +47,7 @@ export const AllTasksIcon: React.FC<{ className?: string }> = ({ className }) =>
   </svg>
 );
 
-export const InboxIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-  </svg>
-);
+export const InboxIcon: React.FC<{ className?: string }> = ({ className }) => <ChromeIcon name="inbox" className={className} />;
 
 export const TodayIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -74,35 +67,15 @@ export const CompletedIcon: React.FC<{ className?: string }> = ({ className }) =
   </svg>
 );
 
-export const ChevronRightIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="M9 5l7 7-7 7" />
-  </svg>
-);
+export const ChevronRightIcon: React.FC<{ className?: string }> = ({ className }) => <ChromeIcon name="chevronRight" className={className} />;
 
-export const ChevronLeftIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="M15 5l-7 7 7 7" />
-  </svg>
-);
+export const ChevronLeftIcon: React.FC<{ className?: string }> = ({ className }) => <ChromeIcon name="chevronLeft" className={className} />;
 
-export const ChevronDownIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="M6 9l6 6 6-6" />
-  </svg>
-);
+export const ChevronDownIcon: React.FC<{ className?: string }> = ({ className }) => <ChromeIcon name="chevronDown" className={className} />;
 
-export const XIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="M18 6L6 18M6 6l12 12" />
-  </svg>
-);
+export const XIcon: React.FC<{ className?: string }> = ({ className }) => <ChromeIcon name="close" className={className} />;
 
-export const PlusIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="M12 4v16m8-8H4" />
-  </svg>
-);
+export const PlusIcon: React.FC<{ className?: string }> = ({ className }) => <ChromeIcon name="plus" className={className} />;
 
 export const CalendarIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -141,11 +114,7 @@ export const FlagIcon: React.FC<{ className?: string }> = ({ className }) => (
   </svg>
 );
 
-export const CloseIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="M6 18L18 6M6 6l12 12" />
-  </svg>
-);
+export const CloseIcon: React.FC<{ className?: string }> = ({ className }) => <ChromeIcon name="close" className={className} />;
 
 export const ClockIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -154,11 +123,7 @@ export const ClockIcon: React.FC<{ className?: string }> = ({ className }) => (
   </svg>
 );
 
-export const CheckIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="M5 13l4 4L19 7" />
-  </svg>
-);
+export const CheckIcon: React.FC<{ className?: string }> = ({ className }) => <ChromeIcon name="check" className={className} />;
 
 export const ListViewIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -260,12 +225,7 @@ export const ArrowLeftIcon: React.FC<{ className?: string }> = ({ className }) =
   </svg>
 );
 
-export const SearchIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <circle cx="11" cy="11" r="8" />
-    <path d="M21 21l-4.35-4.35" />
-  </svg>
-);
+export const SearchIcon: React.FC<{ className?: string }> = ({ className }) => <ChromeIcon name="search" className={className} />;
 
 // Collection icon - stacked pages style (for pages and cards)
 export const CollectionIcon: React.FC<{ className?: string }> = ({ className }) => (
