@@ -61,6 +61,8 @@ export interface LongPressResult {
   isLongPressing: boolean;
   /** Whether the timer is active (press started, not yet triggered) */
   isPressing: boolean;
+  /** True once after a long press fired, so the click that follows the lift can be ignored (it outlives the gesture's reset). */
+  consumeLongPress: () => boolean;
 }
 
 // ============================================================================
@@ -90,6 +92,7 @@ export function useLongPress(options: LongPressOptions): LongPressResult {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const startPos = useRef<{ x: number; y: number } | null>(null);
   const longPressTriggered = useRef(false);
+  const firedRef = useRef(false);
   const eventRef = useRef<React.TouchEvent | React.MouseEvent | null>(null);
   
   const [isPressing, setIsPressing] = useState(false);
@@ -117,14 +120,17 @@ export function useLongPress(options: LongPressOptions): LongPressResult {
     }
     
     const touch = e.touches[0];
+    if (!touch) return;
     startPos.current = { x: touch.clientX, y: touch.clientY };
     longPressTriggered.current = false;
+    firedRef.current = false;
     eventRef.current = e;
     
     setIsPressing(true);
     
     timerRef.current = setTimeout(() => {
       longPressTriggered.current = true;
+      firedRef.current = true;
       setIsLongPressing(true);
       
       // Trigger haptic feedback
@@ -142,6 +148,7 @@ export function useLongPress(options: LongPressOptions): LongPressResult {
     if (!isPressing || !startPos.current) return;
     
     const touch = e.touches[0];
+    if (!touch) return;
     const deltaX = Math.abs(touch.clientX - startPos.current.x);
     const deltaY = Math.abs(touch.clientY - startPos.current.y);
     
@@ -199,12 +206,14 @@ export function useLongPress(options: LongPressOptions): LongPressResult {
     
     startPos.current = { x: e.clientX, y: e.clientY };
     longPressTriggered.current = false;
+    firedRef.current = false;
     eventRef.current = e;
     
     setIsPressing(true);
     
     timerRef.current = setTimeout(() => {
       longPressTriggered.current = true;
+      firedRef.current = true;
       setIsLongPressing(true);
       onLongPressStart?.();
       
@@ -225,6 +234,12 @@ export function useLongPress(options: LongPressOptions): LongPressResult {
     reset();
   }, [reset]);
   
+  const consumeLongPress = useCallback(() => {
+    const was = firedRef.current;
+    firedRef.current = false;
+    return was;
+  }, []);
+
   return {
     longPressHandlers: {
       onTouchStart: handleTouchStart,
@@ -238,6 +253,7 @@ export function useLongPress(options: LongPressOptions): LongPressResult {
     },
     isLongPressing,
     isPressing,
+    consumeLongPress,
   };
 }
 
