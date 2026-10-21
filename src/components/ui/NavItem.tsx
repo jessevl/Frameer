@@ -13,7 +13,6 @@ export interface NavItemProps {
   onClick?: () => void;
   className?: string;
   compact?: boolean;
-  einkMode?: boolean;
 }
 
 /**
@@ -37,22 +36,14 @@ const NavItem: React.FC<NavItemProps> = ({
   onClick,
   className,
   compact = false,
-  einkMode = false,
 }) => {
   const isMobile = useIsMobile();
 
-  const stateClass = einkMode
-    ? cn(
-        'eink-expanded-sidebar-item border border-transparent bg-transparent shadow-none',
-        isActive
-          ? 'eink-expanded-sidebar-item-active text-[var(--color-text-primary)]'
-          : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
-      )
-    : cn(
-        isActive && 'glass-item text-[var(--color-text-primary)]',
-        !isActive && 'glass-item-subtle text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
-      );
-  
+  const stateClass = cn(
+    isActive && 'glass-item text-[var(--color-text-primary)]',
+    !isActive && 'glass-item-subtle text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
+  );
+
   return (
     <button
       onClick={onClick}

@@ -265,7 +265,7 @@ const MobileSheet: React.FC<MobileSheetProps> = ({
           transition-all ${transitionDuration}
           ${mounted ? 'bg-black/50' : 'bg-black/0'}
           pointer-events-auto
-          eink-modal-backdrop
+         
         `}
         onClick={closeOnBackdropClick ? (e) => {
           // Only close if clicking the backdrop itself, not child elements
@@ -289,7 +289,7 @@ const MobileSheet: React.FC<MobileSheetProps> = ({
           transform transition-transform ${transitionDuration}
           ${mounted && !isSwiping && !isClosing ? 'translate-y-0' : 'translate-y-full'}
           pointer-events-auto
-          eink-shell-surface-secondary eink-modal-surface-secondary
+         
           ${className}
         `}
         style={{ 
@@ -314,7 +314,7 @@ const MobileSheet: React.FC<MobileSheetProps> = ({
         {/* Header (if title or close button) - also supports swipe-to-close */}
         {(title || showCloseButton) && (
           <div 
-            className="flex items-center justify-between px-4 py-2 border-b border-[var(--color-border-default)] eink-shell-surface-secondary"
+            className="flex items-center justify-between px-4 py-2 border-b border-[var(--color-border-default)]"
             onTouchStart={onTouchStart}
             onTouchMove={onTouchMove}
             onTouchEnd={onTouchEnd}
