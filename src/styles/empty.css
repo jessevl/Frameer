@@ -1,0 +1,112 @@
+/*
+ * @file empty.css
+ * @description The small motions of the empty-state illustrations: a slow float over a breathing shadow, a stroke that draws itself, and a soft pulse. They play three cycles and then rest (an empty screen is not a screensaver); EmptyState replays them when the pointer or focus returns after the rest. All of them sit behind `prefers-reduced-motion: no-preference`, so with reduced motion the illustrations are still pictures.
+ * Moved from Drift to Frameer with EmptyState.
+ * Used by: EmptyState (Frameer).
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .empty-float {
+    animation: empty-float 4.8s ease-in-out 3;
+  }
+
+  .empty-float-late {
+    animation: empty-float 6.5s ease-in-out -2s 3;
+  }
+
+  .empty-draw {
+    stroke-dasharray: 40;
+    stroke-dashoffset: 40;
+    animation: empty-draw 0.9s ease-out 0.25s forwards;
+  }
+
+  .empty-pulse {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: empty-pulse 3.2s ease-in-out 3;
+  }
+
+  .empty-float-pic {
+    animation: empty-float-pic 4.8s ease-in-out 3;
+  }
+
+  .empty-shadow {
+    animation: empty-breathe 4.8s ease-in-out 3;
+  }
+
+  .empty-accent {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: empty-pulse 2.4s ease-in-out 3;
+  }
+
+  .empty-lift {
+    transform-box: fill-box;
+    transform-origin: left bottom;
+    animation: empty-lift 4s ease-in-out 3;
+  }
+}
+
+@keyframes empty-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+/* The picture sits on a soft shadow that narrows as the picture rises. */
+.empty-shadow {
+  position: absolute;
+  left: 22%;
+  right: 22%;
+  bottom: -4px;
+  height: 7%;
+  min-height: 3px;
+  border-radius: 50%;
+  background: var(--ink);
+  opacity: 0.08;
+}
+
+@keyframes empty-float-pic {
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes empty-breathe {
+  50% {
+    transform: scaleX(0.84);
+    opacity: 0.045;
+  }
+}
+
+@keyframes empty-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes empty-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.92);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes empty-lift {
+  0%,
+  70%,
+  100% {
+    transform: rotate(0deg);
+  }
+  80% {
+    transform: rotate(-9deg);
+  }
+}
