@@ -43,3 +43,8 @@ export function useLucideCatalogue(enabled = true): LucideCatalogue | null {
   }, [enabled, catalogue]);
   return catalogue ?? (enabled ? loaded : null);
 }
+
+/** Lucide icon names are PascalCase words; anything else is shown as text (an emoji). */
+export function isLucideName(icon: string): boolean {
+  return /^[A-Z][A-Za-z0-9]*$/.test(icon);
+}
