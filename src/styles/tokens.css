@@ -210,6 +210,8 @@
   --color-gh-success-muted: rgba(63, 185, 80, 0.15);
   --color-gh-danger-fg: #f85149;
   --color-gh-danger-muted: rgba(248, 81, 73, 0.15);
+  /* Danger text on the 15% danger tint: #f85149 is 3.9:1 over paper-3, this is 5.2:1 (and 7.2:1 on paper). */
+  --color-gh-danger-text: #ff7b72;
   --color-gh-warning-fg: #d29922;
   --color-gh-warning-muted: rgba(210, 153, 34, 0.15);
 
@@ -340,7 +342,8 @@
   --color-warning-bg: var(--color-amber-50);
   --color-warning-border: var(--color-amber-200);
   --color-warning: var(--color-amber-500);
-  --color-danger-fg: var(--color-red-600);
+  /* red-600 on red-50 is 4.4:1; red-700 is 5.9:1 (6.5:1 on white). */
+  --color-danger-fg: var(--color-red-700);
   --color-danger-bg: var(--color-red-50);
   --color-danger-border: var(--color-red-200);
   --color-danger: var(--color-red-600);
@@ -348,6 +351,12 @@
   --color-info-bg: var(--color-blue-50);
   --color-info-border: var(--color-blue-200);
   --color-info: var(--color-blue-600);
+
+  /* The names components read for text and tints of a state; one set, so a theme changes only the -fg values. */
+  --color-state-success: var(--color-success-fg);
+  --color-state-warning: var(--color-warning-fg);
+  --color-state-error: var(--color-danger-fg);
+  --color-state-info: var(--color-info-fg);
 
   /* Task priorities */
   --color-priority-1: var(--color-red-500);
@@ -374,7 +383,7 @@
   --color-warning-bg: rgba(210, 153, 34, 0.15);
   --color-warning-border: rgba(210, 153, 34, 0.4);
   --color-warning: var(--color-gh-warning-fg);
-  --color-danger-fg: var(--color-gh-danger-fg);
+  --color-danger-fg: var(--color-gh-danger-text);
   --color-danger-bg: rgba(248, 81, 73, 0.15);
   --color-danger-border: rgba(248, 81, 73, 0.4);
   --color-danger: var(--color-gh-danger-fg);
@@ -382,6 +391,12 @@
   --color-info-bg: rgba(88, 166, 255, 0.15);
   --color-info-border: rgba(88, 166, 255, 0.4);
   --color-info: var(--color-gh-accent-fg);
+
+  /* The names components read for text and tints of a state; one set, so a theme changes only the -fg values. */
+  --color-state-success: var(--color-success-fg);
+  --color-state-warning: var(--color-warning-fg);
+  --color-state-error: var(--color-danger-fg);
+  --color-state-info: var(--color-info-fg);
 }
 
 /* =============================================================================
