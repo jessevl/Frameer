@@ -12,10 +12,10 @@ import { createContext, useContext, useEffect, useRef, useState, type CSSPropert
 import { KIND_ART, type SectionKey } from '@frameer/icons/kinds';
 import { SectionPicture } from '@frameer/icons/SectionPicture';
 
-export type EmptyKind = 'folder' | 'search' | 'trash' | 'pages' | 'photos' | 'shared' | 'recent' | 'starred' | 'favorites' | 'activity' | 'clear' | 'tasks' | 'whiteboards' | 'bases';
+export type EmptyKind = 'folder' | 'search' | 'trash' | 'pages' | 'photos' | 'albums' | 'shared' | 'recent' | 'starred' | 'favorites' | 'activity' | 'clear' | 'tasks' | 'whiteboards' | 'bases';
 
 /** The kinds that are about a section show that section's glass picture instead of a line drawing. */
-const SECTION_OF: Partial<Record<EmptyKind, SectionKey>> = { folder: 'drive', pages: 'pages', photos: 'photos', favorites: 'photos', tasks: 'tasks', whiteboards: 'whiteboards', bases: 'bases' };
+const SECTION_OF: Partial<Record<EmptyKind, SectionKey>> = { folder: 'drive', pages: 'pages', photos: 'photos', albums: 'photos', favorites: 'photos', tasks: 'tasks', whiteboards: 'whiteboards', bases: 'bases' };
 
 /** The accent of each picture: the glass kit's own color where the picture is about a type (the same colors the type registry gives them). */
 const ACCENTS: Record<EmptyKind, string> = {
@@ -24,6 +24,7 @@ const ACCENTS: Record<EmptyKind, string> = {
   trash: 'var(--ink-2)',
   pages: KIND_ART.page.hue,
   photos: 'var(--ink-2)',
+  albums: 'var(--ink-2)',
   shared: 'var(--ink-2)',
   recent: 'var(--ink-2)',
   starred: KIND_ART.folder.hue,
