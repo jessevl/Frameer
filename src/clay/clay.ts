@@ -5,9 +5,12 @@
  */
 import { mix } from '../icons/palette';
 
-/** The clay colors of one theme, read from the `--clay-*` tokens. `g` runs from the lightest grey (0) to the darkest (8). */
+/** The nine clay greys, from the lightest (0) to the darkest (8). */
+export type Greys = readonly [string, string, string, string, string, string, string, string, string];
+
+/** The clay colors of one theme, read from the `--clay-*` tokens. */
 export interface ClayPalette {
-  g: readonly string[];
+  g: Greys;
   coral: string;
   coralLight: string;
   coralDeep: string;

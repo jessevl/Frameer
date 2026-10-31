@@ -3,9 +3,8 @@
  * @description Reads the clay palette of the current theme from the `--clay-*` tokens (tokens.css), so the pictures follow light and dark mode without a color of their own. Cached per theme; `forgetClayPalette` drops the cache when tokens change.
  * Used by: ClayCanvas.
  */
-import type { ClayPalette } from './clay';
+import type { ClayPalette, Greys } from './clay';
 
-const STEPS = 9;
 let cached: { dark: boolean; pal: ClayPalette } | null = null;
 
 /** The palette from computed tokens; `read` is the token lookup (the document's computed style in the app, a map in tests). */
@@ -14,8 +13,10 @@ export function paletteFrom(read: (name: string) => string, dark: boolean): Clay
     const v = parseFloat(read(name));
     return Number.isFinite(v) ? v : fallback;
   };
+  const grey = (i: number) => read(`--clay-${i}`);
+  const g: Greys = [grey(0), grey(1), grey(2), grey(3), grey(4), grey(5), grey(6), grey(7), grey(8)];
   return {
-    g: Array.from({ length: STEPS }, (_, i) => read(`--clay-${i}`)),
+    g,
     coral: read('--coral'),
     coralLight: read('--clay-coral-light'),
     coralDeep: read('--coral-strong'),
