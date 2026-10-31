@@ -1,6 +1,6 @@
 /**
  * @file ClayCanvas.tsx
- * @description A canvas that holds one clay picture: it follows its box's size and the device's pixel ratio, repaints when the theme changes, and runs on one shared frame loop at about 30 fps, only while it is on screen and only while the picture is alive (`live`) or still settling (the draw returned true). With reduced motion it draws one still frame per change, with every movement already finished. The picture is decoration: hidden from assistive technology.
+ * @description A canvas that holds one clay picture: it follows its box's size and the device's pixel ratio, draws in the theme of where it is (dark inside any `.dark`), repaints when the theme changes, and runs on one shared frame loop at about 30 fps, only while it is on screen and only while the picture is alive (`live`) or still settling (the draw returned true). With reduced motion it draws one still frame per change, with every movement already finished. The picture is decoration: hidden from assistive technology.
  * Used by: the apps' picture components (Drift's desk, done pile, boat and empty states).
  */
 import { useEffect, useRef } from 'react';
@@ -106,7 +106,7 @@ export function ClayCanvas({ draw, live = false, className, version }: ClayCanva
       const dpr = el.width / w;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       const now = performance.now();
-      return drawRef.current(ctx, { w, h, t: reduced ? 0 : now - start, now, reduced, pal: clayPalette() }) === true;
+      return drawRef.current(ctx, { w, h, t: reduced ? 0 : now - start, now, reduced, pal: clayPalette(el) }) === true;
     };
     const scene: Scene = { el, paint, visible: true, live, moving: false };
     sceneRef.current = scene;

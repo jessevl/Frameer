@@ -1,11 +1,11 @@
 /**
  * @file clayPalette.ts
- * @description Reads the clay palette of the current theme from the `--clay-*` tokens (tokens.css), so the pictures follow light and dark mode without a color of their own. Cached per theme; `forgetClayPalette` drops the cache when tokens change.
+ * @description Reads the clay palette from the `--clay-*` tokens (tokens.css) where a picture is, so the pictures follow light and dark mode (and always-dark scenes) without a color of their own. Cached per theme; `forgetClayPalette` drops the cache when tokens change.
  * Used by: ClayCanvas.
  */
 import type { ClayPalette, Greys } from './clay';
 
-let cached: { dark: boolean; pal: ClayPalette } | null = null;
+const cached = new Map<boolean, ClayPalette>();
 
 /** The palette from computed tokens; `read` is the token lookup (the document's computed style in the app, a map in tests). */
 export function paletteFrom(read: (name: string) => string, dark: boolean): ClayPalette {
@@ -28,17 +28,20 @@ export function paletteFrom(read: (name: string) => string, dark: boolean): Clay
   };
 }
 
-/** The current theme's palette, read once per theme. */
-export function clayPalette(): ClayPalette {
-  const root = document.documentElement;
-  const dark = root.classList.contains('dark');
-  if (cached?.dark === dark) return cached.pal;
-  const style = getComputedStyle(root);
+/**
+ * The palette where an element is: dark inside any `.dark` (the document in dark mode, or a scene that is always dark,
+ * like Focus), light elsewhere. Read once per theme, from the element's own computed tokens.
+ */
+export function clayPalette(el: Element = document.documentElement): ClayPalette {
+  const dark = el.closest('.dark') !== null;
+  const known = cached.get(dark);
+  if (known) return known;
+  const style = getComputedStyle(el);
   const pal = paletteFrom((name) => style.getPropertyValue(name).trim(), dark);
-  cached = { dark, pal };
+  cached.set(dark, pal);
   return pal;
 }
 
 export function forgetClayPalette(): void {
-  cached = null;
+  cached.clear();
 }
