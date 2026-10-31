@@ -1,0 +1,29 @@
+/*
+ * @file clay.css
+ * @description The clay pictures' touch (D16 B): the lean toward the pointer eases in and out, and a press squashes a picture like clay. Still with reduced motion.
+ * Used by: ClayCanvas.
+ */
+.clay-canvas {
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes clay-squash {
+  0% { scale: 1 1; }
+  28% { scale: 1.03 0.955; }
+  58% { scale: 0.985 1.02; }
+  100% { scale: 1 1; }
+}
+
+.clay-canvas.clay-squash {
+  animation: clay-squash 0.5s ease-out;
+  transform-origin: 50% 85%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .clay-canvas {
+    transition: none;
+  }
+  .clay-canvas.clay-squash {
+    animation: none;
+  }
+}

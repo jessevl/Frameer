@@ -22,6 +22,32 @@ export interface ClayPalette {
   top: number;
   side: number;
   dark: boolean;
+  /** Where the sun is (D16 A): shadows fall away from it. Without one, a shadow is a plain contact shadow. */
+  sun?: Sun;
+}
+
+/** The sun for an hour: up from 06:00 to 20:30, low in the morning and evening (long shadows), high at noon. */
+export interface Sun {
+  up: boolean;
+  /** 0 at sunrise to 1 at sunset. */
+  f: number;
+  /** 0 on the horizon to 1 at noon. */
+  elev: number;
+  /** How long a cast shadow is, in radii. */
+  len: number;
+  /** The direction shadows fall, on the screen (unit vector): right in the morning, left in the evening. */
+  dx: number;
+  dy: number;
+}
+
+export function sunAt(hour: number): Sun {
+  const up = hour >= 6 && hour <= 20.5;
+  const f = Math.max(0, Math.min(1, (hour - 6) / 14.5));
+  const elev = up ? Math.sin(f * Math.PI) : 0;
+  const dx = (0.5 - f) * 2;
+  const dy = -0.32;
+  const n = Math.hypot(dx, dy);
+  return { up, f, elev, len: up ? 0.25 + (1 - elev) * 1.05 : 0, dx: dx / n, dy: dy / n };
 }
 
 /** The three lit faces of one material, and the highlight on its front edges. */
@@ -187,8 +213,36 @@ export class Clay {
     return [cx, cy, R];
   }
 
-  /** A soft contact shadow under something of radius r. Dark mode needs it stronger to read at all. */
+  /**
+   * A soft shadow under something of radius r. With a sun up (D16 A) it is a short contact shadow plus a cast one
+   * falling away from the sun; at night only the contact shadow. Dark mode needs it stronger to read at all.
+   */
   shadow(x: number, y: number, z: number, r: number, alpha = 0.16): this {
+    const sun = this.pal.sun;
+    if (!sun) return this.contact(x, y, z, r, alpha);
+    if (!sun.up) return this.contact(x, y, z, r * 0.85, alpha);
+    this.contact(x, y, z, r * 0.62, alpha * 0.8);
+    // Big shadows (desks, trays) only lean a little, so they stay inside their canvas.
+    const [cx, cy, rx, ry] = this.ell(x, y, z, r);
+    const k = sun.len * Math.max(0.12, Math.min(1, 1.5 / r));
+    const a = alpha * (this.pal.dark ? 2.2 : 1) * (0.55 + sun.elev * 0.25);
+    const c = this.c;
+    c.save();
+    c.translate(cx + sun.dx * rx * k * 0.55, cy + sun.dy * ry * k * 0.9);
+    c.rotate(Math.atan2(sun.dy * 0.5, sun.dx));
+    c.scale(1 + k * 0.75, ry / rx);
+    const g = c.createRadialGradient(0, 0, 0, 0, 0, rx);
+    g.addColorStop(0, `rgba(${this.pal.shade},${a})`);
+    g.addColorStop(1, `rgba(${this.pal.shade},0)`);
+    c.fillStyle = g;
+    c.beginPath();
+    c.arc(0, 0, rx, 0, Math.PI * 2);
+    c.fill();
+    c.restore();
+    return this;
+  }
+
+  private contact(x: number, y: number, z: number, r: number, alpha: number): this {
     const [cx, cy, rx, ry] = this.ell(x, y, z, r);
     const c = this.c;
     const a = alpha * (this.pal.dark ? 2.2 : 1);

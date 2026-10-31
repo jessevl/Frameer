@@ -1,11 +1,12 @@
 /**
  * @file ClayCanvas.tsx
- * @description A canvas that holds one clay picture: it follows its box's size and the device's pixel ratio, draws in the theme of where it is (dark inside any `.dark`), repaints when the theme changes, and runs on one shared frame loop at about 30 fps, only while it is on screen and only while the picture is alive (`live`) or still settling (the draw returned true). With reduced motion it draws one still frame per change, with every movement already finished. The picture is decoration: hidden from assistive technology.
+ * @description A canvas that holds one clay picture: it follows its box's size and the device's pixel ratio, draws in the theme of where it is (dark inside any `.dark`), repaints when the theme changes, and runs on one shared frame loop at about 30 fps, only while it is on screen and only while the picture is alive (`live`) or still settling (the draw returned true). With reduced motion it draws one still frame per change, with every movement already finished. Living pictures (D16): shadows follow the hour's sun, a picture leans toward the pointer and squashes when pressed, and a seasonal visitor falls past a large one now and then (`alive`). The picture is decoration: hidden from assistive technology.
  * Used by: the apps' picture components (Drift's desk, done pile, boat and empty states).
  */
-import { useEffect, useRef } from 'react';
-import type { ClayPalette } from './clay';
+import { useEffect, useRef, type PointerEvent as ReactPointerEvent } from 'react';
+import { hash, sunAt, type ClayPalette } from './clay';
 import { clayPalette, forgetClayPalette } from './clayPalette';
+import { VISIT_EVERY_MS, VISIT_MS, drawVisitor, roomForVisitor, seasonOf } from './visitors';
 
 /** What a picture is drawn with: its size in CSS pixels, the loop's clock, the wall clock for events, and the palette. */
 export interface ClayFrame {
@@ -29,7 +30,18 @@ interface Scene {
   visible: boolean;
   live: boolean;
   moving: boolean;
+  /** Visitors (D16 C): whether this picture takes them, when the next is due, and when the current one set off. */
+  visitors: boolean;
+  nextVisit: number;
+  visitAt: number | null;
+  seed: number;
 }
+
+let sceneCount = 0;
+const hourNow = () => {
+  const d = new Date();
+  return d.getHours() + d.getMinutes() / 60;
+};
 
 const scenes = new Set<Scene>();
 let running = false;
@@ -49,6 +61,22 @@ function loop(now: number) {
   }
   if ([...scenes].some(wants)) requestAnimationFrame(loop);
   else running = false;
+}
+
+// Once a second, a picture whose visitor is due and that is on screen sends one across.
+let visiting: ReturnType<typeof setInterval> | null = null;
+function watchVisitors() {
+  if (visiting) return;
+  visiting = setInterval(() => {
+    const now = performance.now();
+    if (reducedMotion()) return;
+    scenes.forEach((s) => {
+      if (!s.visitors || !s.visible || s.visitAt !== null || now < s.nextVisit) return;
+      s.visitAt = now;
+      s.moving = true;
+    });
+    kick();
+  }, 1000);
 }
 
 function kick() {
@@ -83,9 +111,11 @@ interface ClayCanvasProps {
   className?: string;
   /** Repaints when this changes (the data the picture shows). */
   version?: unknown;
+  /** Living pictures (D16): visitors fall past a large picture now and then (C), and a picture leans toward the pointer and squashes when pressed (B). Off for scenes that fill a place, like a board's dots or the Focus Cabin. */
+  alive?: boolean;
 }
 
-export function ClayCanvas({ draw, live = false, className, version }: ClayCanvasProps) {
+export function ClayCanvas({ draw, live = false, className, version, alive = true }: ClayCanvasProps) {
   const ref = useRef<HTMLCanvasElement | null>(null);
   const drawRef = useRef(draw);
   const sceneRef = useRef<Scene | null>(null);
@@ -106,9 +136,21 @@ export function ClayCanvas({ draw, live = false, className, version }: ClayCanva
       const dpr = el.width / w;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       const now = performance.now();
-      return drawRef.current(ctx, { w, h, t: reduced ? 0 : now - start, now, reduced, pal: clayPalette(el) }) === true;
+      // One sun for every picture (D16 A): shadows fall away from the hour's sun.
+      const pal = { ...clayPalette(el), sun: sunAt(hourNow()) };
+      const busy = drawRef.current(ctx, { w, h, t: reduced ? 0 : now - start, now, reduced, pal }) === true;
+      if (scene.visitAt === null) return busy;
+      const p = (now - scene.visitAt) / VISIT_MS;
+      if (p < 1 && !reduced && roomForVisitor(w, h)) {
+        drawVisitor(ctx, w, h, pal, seasonOf(new Date().getMonth()), p, scene.seed);
+        return true;
+      }
+      scene.visitAt = null;
+      scene.nextVisit = now + VISIT_EVERY_MS * (1 + hash(scene.seed + 1) * 0.5);
+      return busy;
     };
-    const scene: Scene = { el, paint, visible: true, live, moving: false };
+    const seed = (sceneCount += 1) * 7.13;
+    const scene: Scene = { el, paint, visible: true, live, moving: false, visitors: false, nextVisit: start + VISIT_EVERY_MS * hash(seed), visitAt: null, seed };
     sceneRef.current = scene;
     const fit = () => {
       const r = el.getBoundingClientRect();
@@ -117,6 +159,7 @@ export function ClayCanvas({ draw, live = false, className, version }: ClayCanva
       h = Math.max(1, Math.round(r.height));
       el.width = Math.round(w * dpr);
       el.height = Math.round(h * dpr);
+      scene.visitors = alive && roomForVisitor(w, h);
       scene.moving = paint();
       kick();
     };
@@ -124,6 +167,7 @@ export function ClayCanvas({ draw, live = false, className, version }: ClayCanva
     sizes?.observe(el);
     scenes.add(scene);
     watch();
+    watchVisitors();
     views?.observe(el);
     fit();
     return () => {
@@ -132,7 +176,7 @@ export function ClayCanvas({ draw, live = false, className, version }: ClayCanva
       scenes.delete(scene);
       sceneRef.current = null;
     };
-  }, [live]);
+  }, [live, alive]);
 
   // New data, or a new drawing: paint now and let the loop carry any movement it started.
   useEffect(() => {
@@ -142,5 +186,33 @@ export function ClayCanvas({ draw, live = false, className, version }: ClayCanva
     kick();
   }, [draw, version]);
 
-  return <canvas ref={ref} aria-hidden="true" data-clay="" className={className} style={{ display: 'block', width: '100%', height: '100%' }} />;
+  // Pictures answer your hand (D16 B): a slight lean toward the pointer, and a clay squash on a press.
+  const lean = (event: ReactPointerEvent<HTMLCanvasElement>) => {
+    const el = event.currentTarget;
+    const r = el.getBoundingClientRect();
+    if (!alive || r.width >= 720 || reducedMotion()) return;
+    const dx = (event.clientX - r.left) / r.width - 0.5;
+    const dy = (event.clientY - r.top) / r.height - 0.5;
+    el.style.transform = `perspective(900px) rotateY(${(dx * 5).toFixed(2)}deg) rotateX(${(-dy * 4).toFixed(2)}deg) translateY(-1px)`;
+  };
+  const squash = (event: ReactPointerEvent<HTMLCanvasElement>) => {
+    const el = event.currentTarget;
+    if (!alive || reducedMotion()) return;
+    el.classList.remove('clay-squash');
+    void el.offsetWidth;
+    el.classList.add('clay-squash');
+  };
+  return (
+    <canvas
+      ref={ref}
+      aria-hidden="true"
+      data-clay=""
+      className={`clay-canvas ${className ?? ''}`}
+      style={{ display: 'block', width: '100%', height: '100%' }}
+      onPointerMove={lean}
+      onPointerLeave={(event) => (event.currentTarget.style.transform = '')}
+      onPointerDown={squash}
+      onAnimationEnd={(event) => event.currentTarget.classList.remove('clay-squash')}
+    />
+  );
 }
