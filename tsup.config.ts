@@ -10,6 +10,7 @@ export default defineConfig({
     'lib/index': 'src/lib/index.ts',
     'contexts/index': 'src/contexts/index.ts',
     'icons/index': 'src/icons/index.ts',
+    'clay/index': 'src/clay/index.ts',
     'shell/index': 'src/shell/index.ts',
   },
   format: ['esm'],

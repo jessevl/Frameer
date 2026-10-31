@@ -39,6 +39,10 @@
       "import": "./dist/icons/index.js",
       "types": "./dist/icons/index.d.ts"
     },
+    "./clay": {
+      "import": "./dist/clay/index.js",
+      "types": "./dist/clay/index.d.ts"
+    },
     "./shell": {
       "import": "./dist/shell/index.js",
       "types": "./dist/shell/index.d.ts"

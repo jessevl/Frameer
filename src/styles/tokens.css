@@ -97,6 +97,43 @@
   --shadow-fab: 0 12px 28px -10px rgba(236, 118, 99, 0.55);
 }
 
+/* Clay: the material of the pictures (src/clay). Greys from the lightest (0) to the darkest (8), the pale coral of a
+   lit lamp, the color of contact shadows and of lamp light (as "r, g, b" for rgba()), and how much a top face lightens
+   and a right face darkens. */
+:root {
+  --clay-0: #FFFFFF;
+  --clay-1: #F7F5F2;
+  --clay-2: #EDEAE5;
+  --clay-3: #E0DBD3;
+  --clay-4: #CAC3B9;
+  --clay-5: #A39C92;
+  --clay-6: #77716A;
+  --clay-7: #4A4642;
+  --clay-8: #2A2725;
+  --clay-coral-light: #F4A595;
+  --clay-shade: 60, 40, 20;
+  --clay-warm: 255, 176, 128;
+  --clay-top: 0.42;
+  --clay-side: 0.1;
+}
+
+.dark {
+  --clay-0: #6A625E;
+  --clay-1: #5A5350;
+  --clay-2: #4C4644;
+  --clay-3: #403B39;
+  --clay-4: #36312F;
+  --clay-5: #2D2927;
+  --clay-6: #242120;
+  --clay-7: #1A1817;
+  --clay-8: #100F0E;
+  --clay-coral-light: #F39A8A;
+  --clay-shade: 0, 0, 0;
+  --clay-warm: 255, 160, 112;
+  --clay-top: 0.16;
+  --clay-side: 0.3;
+}
+
 /* =============================================================================
    RAW PALETTES AND SEMANTIC ALIASES (Tailwind @theme)
    ============================================================================= */
