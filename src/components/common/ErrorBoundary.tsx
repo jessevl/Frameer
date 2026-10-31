@@ -15,6 +15,8 @@ interface ErrorBoundaryProps {
   children: ReactNode;
   /** Optional fallback component */
   fallback?: ReactNode;
+  /** A picture in place of the alert icon on the default screen (Drift shows a clay cup on its side). */
+  picture?: ReactNode;
   /** Optional callback when error is caught */
   onError?: (error: Error, errorInfo: ErrorInfo) => void;
   /** Whether to show reset/refresh buttons. Default: true */
@@ -85,7 +87,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
   override render(): ReactNode {
     const { hasError, error, errorInfo } = this.state;
-    const { children, fallback, showActions = true } = this.props;
+    const { children, fallback, picture, showActions = true } = this.props;
 
     if (!hasError) {
       return children;
@@ -100,11 +102,13 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     return (
       <div className="min-h-[400px] flex items-center justify-center p-6">
         <div className="max-w-md w-full text-center">
-          {/* Icon */}
-          <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-red-100 dark:bg-red-900/30 
-                        flex items-center justify-center">
-            <ChromeIcon name="alertTriangle" className="w-8 h-8 text-red-500 dark:text-red-400" />
-          </div>
+          {/* The app's picture, or the alert icon */}
+          {picture ?? (
+            <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-red-100 dark:bg-red-900/30 
+                          flex items-center justify-center">
+              <ChromeIcon name="alertTriangle" className="w-8 h-8 text-red-500 dark:text-red-400" />
+            </div>
+          )}
 
           {/* Title */}
           <h2 className="text-xl font-semibold text-[var(--color-text-primary)] mb-2">
