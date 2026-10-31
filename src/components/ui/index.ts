@@ -57,7 +57,7 @@ export { default as Popover } from "./Popover";
 export { default as ColorDot } from "./ColorDot";
 export { default as IconButton } from "./IconButton";
 export { default as IconWrapper } from "./IconWrapper";
-export { EmptyState, type EmptyKind } from "./EmptyState";
+export { EmptyState, EmptyPictures, type EmptyKind, type EmptyPicture, type EmptySize } from "./EmptyState";
 export { default as SectionHeader } from "./SectionHeader";
 export { default as ContextMenu, ContextMenuContent } from "./ContextMenu";
 export type { ContextMenuItem } from "./ContextMenu";

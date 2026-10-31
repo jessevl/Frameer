@@ -1,13 +1,14 @@
 /**
  * @file EmptyState.tsx
- * @description The one empty state every list uses: an illustration (the glass picture of the section for Drive, Photos, Pages, Tasks, Whiteboards and Bases; otherwise a few paths in the muted ink with one accent, gently moving unless motion is reduced), an optional title, the sentence, and an optional action. "An earned moment, not confetti": quiet pictures, no coral (coral marks actions and selection only), no text inside the art.
+ * @description The one empty state every list uses: an illustration (the glass picture of the section for Drive, Photos, Pages, Tasks, Whiteboards and Bases; otherwise a few paths in the muted ink with one accent, gently moving unless motion is reduced), an optional title, the sentence, and an optional action. "An earned moment, not confetti": quiet pictures, no coral in Frameer's own (an app's picture may carry one small detail), no text inside the art.
  * Based on the canvas board "Details" (empty Today, "Clear for today")
  *
  * Three sizes, one look: `full` for a stage, `panel` for a side panel pane (centred in the panel, a mid-size picture) and `compact` for a column, card or strip (the same stack, small, no box; a drop target keeps its own dashed outline for the drop affordance). The picture floats over a breathing shadow and one accent does the section's gesture; the motion plays three cycles and rests, replays when the pointer or focus comes back to it once it has rested, and is still with reduced motion (empty.css).
  * Moved from Drift's items/ui to Frameer so Drift and Yard draw the same one; styles/empty.css holds its motion.
+ * An app can draw its own picture for a kind through EmptyPictures (Drift draws clay ones): the slot gets the size and the picture fills it, with its own shadow; kinds it leaves out keep the glass or line picture.
  * Used by: every list, landing, pane and card of Drift and Yard that has nothing to show.
  */
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { KIND_ART, type SectionKey } from '@frameer/icons/kinds';
 import { SectionPicture } from '@frameer/icons/SectionPicture';
 
@@ -161,6 +162,21 @@ function Art({ kind }: { kind: EmptyKind }) {
   }
 }
 
+export type EmptySize = 'full' | 'panel' | 'compact';
+
+/** An app's own picture for a kind, or null to keep Frameer's. */
+export type EmptyPicture = (kind: EmptyKind, size: EmptySize) => ReactNode | null;
+
+const PictureContext = createContext<EmptyPicture | null>(null);
+
+/** Gives every EmptyState below it the app's pictures. */
+export function EmptyPictures({ picture, children }: { picture: EmptyPicture; children: ReactNode }) {
+  return <PictureContext.Provider value={picture}>{children}</PictureContext.Provider>;
+}
+
+/** The box an app's picture fills, per size: wider than tall, for a scene on a surface. */
+const SLOT: Record<EmptySize, { width: number; height: number }> = { full: { width: 168, height: 120 }, panel: { width: 128, height: 92 }, compact: { width: 88, height: 64 } };
+
 interface EmptyStateProps {
   kind: EmptyKind;
   /** A short line above the sentence ("Clear for today"). */
@@ -172,7 +188,7 @@ interface EmptyStateProps {
   testId?: string;
   className?: string;
   /** `full` is for a stage, `panel` for a side panel, `compact` fits a column, a card or a strip. */
-  size?: 'full' | 'panel' | 'compact';
+  size?: EmptySize;
 }
 
 /** The section pictures' one accent: the section's gesture (a stroke is drawn, a spark twinkles, a row slides in). */
@@ -208,6 +224,7 @@ export function EmptyState({ kind, title, children, action, testId, className = 
     lastPlay.current = now;
     setPlays((n) => n + 1);
   };
+  const own = useContext(PictureContext)?.(kind, size) ?? null;
   const section = SECTION_OF[kind];
   const compact = size === 'compact';
   const panel = size === 'panel';
@@ -215,7 +232,11 @@ export function EmptyState({ kind, title, children, action, testId, className = 
   const art = compact ? 56 : panel ? 84 : 112;
   return (
     <div data-testid={testId} data-empty-kind={kind} data-empty-size={size} className={`${box} ${className}`} onPointerEnter={replay} onFocus={replay}>
-      {section ? (
+      {own ? (
+        <div className="relative mb-1 flex-shrink-0" style={SLOT[size]} data-empty-own="">
+          {own}
+        </div>
+      ) : section ? (
         <div key={plays} className="relative mb-1 flex-shrink-0" style={{ width: art, height: art }}>
           <div className="empty-float-pic">
             <SectionPicture section={section} size={art} />
