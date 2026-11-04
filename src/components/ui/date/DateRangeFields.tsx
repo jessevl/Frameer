@@ -81,7 +81,7 @@ export const DateRangeFields: React.FC<DateRangeFieldsProps> = ({
           className={cn(FIELD_BOX, 'w-[9.5rem] text-left', editing === end && 'border-[var(--coral-line)]')}
         >
           <ChromeIcon name="calendarDays" size={15} strokeWidth={1.8} aria-hidden="true" className="shrink-0 text-[var(--ink-2)]" />
-          <span className={cn('min-w-0 flex-1 truncate', !value && 'text-[var(--ink-3)]')}>{value ? formatDayShort(value, today, locale) : placeholder}</span>
+          <span className={cn('min-w-0 flex-1 truncate', !value && 'text-[var(--ink-2)]')}>{value ? formatDayShort(value, today, locale) : placeholder}</span>
         </button>
       </div>
     );

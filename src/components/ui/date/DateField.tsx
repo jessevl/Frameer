@@ -70,7 +70,7 @@ export const DateField: React.FC<DateFieldProps> = ({
         className={cn(FIELD_BOX, 'w-full text-left')}
       >
         <ChromeIcon name="calendarDays" size={15} strokeWidth={1.8} aria-hidden="true" className="shrink-0 text-[var(--ink-2)]" />
-        <span className={cn('min-w-0 flex-1 truncate', !value && 'text-[var(--ink-3)]')}>
+        <span className={cn('min-w-0 flex-1 truncate', !value && 'text-[var(--ink-2)]')}>
           {value ? formatDayShort(value, today, locale) : placeholder}
         </span>
       </button>

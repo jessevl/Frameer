@@ -172,7 +172,7 @@ export const TimeField: React.FC<TimeFieldProps> = ({
           if (editing) settle();
         }}
         onKeyDown={onKeyDown}
-        className={cn(FIELD_BOX, 'w-full font-mono tabular-nums placeholder:text-[var(--ink-3)]', invalid && 'border-[var(--color-danger-fg)]')}
+        className={cn(FIELD_BOX, 'w-full font-mono tabular-nums placeholder:text-[var(--ink-2)]', invalid && 'border-[var(--color-danger-fg)]')}
       />
       {invalid ? (
         <p id={errorId} role="alert" className={FIELD_ERROR}>

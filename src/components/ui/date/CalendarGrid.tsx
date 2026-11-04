@@ -217,7 +217,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
                           : cn(
                               tinted ? 'bg-[var(--coral-soft)]' : 'enabled:hover:bg-[var(--hover)]',
                               d === today && 'shadow-[inset_0_0_0_1px_var(--line-2)]',
-                              inMonth ? 'text-[var(--ink)]' : 'text-[var(--ink-3)]',
+                              inMonth ? 'text-[var(--ink)]' : 'text-[var(--ink-2)]',
                             ),
                         off && 'cursor-not-allowed opacity-40',
                       )}
