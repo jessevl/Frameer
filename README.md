@@ -91,6 +91,16 @@ function App() {
 - Badge, Popover, ColorDot, EmptyState
 - ContextMenu, Dropdown, DataTable
 
+### Menus
+
+`useContextMenu(items, { label })` gives a row or card its context menu and returns `{ triggerProps, open(anchor), close, isOpen, menu }`:
+
+- spread `triggerProps` on the row: a right click, a 500 ms long press on touch (the click after it is swallowed), and the Menu key or Shift+F10 open the menu; text fields keep the browser's own menu;
+- call `open(element)` from a `…` button, render `menu` anywhere, and use `isOpen` to draw the row's ring;
+- `items` is a function, read on every render while the menu is open; a menu with no items does not open.
+
+The menu opens at the pointer or under the element (a sheet on a phone), moves the focus to its first item, and works like a native menu: Arrow up and down wrap, Home and End, Right opens a submenu and Left closes it, Enter and Space choose, a typed letter jumps, Escape closes it and returns the focus. A `ContextMenuItem` takes `hint` (the shortcut, right-aligned), `heading` (a quiet label above a group), `checked` (`menuitemradio`; with `checkbox`, `menuitemcheckbox`), `keepOpen`, `divider`, `variant: 'danger'`, `children` (a submenu), `quick` and `toggled`. `<ContextMenu items>` wraps children in the same menu, and `ContextMenuContent` is the list on its own.
+
 ### Typography
 - H1, H2, H3, H4, Text, TextSmall, Label
 
@@ -107,6 +117,8 @@ function App() {
 - `useMediaQuery(query)` - Custom media query hook
 - `useClickOutside(refs)` - Click outside detection
 - `useLongPress(options)` - Long press gesture
+- `useContextMenu(items, options)` - A context menu on any element (see Menus)
+- `usePhoneWidth()` - True below 768 px, where menus and pickers open as sheets
 - `useAutoSave(callback, deps, delay)` - Debounced autosave
 
 ## Stores

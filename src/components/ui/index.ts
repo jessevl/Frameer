@@ -59,8 +59,11 @@ export { default as IconButton } from "./IconButton";
 export { default as IconWrapper } from "./IconWrapper";
 export { EmptyState, EmptyPictures, type EmptyKind, type EmptyPicture, type EmptySize } from "./EmptyState";
 export { default as SectionHeader } from "./SectionHeader";
-export { default as ContextMenu, ContextMenuContent } from "./ContextMenu";
-export type { ContextMenuItem } from "./ContextMenu";
+export { default as ContextMenu, ContextMenuContent, useContextMenu } from "./ContextMenu";
+export type { ContextMenuItem, ContextMenuOptions, ContextMenuResult, ContextMenuTriggerProps } from "./ContextMenu";
+export { FloatingSurface, usePhoneWidth } from "./FloatingSurface";
+export type { FloatingAnchor } from "./FloatingSurface";
+
 export { default as ToggleTile, toggleTileStyles } from "./ToggleTile";
 export type { ToggleTileProps } from "./ToggleTile";
 

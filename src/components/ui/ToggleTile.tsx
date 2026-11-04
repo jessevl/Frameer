@@ -26,6 +26,8 @@ export interface ToggleTileProps {
   /** Disabled state */
   disabled?: boolean;
   className?: string;
+  /** Set to "menuitemcheckbox" inside a menu, so the tile is reached with the arrow keys and read as on or off. */
+  role?: 'menuitemcheckbox';
 }
 
 /** Shared class strings so consumers can compose if needed */
@@ -48,9 +50,12 @@ const ToggleTile: React.FC<ToggleTileProps> = ({
   showSublabel = true,
   disabled = false,
   className,
+  role,
 }) => (
   <button
     type="button"
+    role={role}
+    aria-checked={role ? active : undefined}
     onClick={onClick}
     disabled={disabled}
     className={cn(
