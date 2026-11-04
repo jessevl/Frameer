@@ -128,7 +128,12 @@ npm run dev
 
 # Type check
 npm run typecheck
+
+# Tests
+npm test
 ```
+
+Frameer's tests (`src/**/*.test.{ts,tsx}`, Vitest in jsdom, Testing Library and axe-core) run on the dev tools of the app Frameer sits in (`frontend/frameer` in Drift, Harbour, Lighthouse and Yard), found in the app's `node_modules` one level up; Frameer adds no dev dependencies for them. An app can also run them in its own suite with a Vitest project that includes `frameer/src/**/*.test.{ts,tsx}`.
 
 ## License
 
