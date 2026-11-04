@@ -19,6 +19,10 @@
       "import": "./dist/components/ui/index.js",
       "types": "./dist/components/ui/index.d.ts"
     },
+    "./components/ui/date": {
+      "import": "./dist/components/ui/date/index.js",
+      "types": "./dist/components/ui/date/index.d.ts"
+    },
     "./hooks": {
       "import": "./dist/hooks/index.js",
       "types": "./dist/hooks/index.d.ts"

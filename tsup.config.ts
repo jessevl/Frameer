@@ -5,6 +5,7 @@ export default defineConfig({
     index: 'src/index.ts',
     'components/index': 'src/components/index.ts',
     'components/ui/index': 'src/components/ui/index.ts',
+    'components/ui/date/index': 'src/components/ui/date/index.ts',
     'hooks/index': 'src/hooks/index.ts',
     'stores/index': 'src/stores/index.ts',
     'lib/index': 'src/lib/index.ts',

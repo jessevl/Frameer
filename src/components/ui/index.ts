@@ -64,6 +64,21 @@ export type { ContextMenuItem, ContextMenuOptions, ContextMenuResult, ContextMen
 export { FloatingSurface, usePhoneWidth } from "./FloatingSurface";
 export type { FloatingAnchor } from "./FloatingSurface";
 
+// Date and time pickers (also at @frameer/components/ui/date, with the wall-date helpers)
+export { CalendarGrid, DateField, TimeField, TimeRangeFields, DateRangeFields, DateTimeField } from "./date";
+export type {
+	CalendarGridProps,
+	DateFieldProps,
+	TimeFieldProps,
+	TimeRange,
+	TimeRangeFieldsProps,
+	DateRange,
+	DateRangeFieldsProps,
+	DateTimeFieldProps,
+	DateTimeValue,
+	IsoDate,
+	WallTime,
+} from "./date";
 export { default as ToggleTile, toggleTileStyles } from "./ToggleTile";
 export type { ToggleTileProps } from "./ToggleTile";
 
