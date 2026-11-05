@@ -61,6 +61,8 @@ export { EmptyState, EmptyPictures, type EmptyKind, type EmptyPicture, type Empt
 export { default as SectionHeader } from "./SectionHeader";
 export { default as ContextMenu, ContextMenuContent, useContextMenu } from "./ContextMenu";
 export type { ContextMenuItem, ContextMenuOptions, ContextMenuResult, ContextMenuTriggerProps } from "./ContextMenu";
+export { SelectionPill } from "./SelectionPill";
+export type { SelectionPillAction, SelectionPillProps } from "./SelectionPill";
 export { FloatingSurface, usePhoneWidth } from "./FloatingSurface";
 export type { FloatingAnchor } from "./FloatingSurface";
 
