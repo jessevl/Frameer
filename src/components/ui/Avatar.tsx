@@ -15,6 +15,8 @@ const SIZES: Record<AvatarSize, string> = { sm: 'h-5 w-5 text-[9.5px]', md: 'h-6
 
 export interface AvatarProps {
   name: string;
+  /** The letters to show when they should not be taken from the name ("MV" for a first name that is two words). */
+  initials?: string;
   /** The person's hue; without one the avatar is the quiet grey. */
   hue?: HueName;
   /** A picture of the person; it replaces the initials. */
@@ -39,8 +41,8 @@ export function initialsOf(name: string): string {
     .toUpperCase();
 }
 
-export const Avatar: React.FC<AvatarProps> = ({ name, hue, src, size = 'md', ringed = false, label, className }) => {
-  const initials = initialsOf(name);
+export const Avatar: React.FC<AvatarProps> = ({ name, initials: given, hue, src, size = 'md', ringed = false, label, className }) => {
+  const initials = given ?? initialsOf(name);
   const unknown = initials === '';
   const style = !src && !unknown && hue ? { background: hueVar(hue, 'fill'), color: hueVar(hue, 'ink') } : undefined;
   return (

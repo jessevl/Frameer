@@ -60,7 +60,7 @@ export { default as IconWrapper } from "./IconWrapper";
 export { EmptyState, EmptyPictures, type EmptyKind, type EmptyPicture, type EmptySize } from "./EmptyState";
 export { default as SectionHeader } from "./SectionHeader";
 export { default as ContextMenu, ContextMenuContent, useContextMenu } from "./ContextMenu";
-export type { ContextMenuItem, ContextMenuOptions, ContextMenuResult, ContextMenuTriggerProps } from "./ContextMenu";
+export type { ContextMenuItem, ContextMenuChoice, ContextMenuChoices, ContextMenuOptions, ContextMenuResult, ContextMenuTriggerProps } from "./ContextMenu";
 export { Avatar, initialsOf } from "./Avatar";
 export type { AvatarProps, AvatarSize } from "./Avatar";
 export { AvatarStack } from "./AvatarStack";
