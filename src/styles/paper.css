@@ -1,0 +1,30 @@
+/*
+ * @file paper.css
+ * @description Paper and a breath of light (D15 D): the grain and the hour's faint wash on the app's paper surfaces (the stage card, the sidebar card, the phone's screen), laid behind their content so type and pictures stay clean. The variables come from `lib/paper.ts`; until the grain is made, only the wash shows. Off in print and with forced colours.
+ * Based on drift@d91d6950:frontend/src/styles/paper.css
+ * Used by: the app shell (`.paper-surface`).
+ */
+.paper-surface {
+  position: relative;
+  isolation: isolate;
+}
+
+.paper-surface::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: inherit;
+  background: var(--paper-wash, none), var(--paper-grain, none) 0 0 / var(--paper-grain-size, 256px);
+}
+
+.dark .paper-surface::before {
+  background: var(--paper-wash-dark, none), var(--paper-grain-dark, none) 0 0 / var(--paper-grain-size, 256px);
+}
+
+@media print, (forced-colors: active) {
+  .paper-surface::before {
+    display: none;
+  }
+}

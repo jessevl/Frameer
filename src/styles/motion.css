@@ -1,0 +1,312 @@
+/*
+ * @file motion.css
+ * @description The motion kit: five duration tokens (80 to 600 ms), one spring and one ease-out, the shared keyframes, and the icon micro-animations ("icons that answer back"). A button opts in with `data-motion="<name>"`; its glyph then answers on hover and focus. Every motion reports something that just happened, none loops except the two ambient ones (sync, upload). With reduced motion all animations are off and transitions last 1 ms.
+ * Based on drift@d91d6950:frontend/src/styles/motion.css
+ * Used by: menus, the rail and toolbars (via `data-motion`), popovers (`.motion-pop`), the selection pill and side panels (`--dur-gentle` with `--spring`).
+ */
+:root {
+  /* Hover tints, pressed states, checkbox borders. */
+  --dur-instant: 80ms;
+  /* Row hover actions fade in; tooltips. */
+  --dur-quick: 120ms;
+  /* Menus and popovers: scale .98 to 1 plus fade, from their trigger. */
+  --dur-base: 200ms;
+  /* Side panel, sheets, the selection pill, Quick Look opening from its row. */
+  --dur-gentle: 320ms;
+  /* Ambient only (sync strokes, the sign-in art). Never blocks input. */
+  --dur-drift: 600ms;
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --spring: cubic-bezier(0.2, 0.9, 0.25, 1.15);
+}
+
+@keyframes motion-pop {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes motion-heart-pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.3); }
+  70% { transform: scale(0.92); }
+  100% { transform: scale(1.05); }
+}
+
+@keyframes motion-bell {
+  0% { transform: rotate(0); }
+  25% { transform: rotate(14deg); }
+  50% { transform: rotate(-12deg); }
+  75% { transform: rotate(7deg); }
+  100% { transform: rotate(-3deg); }
+}
+
+@keyframes motion-burst {
+  from { transform: scale(0.4); opacity: 0.9; }
+  to { transform: scale(1.5); opacity: 0; }
+}
+
+@keyframes motion-sync {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(-3.5px); }
+}
+
+@keyframes motion-rise {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2.5px); }
+}
+
+@keyframes motion-draw {
+  from { stroke-dashoffset: 24; }
+  to { stroke-dashoffset: 0; }
+}
+
+/* The shell of a floating menu or popover grows from its trigger. */
+.motion-pop {
+  animation: motion-pop var(--dur-base) var(--spring) both;
+}
+
+/* A glyph inside an opted-in button answers on hover and keyboard focus. */
+[data-motion] svg:not([data-line]) {
+  transition: transform var(--dur-base) var(--spring);
+  transform-origin: center;
+}
+[data-motion='search']:is(:hover, :focus-visible) svg:not([data-line]) { transform: rotate(-14deg) scale(1.1); }
+[data-motion='share']:is(:hover, :focus-visible) svg:not([data-line]),
+[data-motion='open']:is(:hover, :focus-visible) svg:not([data-line]) { transform: translate(2.5px, -2.5px); }
+[data-motion='new']:is(:hover, :focus-visible) svg:not([data-line]) { transform: rotate(135deg); }
+[data-motion='collapse'] svg:not([data-line]) { transform-origin: left center; }
+[data-motion='collapse']:is(:hover, :focus-visible) svg:not([data-line]) { transform: scaleX(0.35); }
+[data-motion='star']:is(:hover, :focus-visible) svg:not([data-line]) { transform: scale(1.15) rotate(-14deg); }
+[data-motion='star'][aria-pressed='true'] svg:not([data-line]),
+[data-motion='star'][data-on='true'] svg:not([data-line]) { fill: var(--coral); color: var(--coral); }
+[data-motion='delete'] svg:not([data-line]) { transform-origin: left bottom; }
+[data-motion='delete']:is(:hover, :focus-visible) svg:not([data-line]) { transform: rotate(-16deg) translateY(-2px); }
+[data-motion='drop'][data-hover='true'] svg:not([data-line]) { transform: skewX(-10deg) scaleY(0.82); }
+[data-motion='complete']:is(:hover, :focus-visible) svg:not([data-line]) path { stroke-dasharray: 24; animation: motion-draw var(--dur-gentle) var(--ease-out) 0.1s both; }
+[data-motion='favorite'][aria-pressed='true'] svg:not([data-line]),
+[data-motion='favorite'][data-on='true'] svg:not([data-line]) { fill: var(--coral); color: var(--coral); animation: motion-heart-pop 0.5s var(--spring) both; }
+[data-motion='notify']:is(:hover, :focus-visible) svg:not([data-line]) { animation: motion-bell 0.7s var(--ease-in-out) 1 both; }
+
+/* Ambient: the coral strokes of a syncing glyph, the arrow of an upload. */
+[data-motion='sync'][data-busy='true'] svg:not([data-line]) path { animation: motion-sync 1.4s var(--ease-in-out) infinite; }
+[data-motion='sync'][data-busy='true'] svg:not([data-line]) path:nth-child(2) { animation-delay: 0.15s; }
+[data-motion='sync'][data-busy='true'] svg:not([data-line]) path:nth-child(3) { animation-delay: 0.3s; }
+[data-motion='upload'][data-busy='true'] .gi-line .arrow { animation: motion-rise 1s var(--ease-in-out) infinite; }
+[data-motion='upload'][data-busy='true'] svg:not([data-line]) { animation: motion-rise 1s var(--ease-in-out) infinite; }
+
+/* A heart that was just switched on (reduced motion removes the animation; callers also skip the burst). */
+.motion-heart-pop {
+  animation: motion-heart-pop 0.5s var(--spring) both;
+}
+
+/* A dotted burst behind a star that was just switched on (the unstar case never mounts it). */
+.motion-burst {
+  position: absolute;
+  inset: -4px;
+  border-radius: 999px;
+  border: 1.5px dotted var(--coral);
+  pointer-events: none;
+  animation: motion-burst 600ms var(--ease-out) both;
+}
+
+/*
+ * Icons that answer back (Drift line and the glass folder). The parts of a drawing that move carry a short class (`.st`, `.lid`, `.pocket` ...); they move when the icon's button, rail link or pane row (`.icon-hv`) is hovered or focused. Coral only where the motion kit fills (task done, star, favorite). Ported from the icon generator page.
+ */
+.gi-line {
+  color: var(--ink-2);
+  transition: color var(--dur-base);
+}
+.gi-line.gi-fixed { color: var(--coral); }
+/* In toolbars and menus the icon takes the text color of its button. The surface behind it varies, so nothing occludes the lines. */
+.gi-line.gi-inherit { color: inherit; --icon-bg: transparent; }
+:is(.icon-hv, button, a, [role='menuitem'], [role='option'], [role='treeitem'], [role='tab']):is(:hover, :focus-visible) .gi-line:not(.gi-fixed, .gi-inherit) { color: var(--ink); }
+:is(.icon-hv, button, a, [role='menuitem'], [role='option'], [role='treeitem'], [role='tab']):is(:hover, :focus-visible) .gi-line .fs { stroke: var(--coral); }
+/* The current rail section and pane row. */
+[aria-current='page'] > .gi-line:not(.gi-fixed),
+[aria-current='page'] .gi-line:not(.gi-fixed) { color: var(--coral-ink); }
+
+.gi-line :is(.st, .pop, .lid, .front, .s1, .s2, .s3, .arrow, .arr, .pl, .lens, .pane, .door, .hands, .n1, .n2, .n3, .dup, .drop, .rays, .day, .jl, .l1, .l3, .r1, .r2, .r3, .clap, .bounce, .spk, .tw1, .tw2, .q1, .q2, .q3, .q4, .gear, .burst, .led, .lift, .fanb, .ca, .cb, .sun, .cd, .b1, .b2, .tk, .br, .rg, .dt, .dp1, .dp2, .dp3, .fn, .ar, .d1, .d2, .d3, .eye, .pu, .lk1, .lk2, .dn, .tray, .mv, .pen, .ul, .plc, .tg, .hb, .ah, .slt, .mt, .pt, .wv, .tri, .sq, .ci, .dr, .hd, .er, .crm, .cr) {
+  transition: transform var(--dur-gentle) var(--spring), opacity var(--dur-base);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+/* The side panel's icons are static: no hover gesture (round 3, point 7). */
+.gi-line.gi-static, .gi-line.gi-static * { animation: none !important; }
+.gi-line.gi-static [class] { transform: none !important; }
+.gi-line :is(.fon, .dk) { transition: opacity var(--dur-base); }
+.gi-line :is(.tick, .prog, .ul) { transition: stroke-dashoffset var(--dur-gentle); }
+.gi-line .vb { transform-box: view-box; transform-origin: 12px 12px; }
+/* The round 3 turns pivot on the tag's hole and the clock's center. */
+.gi-line .tg { transform-box: view-box; transform-origin: 8px 8px; }
+.gi-line .hb { transform-box: view-box; transform-origin: 12.5px 12px; }
+.gi-line :is(.fon, .burst, .dk, .drop, .dp1, .dp2, .dp3, .crm) { opacity: 0; }
+.gi-line .tick { stroke-dasharray: 16; stroke-dashoffset: 16; }
+.gi-line .prog { stroke-dasharray: 57; stroke-dashoffset: 57; }
+.gi-line .pulse { stroke-dasharray: 32; }
+.gi-line .ul { stroke-dasharray: 8; stroke-dashoffset: 8; }
+.gi-line .dr { stroke-dasharray: 30; }
+.gi-line :is(.lid, .clap) { transform-origin: left bottom; }
+.gi-line .front { transform-origin: center bottom; }
+.gi-line .b2 { transform-origin: center top; }
+.gi-line .wv { transform-origin: center bottom; }
+.gi-line :is(.door, .pane, .jl) { transform-origin: left center; }
+
+:is(.icon-hv, button, a, [role='menuitem'], [role='option'], [role='treeitem'], [role='tab']):is(:hover, :focus-visible) .gi-line {
+  & .fon { opacity: 1; }
+  & .tick { stroke-dashoffset: 0; transition-delay: 0.1s; }
+  & .st { transform: scale(1.15) rotate(-14deg); }
+  & .burst { animation: gi-burst 0.6s var(--ease-out); }
+  & .lid { transform: translateY(-1.6px) rotate(-16deg); }
+  & .front { transform: skewX(-10deg) scaleY(0.82); }
+  & .s1 { animation: gi-drift 1.4s var(--ease-in-out) infinite; }
+  & .s2 { animation: gi-drift 1.4s var(--ease-in-out) 0.15s infinite; }
+  & .s3 { animation: gi-drift 1.4s var(--ease-in-out) 0.3s infinite; }
+  & .prog { stroke-dashoffset: 10; transition: stroke-dashoffset 1.2s var(--ease-out); }
+  & .arrow { animation: gi-rise 1s var(--ease-out) infinite; }
+  & .pop { animation: gi-pop 0.5s var(--spring); }
+  & .arr { transform: translate(2px, -2px); }
+  & .pl { transform: rotate(135deg); }
+  & .dk { opacity: 0.45; }
+  & .lens { transform: rotate(-14deg) scale(1.1); }
+  & .pane { transform: scaleX(0.35); }
+  & .door { transform: scaleX(0.3); }
+  & .hands { transform: rotate(360deg); transition-duration: 0.8s; }
+  & .n1 { animation: gi-pop 0.5s var(--spring); }
+  & .n2 { animation: gi-pop 0.5s var(--spring) 0.08s; }
+  & .n3 { animation: gi-pop 0.5s var(--spring) 0.16s; }
+  & .pulse { animation: gi-draw 0.7s var(--ease-out); }
+  & .dup { transform: translate(1.6px, 1.6px); }
+  & .drop { animation: gi-drop 0.8s var(--spring); }
+  & .rays { transform: rotate(45deg); }
+  & .day { animation: gi-pop 0.5s var(--spring); }
+  & .jl { animation: gi-grow 0.5s var(--ease-out); }
+  & .l1 { transform: translateY(-1.6px); }
+  & .l3 { transform: translateY(1.4px); }
+  & .r1 { animation: gi-slide 0.45s var(--spring); }
+  & .r2 { animation: gi-slide 0.45s var(--spring) 0.06s backwards; }
+  & .r3 { animation: gi-slide 0.45s var(--spring) 0.12s backwards; }
+  & .clap { animation: gi-clap 0.5s var(--ease-out); }
+  & .bounce { animation: gi-bounce 0.6s var(--spring); }
+  & .spk { transform: rotate(15deg) scale(1.1); }
+  & .tw1 { animation: gi-pop 0.5s var(--spring) 0.1s; }
+  & .tw2 { animation: gi-pop 0.5s var(--spring) 0.2s; }
+  & .q1 { transform: translate(-0.8px, -0.8px); }
+  & .q2 { transform: translate(0.8px, -0.8px); }
+  & .q3 { transform: translate(-0.8px, 0.8px); }
+  & .q4 { transform: translate(0.8px, 0.8px); }
+  & .gear { transform: rotate(90deg); }
+  & .led { animation: gi-blink 0.9s steps(2) infinite; }
+  & .lift { transform: translateY(-1px); }
+  & .fanb { transform: rotate(6deg); }
+  & .ca { transform: translateY(-1.3px); }
+  & .cb { transform: translateY(-1.3px); transition-delay: 0.07s; }
+  & .sun { animation: gi-pop 0.5s var(--spring) 0.12s; }
+  & .cd { transform: translate(6.7px, -2.9px); }
+  & .b1 { animation: gi-slide 0.45s var(--spring); }
+  & .b2 { transform: scaleY(1.14); }
+  & .tk { animation: gi-slide 0.45s var(--spring) 0.08s backwards; }
+  & .br { transform: scale(0.84); }
+  & .rg { transform: scale(1.12); transition-delay: 0.06s; }
+  & .dt { animation: gi-pop 0.5s var(--spring) 0.14s; }
+  & .dp1 { animation: gi-drop 0.8s var(--spring); }
+  & .dp2 { animation: gi-drop 0.8s var(--spring) 0.12s; }
+  & .dp3 { animation: gi-drop 0.8s var(--spring) 0.24s; }
+  & .fn { animation: gi-squeeze 0.5s var(--spring) 0.2s; }
+  & .ar { animation: gi-nudge 0.6s var(--spring) 0.1s; }
+  & .d1 { animation: gi-bounce 0.5s var(--spring); }
+  & .d2 { animation: gi-bounce 0.5s var(--spring) 0.08s; }
+  & .d3 { animation: gi-bounce 0.5s var(--spring) 0.16s; }
+  & .eye { animation: gi-blinkeye 0.42s var(--ease-in-out); }
+  & .pu { animation: gi-look 0.9s var(--ease-in-out) 0.3s; }
+  & .lk1 { animation: gi-pull1 0.55s var(--spring); }
+  & .lk2 { animation: gi-pull2 0.55s var(--spring); }
+  & .dn { animation: gi-fall 0.7s var(--spring); }
+  & .tray { animation: gi-dip 0.5s var(--spring) 0.28s; }
+  & .mv { transform: translateX(1.8px); transition-delay: 0.06s; }
+  & .pen { transform: translate(-1.2px, 1px) rotate(-8deg); }
+  & .ul { stroke-dashoffset: 0; transition-delay: 0.1s; }
+  & .plc { transform: rotate(90deg) scale(1.1); transition-delay: 0.08s; }
+  & .tg { animation: gi-swing 0.7s var(--ease-in-out); }
+  & .hb { transform: rotate(-360deg); transition-duration: 0.8s; }
+  & .ah { animation: gi-pop 0.5s var(--spring) 0.3s; }
+  & .slt { animation: gi-slide 0.45s var(--spring) 0.1s backwards; }
+  & .mt { transform: translateY(-0.8px); }
+  & .pt { transform: translate(-1.2px, -1.2px); }
+  & .wv { animation: gi-wave 0.7s var(--ease-in-out); }
+  & .tri { transform: rotate(14deg); }
+  & .sq { transform: rotate(-12deg); transition-delay: 0.05s; }
+  & .ci { animation: gi-pop 0.5s var(--spring) 0.1s; }
+  & .dr { animation: gi-drawl 0.6s var(--ease-out); }
+  & .hd { animation: gi-pop 0.5s var(--spring) 0.3s; }
+  & .er { animation: gi-rub 0.6s var(--ease-in-out); }
+  & .crm { animation: gi-drop 0.8s var(--spring) 0.2s; }
+  & .cr { animation: gi-blink 0.9s steps(2) infinite; }
+}
+
+/* The glass folder's pocket tips open under the pointer and while files are dragged over the folder. */
+.gi-glass .gi-pocket {
+  transition: transform var(--dur-gentle) var(--spring);
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+/* A row of tiles holds several folders, so it never counts: only the tile under the pointer does. */
+:is(.icon-hv, a, button, [role='row']:not([data-tile-row]), [role='treeitem'], [data-testid='item-card'], [data-tile]):is(:hover, :focus-visible) .gi-glass .gi-pocket,
+[data-dropping='true'] .gi-glass .gi-pocket {
+  transform: skewX(-8deg) scaleY(0.86);
+}
+
+/*
+ * Frameer's chrome icons (ChromeIconsProvider; `data-chrome="<name>"` on each svg). The ones the provider fills with a generic Lucide geometry have no named parts, so the whole icon makes its gesture when the button, row or link around it is hovered or focused; the ones drawn from the Drift kit (search, inbox, folder ...) keep their own part motion above. Skipped with reduced motion.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .gi-line[data-chrome] {
+    transition: color var(--dur-base), transform var(--dur-gentle) var(--spring);
+  }
+  :is(.icon-hv, button, a, [role='menuitem'], [role='option'], [role='treeitem'], [role='tab']):is(:hover, :focus-visible) .gi-line[data-chrome] {
+    &[data-chrome='chevronRight'] { transform: translateX(2px); }
+    &[data-chrome='chevronLeft'] { transform: translateX(-2px); }
+    &[data-chrome='chevronDown'] { transform: translateY(2px); }
+    &:is([data-chrome='close'], [data-chrome='plus']) { transform: rotate(90deg); }
+    &[data-chrome='check'] { transform: scale(1.18); }
+    &[data-chrome='refresh'] { transform: rotate(180deg); }
+    &[data-chrome='undo'] { transform: rotate(-20deg); }
+    &[data-chrome='home'] { transform: translateY(-1px); }
+    &:is([data-chrome='info'], [data-chrome='alertCircle'], [data-chrome='alertTriangle'], [data-chrome='checkCircle'], [data-chrome='bug'], [data-chrome='wifiOff']) { transform: scale(1.1); }
+    &[data-chrome='pencil'] { transform: translate(1px, -1px) rotate(-8deg); }
+    &[data-chrome='stickyNote'] { transform: rotate(-6deg); }
+    &[data-chrome='calendarRange'] { transform: translateY(-1px); }
+  }
+}
+
+@keyframes gi-burst { 0% { opacity: 0.9; transform: scale(0.4); } 100% { opacity: 0; transform: scale(1.5); } }
+@keyframes gi-drift { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(-3.5px); } }
+@keyframes gi-rise { 0% { transform: translateY(3px); opacity: 0; } 35% { opacity: 1; } 100% { transform: translateY(-2px); opacity: 0; } }
+@keyframes gi-pop { 0% { transform: scale(1); } 40% { transform: scale(1.3); } 70% { transform: scale(0.92); } 100% { transform: scale(1.05); } }
+@keyframes gi-draw { from { stroke-dashoffset: 32; } to { stroke-dashoffset: 0; } }
+@keyframes gi-drop { 0% { opacity: 0; transform: translateY(-4px); } 40% { opacity: 1; } 100% { opacity: 0; transform: translateY(6px); } }
+@keyframes gi-grow { from { transform: scaleX(0.2); } }
+@keyframes gi-slide { from { transform: translateX(-3px); opacity: 0.2; } }
+@keyframes gi-clap { 0%, 100% { transform: rotate(0); } 40% { transform: rotate(-14deg); } }
+@keyframes gi-bounce { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-2.4px); } }
+@keyframes gi-blink { 50% { opacity: 0.2; } }
+@keyframes gi-squeeze { 40% { transform: scaleX(0.9); } }
+@keyframes gi-nudge { 40% { transform: translateY(2px); } }
+@keyframes gi-blinkeye { 45% { transform: scaleY(0.12); } }
+@keyframes gi-look { 25% { transform: translateX(-1.6px); } 65% { transform: translateX(1.6px); } }
+@keyframes gi-pull1 { 40% { transform: translate(1.4px, -1.4px); } }
+@keyframes gi-pull2 { 40% { transform: translate(-1.4px, 1.4px); } }
+@keyframes gi-fall { 0% { transform: translateY(-3.5px); opacity: 0; } 50% { opacity: 1; } }
+@keyframes gi-dip { 40% { transform: translateY(1px); } }
+@keyframes gi-swing { 25% { transform: rotate(-12deg); } 60% { transform: rotate(7deg); } }
+@keyframes gi-wave { 25% { transform: rotate(-10deg); } 60% { transform: rotate(8deg); } }
+@keyframes gi-drawl { from { stroke-dashoffset: 30; } }
+@keyframes gi-rub { 25% { transform: translateX(-1.5px); } 50% { transform: translateX(1.5px); } 75% { transform: translateX(-1px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition-duration: 1ms !important;
+  }
+}

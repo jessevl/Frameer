@@ -1,0 +1,8 @@
+/*
+ * @file reading.css
+ * @description The reading face: Literata for mail bodies, the compose body and long text, as the token `--font-reading` next to Frameer's `--font-sans` and `--font-mono`. The app loads the font file itself (Frameer ships no font files).
+ * Used by: the mail reader and the compose body (M3), through `font-family: var(--font-reading)`.
+ */
+:root {
+  --font-reading: 'Literata Variable', ui-serif, Georgia, 'Times New Roman', serif;
+}

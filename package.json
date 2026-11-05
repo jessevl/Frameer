@@ -53,7 +53,14 @@
     },
     "./styles/tokens.css": "./src/styles/tokens.css",
     "./styles/base.css": "./src/styles/base.css",
-    "./styles/empty.css": "./src/styles/empty.css"
+    "./styles/empty.css": "./src/styles/empty.css",
+    "./styles/motion.css": "./src/styles/motion.css",
+    "./styles/density.css": "./src/styles/density.css",
+    "./styles/hues.css": "./src/styles/hues.css",
+    "./styles/paper.css": "./src/styles/paper.css",
+    "./styles/shell.css": "./src/styles/shell.css",
+    "./styles/print.css": "./src/styles/print.css",
+    "./styles/reading.css": "./src/styles/reading.css"
   },
   "files": [
     "dist",
