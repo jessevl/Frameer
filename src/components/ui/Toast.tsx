@@ -5,16 +5,21 @@
  * Provides brief toast notifications with optional undo action
  * for destructive operations like delete, complete, etc.
  * 
+ * The timer pauses while the pointer or the focus is on a toast, so an Undo is never taken from under a hand.
+ * An action can show a countdown (seconds left), and the `pill` variant is Lighthouse's dark pill.
+ * The timer is ported from lighthouse@dd62578:frontend/src/components/ui/ToastHost.tsx.
+ *
  * Positioning:
  * - Mobile: Bottom right (avoid FAB)
  * - Desktop: Bottom center (avoid FAB overlap)
  */
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { create } from 'zustand';
 import { XIcon } from '@frameer/components/common/Icons';
 import { ChromeIcon, type ChromeIconName } from './ChromeIcons';
 import { useIsMobile } from '@frameer/hooks/useMobileDetection';
+import { createPausableTimer, type PausableTimer } from '@frameer/lib/pausableTimer';
 
 // ============================================================================
 // TOAST STORE
@@ -26,6 +31,8 @@ interface ToastAction {
   label: string;
   onClick: () => void;
 }
+
+export type ToastVariant = 'tinted' | 'pill';
 
 interface ToastItem {
   id: string;
@@ -39,6 +46,10 @@ interface ToastItem {
   duration?: number;
   /** Whether the toast is dismissible */
   dismissible?: boolean;
+  /** `tinted` (default) takes the type's color; `pill` is the dark pill */
+  variant?: ToastVariant;
+  /** Show the seconds left beside the action or Undo */
+  countdown?: boolean;
 }
 
 interface ToastState {
@@ -60,15 +71,8 @@ export const useToastStore = create<ToastState>((set, get) => ({
       dismissible: toast.dismissible ?? true,
     };
     
+    // The toast's own component runs the timer, so hover and focus can pause it.
     set({ toasts: [...get().toasts, newToast] });
-    
-    // Auto-remove after duration
-    if (newToast.duration && newToast.duration > 0) {
-      setTimeout(() => {
-        get().removeToast(id);
-      }, newToast.duration);
-    }
-    
     return id;
   },
   
@@ -142,6 +146,25 @@ export function toastSuccessWithAction(
   });
 }
 
+/**
+ * Show a message with one action (usually Undo), a countdown beside it and the dark pill look.
+ * The toast stays 8 seconds and pauses while the pointer or the focus is on it.
+ */
+export function toastWithAction(
+  message: string,
+  action: { label: string; onClick: () => void },
+  options: { duration?: number; variant?: ToastVariant; countdown?: boolean; type?: ToastType } = {},
+) {
+  return useToastStore.getState().addToast({
+    type: options.type ?? 'success',
+    message,
+    action,
+    duration: options.duration ?? 8000,
+    variant: options.variant ?? 'pill',
+    countdown: options.countdown ?? true,
+  });
+}
+
 // ============================================================================
 // TOAST COMPONENT
 // ============================================================================
@@ -184,12 +207,27 @@ interface ToastItemComponentProps {
 
 const ToastItemComponent: React.FC<ToastItemComponentProps> = ({ toast, onRemove }) => {
   const [isExiting, setIsExiting] = useState(false);
+  const [secondsLeft, setSecondsLeft] = useState(Math.ceil((toast.duration ?? 0) / 1000));
+  const timer = useRef<PausableTimer | null>(null);
   const config = typeConfig[toast.type];
+  const pill = toast.variant === 'pill';
 
   const handleRemove = useCallback(() => {
     setIsExiting(true);
     setTimeout(onRemove, 150);
   }, [onRemove]);
+
+  // The countdown runs here, not in the store, so hover and focus can pause it.
+  useEffect(() => {
+    if (!toast.duration || toast.duration <= 0) return;
+    const t = createPausableTimer(toast.duration, handleRemove);
+    timer.current = t;
+    const tick = toast.countdown ? setInterval(() => setSecondsLeft(Math.ceil(t.remaining() / 1000)), 250) : null;
+    return () => {
+      t.cancel();
+      if (tick) clearInterval(tick);
+    };
+  }, [toast.duration, toast.countdown, handleRemove]);
 
   const handleUndo = useCallback(() => {
     toast.onUndo?.();
@@ -198,17 +236,24 @@ const ToastItemComponent: React.FC<ToastItemComponentProps> = ({ toast, onRemove
 
   return (
     <div
+      role={toast.type === 'error' ? 'alert' : 'status'}
+      data-testid="toast"
+      data-variant={pill ? 'pill' : 'tinted'}
+      onPointerEnter={() => timer.current?.pause()}
+      onPointerLeave={() => timer.current?.resume()}
+      onFocus={() => timer.current?.pause()}
+      onBlur={() => timer.current?.resume()}
       className={`
-        flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg backdrop-blur-sm
-        ${config.bgClass} ${config.borderClass}
+        flex items-center gap-3 shadow-lg backdrop-blur-sm
+        ${pill ? 'min-h-11 rounded-full bg-[var(--ink)] pl-[18px] pr-2 text-[var(--paper)]' : `px-4 py-3 rounded-xl ${config.bgClass} ${config.borderClass}`}
         transition-all duration-150 ease-out
         ${isExiting ? 'opacity-0 translate-x-4' : 'opacity-100 translate-x-0'}
         toast-enter
       `}
     >
-      <ChromeIcon name={config.icon} size={18} className={config.iconClass} strokeWidth={1.75} />
+      {pill ? null : <ChromeIcon name={config.icon} size={18} className={config.iconClass} strokeWidth={1.75} />}
       
-      <span className={`flex-1 text-sm font-medium ${config.textClass}`}>
+      <span className={`flex-1 text-sm font-medium ${pill ? '' : config.textClass}`}>
         {toast.message}
       </span>
 
@@ -218,11 +263,12 @@ const ToastItemComponent: React.FC<ToastItemComponentProps> = ({ toast, onRemove
           className={`
             flex items-center gap-1 px-2 py-1 rounded text-xs font-medium
             hover:bg-black/5 dark:hover:bg-white/10 transition-colors
-            ${config.textClass}
+            ${pill ? 'text-[var(--paper)]' : config.textClass}
           `}
         >
           <ChromeIcon name="undo" size={14} />
           Undo
+          {toast.countdown ? <span aria-hidden="true" className="tabular-nums opacity-70">{secondsLeft}</span> : null}
         </button>
       )}
 
@@ -235,10 +281,11 @@ const ToastItemComponent: React.FC<ToastItemComponentProps> = ({ toast, onRemove
           className={`
             px-2 py-1 rounded text-xs font-medium
             hover:bg-black/5 dark:hover:bg-white/10 transition-colors
-            ${config.textClass}
+            ${pill ? 'text-[var(--paper)]' : config.textClass}
           `}
         >
           {toast.action.label}
+          {toast.countdown ? <span aria-hidden="true" className="tabular-nums opacity-70">{secondsLeft}</span> : null}
         </button>
       )}
 
@@ -247,7 +294,7 @@ const ToastItemComponent: React.FC<ToastItemComponentProps> = ({ toast, onRemove
           onClick={handleRemove}
           className={`
             p-1 rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-colors
-            ${config.iconClass}
+            ${pill ? 'text-[var(--paper)]' : config.iconClass}
           `}
           aria-label="Dismiss"
         >

@@ -87,6 +87,15 @@ function App() {
 - Card, Panel, Container, Sidebar, Header
 - Modal, ModalFooter, Divider, Stack, FlexGroup
 - MobileSheet, HorizontalScrollContainer
+- AdaptiveDialog (a Modal on the desktop, a sheet below 768 px, same props)
+
+### Side panels
+
+`PropertyGrid` is a grid of an 88 px label column and two value columns; `PropertyRow` lays itself across it (`children` over both value columns, or `children` and `second` side by side). Outside a grid it is a flex row, the label left and the value right. `icon` takes a node and `line` a Drift line icon (drawn static); `tone` colors it: `accent` (coral, the default) or `grey`, for apps where coral marks actions only. With `onClick` the whole row is one button, so keep its children plain text. `PanelSection` is a region under a kicker, and `AddChip` is the dashed "Add ..." button at the foot of a list.
+
+### Dialogs
+
+`Modal` follows the keyboard rules of a dialog: Escape closes the top dialog only, focus moves in when it opens (to the element marked `data-autofocus`, else the first control), Tab and Shift+Tab stay inside, and focus returns to what had it. `ConfirmModal` (with `useConfirmStore`) takes children, or `requestConfirm({ children })`, that name what is lost.
 
 ### Display Components
 - Badge, Popover, ColorDot, EmptyState
@@ -121,7 +130,7 @@ Fields are 36 px with 14 px text (44 px and 16 px on a phone). Popovers and the 
 - H1, H2, H3, H4, Text, TextSmall, Label
 
 ### Feedback
-- Toast (with toastSuccess, toastError, etc.)
+- Toast (with toastSuccess, toastError, etc.). The timer pauses while the pointer or the focus is on a toast. `toastWithAction(message, { label, onClick }, { duration, countdown, variant })` shows an action with the seconds left beside it; `variant: 'pill'` is the dark pill.
 - ErrorBanner, StatusBanner
 - SmartEmptyState
 

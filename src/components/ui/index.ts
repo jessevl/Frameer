@@ -102,8 +102,8 @@ export type { IconProps } from "./Icon";
 export { SmartEmptyState, CompactEmptyState } from "./SmartEmptyState";
 
 // Toast
-export { ToastContainer, useToastStore, toastSuccess, toastError, toastWarning, toastInfo, toastSuccessWithAction } from "./Toast";
-export type { ToastType } from "./Toast";
+export { ToastContainer, useToastStore, toastSuccess, toastError, toastWarning, toastInfo, toastSuccessWithAction, toastWithAction } from "./Toast";
+export type { ToastType, ToastVariant } from "./Toast";
 
 // Settings UI Primitives
 export {
