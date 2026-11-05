@@ -1,0 +1,35 @@
+/*
+ * @file density.css
+ * @description Spacing tokens for the Density setting. The unmarked values are Comfortable (what every screen was drawn with); `[data-density='compact']` on the root tightens the tree rows and the pane headers. Virtualized rows read the same choice in JavaScript, in the app.
+ * Based on drift@d91d6950:frontend/src/styles/density.css
+ * Used by: the tree, the pane parts and the toolbars, through the CSS variables.
+ */
+:root {
+  --tree-row-h: 2rem;
+  --pane-head-h: 2.25rem;
+  --toolbar-btn: 2rem;
+}
+
+:root[data-density='compact'] {
+  --tree-row-h: 1.625rem;
+  --pane-head-h: 1.875rem;
+  --toolbar-btn: 1.75rem;
+}
+
+/*
+ * Theme preview swatches (Settings, Appearance). A card previews a theme other than the current one, so it cannot read the live
+ * tokens; these mirror the canvas, paper, paper-2 and line tokens for each theme.
+ */
+.theme-swatch[data-swatch='light'] {
+  --sw-canvas: #f5f4f1;
+  --sw-side: #faf9f7;
+  --sw-stage: #ffffff;
+  --sw-line: #ece8e2;
+}
+
+.theme-swatch[data-swatch='dark'] {
+  --sw-canvas: #0f0e0e;
+  --sw-side: #1d1a1a;
+  --sw-stage: #171515;
+  --sw-line: #272423;
+}

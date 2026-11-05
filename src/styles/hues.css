@@ -1,0 +1,31 @@
+/*
+ * @file hues.css
+ * @description The ten named hues as tokens, four steps each: fill, stroke, ink (text on fill) and mark (the translucent highlighter), light and dark. The names are in lib/hues.ts (`HueName`, `hueVar`); an app that needs the numbers in code keeps its own table next to a test that holds both equal. Coral is not a hue.
+ * Based on drift@d91d6950:frontend/src/styles/hues.css
+ * Used by: every surface that lets people color something (tags, folders, base options, whiteboards, page highlights and tints, charts).
+ */
+:root {
+  --hue-gray-fill: #EFEDEA; --hue-gray-stroke: #8C857D; --hue-gray-ink: #4A4540; --hue-gray-mark: rgba(140,133,125,.24);
+  --hue-brown-fill: #F2E6DC; --hue-brown-stroke: #A0714F; --hue-brown-ink: #6B4426; --hue-brown-mark: rgba(160,113,79,.24);
+  --hue-orange-fill: #FCE6D3; --hue-orange-stroke: #D9772B; --hue-orange-ink: #8A4310; --hue-orange-mark: rgba(240,140,60,.28);
+  --hue-yellow-fill: #FBF0C4; --hue-yellow-stroke: #C99A06; --hue-yellow-ink: #6E5300; --hue-yellow-mark: rgba(250,214,60,.42);
+  --hue-green-fill: #DDF0E1; --hue-green-stroke: #3E9A5B; --hue-green-ink: #1E5E33; --hue-green-mark: rgba(90,200,120,.28);
+  --hue-teal-fill: #D6EFEE; --hue-teal-stroke: #2A9690; --hue-teal-ink: #135955; --hue-teal-mark: rgba(60,190,185,.26);
+  --hue-blue-fill: #DCE8F7; --hue-blue-stroke: #3F7FD1; --hue-blue-ink: #1D4E8F; --hue-blue-mark: rgba(80,150,240,.24);
+  --hue-purple-fill: #E7E1F7; --hue-purple-stroke: #7F62D1; --hue-purple-ink: #4A3290; --hue-purple-mark: rgba(140,110,230,.22);
+  --hue-pink-fill: #F8DFEA; --hue-pink-stroke: #CF5C8E; --hue-pink-ink: #8A2654; --hue-pink-mark: rgba(240,120,170,.24);
+  --hue-red-fill: #F9DEDB; --hue-red-stroke: #CC4B3E; --hue-red-ink: #8C2219; --hue-red-mark: rgba(235,90,75,.22);
+}
+
+.dark {
+  --hue-gray-fill: #2A2725; --hue-gray-stroke: #A59E96; --hue-gray-ink: #D8D2CB;
+  --hue-brown-fill: #33281F; --hue-brown-stroke: #C29372; --hue-brown-ink: #E9CDB6;
+  --hue-orange-fill: #3A2618; --hue-orange-stroke: #EE9A55; --hue-orange-ink: #F8CDA6;
+  --hue-yellow-fill: #3A3216; --hue-yellow-stroke: #E3BE3C; --hue-yellow-ink: #F4E3A3;
+  --hue-green-fill: #1D3224; --hue-green-stroke: #6CC48A; --hue-green-ink: #BFE7CB;
+  --hue-teal-fill: #173332; --hue-teal-stroke: #5CC2BB; --hue-teal-ink: #B7E8E4;
+  --hue-blue-fill: #1C2A3D; --hue-blue-stroke: #78A9EE; --hue-blue-ink: #C3D8F7;
+  --hue-purple-fill: #2A2340; --hue-purple-stroke: #A68DF0; --hue-purple-ink: #D8CCF8;
+  --hue-pink-fill: #3A2030; --hue-pink-stroke: #EC8DB6; --hue-pink-ink: #F6CCDD;
+  --hue-red-fill: #3B1F1C; --hue-red-stroke: #EE8378; --hue-red-ink: #F7C7C1;
+}

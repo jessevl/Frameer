@@ -8,7 +8,7 @@ import { useContextMenu } from './useContextMenu';
 import type { ContextMenuItem } from './ContextMenuContent';
 
 export { ContextMenuContent } from './ContextMenuContent';
-export type { ContextMenuItem } from './ContextMenuContent';
+export type { ContextMenuItem, ContextMenuChoice, ContextMenuChoices } from "./ContextMenuContent";
 export { useContextMenu } from './useContextMenu';
 export type { ContextMenuOptions, ContextMenuResult, ContextMenuTriggerProps } from './useContextMenu';
 

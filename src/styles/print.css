@@ -1,0 +1,15 @@
+/*
+ * @file print.css
+ * @description Print styles: printing shows the stage on a plain page; the rail, the pane, the docked bar and the side panel are hidden. Browser print only.
+ * Based on drift@d91d6950:frontend/src/styles/print.css (the generic part; Drift keeps its base-view rules)
+ * Used by: every app, with the shell parts that carry `nav`, `aside`, `data-docked-bar` and `data-print-hide`.
+ */
+@media print {
+  nav,
+  aside,
+  [data-testid='side-panel'],
+  [data-print-hide],
+  [data-docked-bar] {
+    display: none !important;
+  }
+}

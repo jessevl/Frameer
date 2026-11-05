@@ -175,3 +175,10 @@ Frameer's tests (`src/**/*.test.{ts,tsx}`, Vitest in jsdom, Testing Library and 
 ## License
 
 MIT
+
+## Menus, avatars, segmented control and styles (v0.3)
+
+- **Context menu items** take `line` (one of the suite's line icons) and `choices`: a compact row of round options, either color swatches or avatars, one choice (`menuitemradio`) or several (`menuitemcheckbox`). The chosen option has a coral ring. Several choices keep the menu open; Up and Down treat the row as one stop, Left and Right move between options. Each option has a name and a tooltip.
+- **`Avatar`** (`{ name, hue?, src?, size?, initials?, ringed?, label? }`) and **`AvatarStack`** (`{ people, label, max? }`). The app picks each person's `HueName`.
+- **`Segmented`** (`{ label, options: { id, label, line?, icon? }[], value, onChange, iconOnly? }`) and **`ThemeChoice`** (`{ value, onChange, iconOnly? }`).
+- **Styles.** Import what the app uses: `@frameer/ui/styles/motion.css`, `density.css`, `hues.css`, `paper.css`, `shell.css`, `print.css`, `reading.css`. `lib/hues` has `HueName` and `hueVar`; `lib/paper` has `paperWash`, `grainField` and `usePaper`, which `paper.css` lays behind `.paper-surface`.

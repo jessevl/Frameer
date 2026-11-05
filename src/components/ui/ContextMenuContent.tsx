@@ -11,12 +11,21 @@ import React, { useEffect, useRef, useState } from 'react';
 import { cn } from '@frameer/lib/design-system';
 import { ChromeIcon } from './ChromeIcons';
 import ToggleTile from './ToggleTile';
+import { LineIcon, type LineName } from '@frameer/icons/LineIcon';
+import { ChoiceRow, type ContextMenuChoices } from './ContextMenuChoices';
+
+export type { ContextMenuChoice, ContextMenuChoices } from './ContextMenuChoices';
 
 export interface ContextMenuItem {
   id: string;
   label: string;
   icon?: React.ReactNode;
+  /** One of the suite's line icons, drawn in the menu's icon grey. `icon` wins when both are set. */
+  line?: LineName;
+  /** What the item does. Not called for an item with `choices` (its options call `choices.onToggle`); pass a no-op there. */
   onClick: () => void;
+  /** Draws the item as a compact choice row: the label, then round options (color swatches or avatars), single or several. */
+  choices?: ContextMenuChoices;
   variant?: 'default' | 'danger';
   disabled?: boolean;
   /** A line above this item. */
@@ -59,6 +68,11 @@ function roleOf(item: ContextMenuItem): 'menuitem' | 'menuitemradio' | 'menuitem
   return item.checkbox ? 'menuitemcheckbox' : 'menuitemradio';
 }
 
+/** The item's icon: its own node, else its line icon. */
+function iconOf(item: ContextMenuItem): React.ReactNode {
+  return item.icon ?? (item.line ? <LineIcon name={item.line} size={18} inherit /> : undefined);
+}
+
 export const ContextMenuContent: React.FC<ContextMenuContentProps> = ({ items, onItemClick, className, touchFriendly = false, autoFocus = false }) => {
   const root = useRef<HTMLDivElement>(null);
   const [expanded, setExpanded] = useState<string | null>(null);
@@ -88,6 +102,13 @@ export const ContextMenuContent: React.FC<ContextMenuContentProps> = ({ items, o
     onItemClick?.(item);
   };
 
+  /** A person chose an option of a choice row. A single choice closes the menu (unless `keepOpen`); several stay open. */
+  const pick = (item: ContextMenuItem, optionId: string) => {
+    if (item.disabled || !item.choices) return;
+    item.choices.onToggle(optionId);
+    onItemClick?.({ ...item, keepOpen: item.keepOpen ?? item.choices.multiple });
+  };
+
   const byId = (id: string | undefined): ContextMenuItem | undefined => {
     for (const item of items) {
       if (item.id === id) return item;
@@ -99,10 +120,29 @@ export const ContextMenuContent: React.FC<ContextMenuContentProps> = ({ items, o
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.altKey || e.ctrlKey || e.metaKey) return;
-    const list = Array.from(e.currentTarget.querySelectorAll<HTMLElement>(ITEM_SELECTOR));
+    // A choice row is one stop for the up and down keys; its options are reached with Left and Right.
+    const list = Array.from(e.currentTarget.querySelectorAll<HTMLElement>(ITEM_SELECTOR)).filter((el) => el.dataset.choiceRow === undefined || el.dataset.choiceStop !== undefined);
     const current = document.activeElement as HTMLElement | null;
-    const index = current ? list.indexOf(current) : -1;
+    const choiceRow = current?.dataset.choiceRow;
+    const stop = choiceRow === undefined ? current : list.find((el) => el.dataset.choiceRow === choiceRow);
+    const index = stop ? list.indexOf(stop) : -1;
     const item = byId(current?.dataset.itemId);
+    if (choiceRow !== undefined && current) {
+      const options = Array.from(e.currentTarget.querySelectorAll<HTMLElement>(ITEM_SELECTOR)).filter((el) => el.dataset.choiceRow === choiceRow);
+      const at = options.indexOf(current);
+      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+        e.preventDefault();
+        options[(at + (e.key === 'ArrowRight' ? 1 : -1) + options.length) % options.length]?.focus({ preventScroll: true });
+        return;
+      }
+      if (e.key === 'Enter' || e.key === ' ') {
+        // Chosen here, like the other items, so Space acts on key down.
+        e.preventDefault();
+        const owner = byId(choiceRow);
+        if (owner && current.dataset.choiceId !== undefined) pick(owner, current.dataset.choiceId);
+        return;
+      }
+    }
     const focus = (i: number) => list[(i + list.length) % list.length]?.focus({ preventScroll: true });
     switch (e.key) {
       case 'ArrowDown':
@@ -150,7 +190,7 @@ export const ContextMenuContent: React.FC<ContextMenuContentProps> = ({ items, o
       default:
         if (e.key.length === 1 && e.key.trim()) {
           const letter = e.key.toLowerCase();
-          const order = list.map((_, i) => list[(index + 1 + i) % list.length]);
+          const order = list.map((_, i) => list[(index + 1 + i) % list.length]).filter((el) => el?.dataset.choiceRow === undefined);
           const hit = order.find((el) => el?.textContent?.trim().toLowerCase().startsWith(letter));
           if (hit) {
             e.preventDefault();
@@ -173,14 +213,27 @@ export const ContextMenuContent: React.FC<ContextMenuContentProps> = ({ items, o
     const hasChildren = !!item.children?.length;
     const open = expanded === item.id;
     const hint = item.hint ?? item.shortcut;
-    return (
-      <React.Fragment key={item.id}>
+    const lead = (
+      <>
         {item.divider ? <div role="separator" className={cn('mx-1.5 h-px bg-[var(--line)]', touchFriendly ? 'my-1.5' : 'my-[3px]')} /> : null}
         {item.heading ? (
           <p role="presentation" className="px-2 pb-1 pt-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--ink-2)]">
             {item.heading}
           </p>
         ) : null}
+      </>
+    );
+    if (item.choices) {
+      return (
+        <React.Fragment key={item.id}>
+          {lead}
+          <ChoiceRow itemId={item.id} label={item.label} choices={item.choices} touchFriendly={touchFriendly} nested={!!parent} onPick={(id) => pick(item, id)} />
+        </React.Fragment>
+      );
+    }
+    return (
+      <React.Fragment key={item.id}>
+        {lead}
         <button
           type="button"
           role={roleOf(item)}
@@ -197,7 +250,7 @@ export const ContextMenuContent: React.FC<ContextMenuContentProps> = ({ items, o
           className={rowClass(item, !!parent)}
         >
           <span className={cn('flex shrink-0 items-center justify-center text-[var(--ink-2)]', touchFriendly ? 'h-5 w-5' : 'h-[18px] w-[18px]')} aria-hidden="true">
-            {item.icon}
+            {iconOf(item)}
           </span>
           <span className="min-w-0 flex-1 truncate">{item.label}</span>
           {item.checked ? <ChromeIcon name="check" size={16} strokeWidth={1.8} aria-hidden="true" className="shrink-0 text-[var(--coral)]" /> : null}
@@ -243,7 +296,7 @@ export const ContextMenuContent: React.FC<ContextMenuContentProps> = ({ items, o
                 item.variant === 'danger' ? 'text-[var(--coral-ink)]' : 'text-[var(--ink)]',
               )}
             >
-              {item.icon ? <span aria-hidden="true" className="flex h-[18px] w-[18px] items-center justify-center text-[var(--ink-2)]">{item.icon}</span> : null}
+              {iconOf(item) ? <span aria-hidden="true" className="flex h-[18px] w-[18px] items-center justify-center text-[var(--ink-2)]">{iconOf(item)}</span> : null}
               <span className="max-w-full truncate">{item.label}</span>
             </button>
           ))}
@@ -253,7 +306,7 @@ export const ContextMenuContent: React.FC<ContextMenuContentProps> = ({ items, o
         <>
           <div role="none" className={cn('grid gap-1.5 px-1 py-1', tiles.length > 1 ? 'grid-cols-2' : 'grid-cols-1')}>
             {tiles.map((item) => (
-              <ToggleTile key={item.id} role="menuitemcheckbox" active={!!item.toggled} onClick={() => run(item)} label={item.label} icon={item.icon} disabled={item.disabled} />
+              <ToggleTile key={item.id} role="menuitemcheckbox" active={!!item.toggled} onClick={() => run(item)} label={item.label} icon={iconOf(item)} disabled={item.disabled} />
             ))}
           </div>
           {rest.length > 0 ? <div role="separator" className="mx-1.5 my-[3px] h-px bg-[var(--line)]" /> : null}

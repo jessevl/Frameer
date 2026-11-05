@@ -6,3 +6,5 @@ export * from "./errors";
 export * from "./config";
 export * from "./iconUtils";
 export * from "./lucideCatalogue";
+export * from "./hues";
+export * from "./paper";

@@ -1,0 +1,24 @@
+/*
+ * @file shell.css
+ * @description The docked top bar's fallbacks: a solid surface where backdrop blur is missing or the person asked for less transparency.
+ * Based on drift@d91d6950:frontend/src/styles/shell.css
+ * Used by: DockedBar.
+ */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  [data-docked-bar] {
+    background: var(--paper);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  [data-docked-bar] {
+    background: var(--paper);
+    backdrop-filter: none;
+  }
+}
+
+/* How far the docked bar reaches over the stage: the bar's height on desktop (set by the stage and the side panel), none elsewhere. */
+:root {
+  --stage-top: 0px;
+}
+
