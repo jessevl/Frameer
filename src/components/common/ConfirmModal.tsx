@@ -10,11 +10,12 @@
  */
 'use client';
 
-import React from 'react';
+import React, { type ReactNode } from 'react';
 import { Modal, Text, ModalFooter } from '@frameer/components/ui';
 import { useConfirmStore, type ConfirmVariant } from '@frameer/stores/confirmStore';
 
-const ConfirmModal: React.FC = () => {
+/** `children` names what is lost (a list, a count); the store's own `children` from requestConfirm shows too. */
+const ConfirmModal: React.FC<{ children?: ReactNode }> = ({ children }) => {
   const { 
     isOpen, 
     title, 
@@ -23,6 +24,7 @@ const ConfirmModal: React.FC = () => {
     confirmLabel, 
     cancelLabel, 
     variant,
+    children: requested,
     confirm, 
     cancel 
   } = useConfirmStore();
@@ -33,6 +35,8 @@ const ConfirmModal: React.FC = () => {
     <Modal 
       isOpen={isOpen} 
       onClose={cancel} 
+      title={title}
+      hideHeader
       footer={
         <ModalFooter
           onCancel={cancel}
@@ -49,6 +53,8 @@ const ConfirmModal: React.FC = () => {
           {detail}
         </Text>
       )}
+      {requested}
+      {children}
     </Modal>
   );
 };

@@ -12,6 +12,7 @@
  * 3. On confirm, the callback is executed and modal closes
  * 4. On cancel, modal closes without action
  */
+import type { ReactNode } from 'react';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 
@@ -34,6 +35,9 @@ interface ConfirmState {
   confirmLabel: string;
   cancelLabel: string;
   
+  // Content under the message that names what is lost
+  children?: ReactNode;
+
   // Visual variant
   variant: ConfirmVariant;
   
@@ -45,6 +49,7 @@ interface ConfirmState {
     title: string;
     message: string;
     detail?: string;
+    children?: ReactNode;
     confirmLabel?: string;
     cancelLabel?: string;
     variant?: ConfirmVariant;
@@ -71,6 +76,7 @@ export const useConfirmStore = create<ConfirmState>()(
         title, 
         message, 
         detail, 
+        children,
         confirmLabel = 'Confirm', 
         cancelLabel = 'Cancel',
         variant = 'default',
@@ -81,6 +87,7 @@ export const useConfirmStore = create<ConfirmState>()(
           title,
           message,
           detail,
+          children,
           confirmLabel,
           cancelLabel,
           variant,
@@ -97,6 +104,7 @@ export const useConfirmStore = create<ConfirmState>()(
           isOpen: false,
           onConfirm: null,
           detail: undefined,
+          children: undefined,
         }, false, 'confirm');
       },
       
@@ -105,6 +113,7 @@ export const useConfirmStore = create<ConfirmState>()(
           isOpen: false,
           onConfirm: null,
           detail: undefined,
+          children: undefined,
         }, false, 'cancel');
       },
     }),

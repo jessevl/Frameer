@@ -28,6 +28,8 @@ export { default as Header } from "./Header";
 export { default as Modal } from "./Modal";
 export { default as ModalFooter } from "./ModalFooter";
 export type { ModalFooterProps } from "./ModalFooter";
+export { AdaptiveDialog } from "./AdaptiveDialog";
+export type { AdaptiveDialogProps } from "./AdaptiveDialog";
 export { PropertyRow, PropertyGrid } from "./PropertyRow";
 export type { PropertyRowProps, PropertyTone } from "./PropertyRow";
 export { PanelSection, AddChip } from "./PanelSection";

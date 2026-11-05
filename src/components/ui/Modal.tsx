@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { cn } from '@frameer/lib/design-system';
 import { H2 } from './Typography';
 import { XIcon } from '../common/Icons';
 import { useIsMobile } from '@frameer/hooks/useMobileDetection';
+import { useDialogKeys } from './useDialogKeys';
 
 interface ModalProps {
   isOpen: boolean;
@@ -40,6 +41,9 @@ const Modal: React.FC<ModalProps> = ({
   const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null);
   // Mobile detection for full-screen mode
   const isMobile = useIsMobile();
+  // Escape, Tab kept inside, focus in on open and back on close (Yard's rules).
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useDialogKeys(dialogRef, isOpen && portalContainer !== null, onClose);
   
   // Determine if we should use full-screen on mobile
   // Default: true for md/lg/xl sizes (all modals except sm), false for sm only
@@ -84,6 +88,7 @@ const Modal: React.FC<ModalProps> = ({
   if (useFullScreen) {
     return createPortal(
       <div 
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-label={title}
@@ -135,6 +140,7 @@ const Modal: React.FC<ModalProps> = ({
       onClick={onClose}
     >
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-label={title}
