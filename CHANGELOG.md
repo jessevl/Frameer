@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.4.3 (unreleased)
+## v0.4.3 (6 Nov 2026)
 
 ### Added
 - `SidePanel overlayBelow` (default 1024 px of window; 0 keeps it docked), `usePanelOverlay` and `PANEL_OVERLAY_BELOW`: below it a docked panel opens over the stage with a scrim, its own heading, and Escape or the scrim to close. `DockedBar`'s `panel.overlayBelow` must match, so the bar spans the window and draws no panel half. `floating` is unchanged.
