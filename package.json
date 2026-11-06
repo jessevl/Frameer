@@ -59,6 +59,7 @@
     "./styles/hues.css": "./src/styles/hues.css",
     "./styles/paper.css": "./src/styles/paper.css",
     "./styles/shell.css": "./src/styles/shell.css",
+    "./styles/phone.css": "./src/styles/phone.css",
     "./styles/print.css": "./src/styles/print.css",
     "./styles/reading.css": "./src/styles/reading.css"
   },

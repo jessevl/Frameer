@@ -1,0 +1,193 @@
+/*
+ * @file phone.css
+ * @description The phone chrome: the header row (the app's mark or a back button, a compact title pill that fades in as the list scrolls, and one tools pill), the large title under it, and the frosted floating tab bar (66 px, radius 26, inset 14 px, 22 px above the bottom edge). Tokens only, so light and dark follow. The scroll reaches the header as `--title-p` (0 to 1), written to the stage by PhoneHeader.
+ * Based on harbour@feat/m5.5:frontend/src/styles/phone-chrome.css (`hb-` renamed `fr-`), which came from lighthouse@83d9bac
+ * Used by: PhoneHeader, PhoneTabBar.
+ */
+:root {
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* ---------- the header row and the large title ---------- */
+.fr-phead {
+  position: relative;
+  z-index: 30;
+  flex-shrink: 0;
+  padding: max(var(--safe-area-top), 12px) 16px 0;
+}
+.fr-phead-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 48px;
+}
+.fr-pb {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  background: var(--paper);
+  box-shadow: var(--shadow-pill);
+  display: grid;
+  place-items: center;
+  color: var(--ink);
+}
+.fr-pb:focus-visible {
+  box-shadow: 0 0 0 2px var(--coral-line);
+}
+/* The back button of a nested page carries the parent's name. */
+.fr-pb[data-named] {
+  width: auto;
+  max-width: 45%;
+  gap: 2px;
+  padding: 0 14px 0 10px;
+  display: flex;
+  align-items: center;
+}
+.fr-pb-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 600;
+}
+/* One pill for the tools. */
+.fr-ptools {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 48px;
+  padding: 0 4px 0 8px;
+  border-radius: 999px;
+  background: var(--paper);
+  box-shadow: var(--shadow-pill);
+}
+.fr-pt {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  color: var(--ink);
+}
+.fr-pt:focus-visible {
+  box-shadow: 0 0 0 2px var(--coral-line);
+}
+.fr-phead-title {
+  flex: 1;
+  min-width: 0;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: var(--paper);
+  box-shadow: var(--shadow-pill);
+  font-size: 15px;
+  font-weight: 650;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: var(--title-p, 0);
+  pointer-events: none;
+}
+.fr-phead-title[data-compact='true'] {
+  opacity: 1;
+}
+.fr-lt {
+  flex-shrink: 0;
+  overflow: hidden;
+  padding: 4px 20px 0;
+  height: calc(var(--lt-h, 46px) * (1 - var(--title-p, 0)));
+  opacity: calc(1 - var(--title-p, 0) * 1.4);
+}
+.fr-lt h1,
+.fr-lt h2 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  color: var(--ink);
+}
+.fr-lt-sub {
+  all: unset;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+button.fr-lt-sub {
+  cursor: pointer;
+}
+button.fr-lt-sub:focus-visible {
+  box-shadow: 0 0 0 2px var(--coral-line);
+  border-radius: 6px;
+}
+
+/* ---------- the tab bar ---------- */
+.fr-tabs {
+  position: fixed;
+  z-index: 40;
+  left: 14px;
+  right: 14px;
+  bottom: calc(22px + var(--safe-area-bottom));
+  height: 66px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 4px;
+  border-radius: 26px;
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--paper) 92%, transparent);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  box-shadow: var(--shadow-float);
+}
+.fr-tab {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+  flex: 0 1 62px;
+  min-width: 0;
+  height: 56px;
+  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--ink-2);
+  --icon-bg: transparent;
+}
+.fr-tab[data-on='true'] {
+  color: var(--coral-ink);
+  font-weight: 700;
+}
+.fr-tab:focus-visible {
+  box-shadow: 0 0 0 2px var(--coral-line);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .fr-tabs {
+    background: var(--paper);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
