@@ -34,7 +34,7 @@ export function lazyPicture<M extends Record<string, unknown>, K extends keyof M
   load: () => Promise<M>,
   name: K,
 ): M[K] extends ComponentType<infer P> ? ComponentType<P> : never;
-export function lazyPicture(load: () => Promise<Record<string, unknown>>, name = 'default'): ComponentType<never> {
-  // The overloads fix the exported type; this body only picks the export.
-  return lazy(async () => ({ default: (await load())[name] as ComponentType<never> }));
+export function lazyPicture(load: () => Promise<Record<string, unknown>>, name = 'default'): unknown {
+  // The overloads fix the exported type; this body only picks the export, so it returns unknown (every overload's type is assignable to it).
+  return lazy(async () => ({ default: (await load())[name] as ComponentType<object> }));
 }

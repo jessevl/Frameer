@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.4.1 (6 Nov 2026)
+
+### Fixed
+- `lazyPicture`: the implementation signature returns `unknown`, so both overloads type-check under every app's strictness (Yard's tsc refused v0.4.0).
+
 ## v0.4.0 (6 Nov 2026)
 
 ### Added
