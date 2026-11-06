@@ -9,7 +9,7 @@ import React, { createContext, useContext, useMemo } from 'react';
 import {
   AlertCircle, AlertTriangle, Bug, CalendarDays, CalendarRange, Check, CheckCircle, ChevronDown, ChevronLeft, ChevronRight,
   FileText, Folder, Home, Inbox, Info, Layers, ListTodo, Loader2, Pencil, Plus, RefreshCw, Search, SearchX, Sparkles, StickyNote,
-  Undo2, WifiOff, X,
+  Undo2, WifiOff, X, Copy, Heading, IndentDecrease, IndentIncrease, ListOrdered, LogOut, PanelRight, Redo2, RemoveFormatting,
   AlignCenter, AlignLeft, AlignRight, ArrowLeft, ArrowRight, ArrowUpDown, Bold, Bookmark, Clock, Code, Columns2, Columns3, Download, Ellipsis, ExternalLink, Filter, Flag, Hash, Highlighter, Image, Italic, LayoutGrid, Lightbulb, Link, List, ListTree, Menu, Mic, Minus, Paperclip, Pause, Pin, Play, Quote, Repeat, Settings, Strikethrough, Table, Table2, Timer, Trash2, Type, Underline, Upload, User, Video,
 } from 'lucide-react';
 
@@ -37,7 +37,16 @@ const DEFAULTS = {
   chevronDown: ChevronDown,
   chevronLeft: ChevronLeft,
   chevronRight: ChevronRight,
+  clearFormatting: RemoveFormatting,
   close: X,
+  copy: Copy,
+  heading: Heading,
+  indentLess: IndentDecrease,
+  indentMore: IndentIncrease,
+  logOut: LogOut,
+  numberedList: ListOrdered,
+  panelRight: PanelRight,
+  redo: Redo2,
   fileText: FileText,
   folder: Folder,
   home: Home,

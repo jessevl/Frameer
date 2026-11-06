@@ -47,6 +47,10 @@
       "import": "./dist/clay/index.js",
       "types": "./dist/clay/index.d.ts"
     },
+    "./build": {
+      "import": "./dist/build/index.js",
+      "types": "./dist/build/index.d.ts"
+    },
     "./shell": {
       "import": "./dist/shell/index.js",
       "types": "./dist/shell/index.d.ts"
@@ -60,7 +64,8 @@
     "./styles/paper.css": "./src/styles/paper.css",
     "./styles/shell.css": "./src/styles/shell.css",
     "./styles/print.css": "./src/styles/print.css",
-    "./styles/reading.css": "./src/styles/reading.css"
+    "./styles/reading.css": "./src/styles/reading.css",
+    "./styles/signin.css": "./src/styles/signin.css"
   },
   "files": [
     "dist",

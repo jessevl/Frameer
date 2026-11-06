@@ -1,0 +1,41 @@
+/*
+ * @file signin.css
+ * @description The motion of the sign-in art (`AuthArt`): outline tiles that float, and strokes that drift sideways (an app's drifting mark gives its strokes the `signin-stroke` class). Ambient only, and still with reduced motion.
+ * Used by: AuthArt, and an app's own sign-in art.
+ */
+@keyframes signin-drift {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-16px);
+  }
+}
+
+@keyframes signin-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(var(--tile-rotate, 0deg));
+  }
+  50% {
+    transform: translateY(-14px) rotate(var(--tile-rotate, 0deg));
+  }
+}
+
+.signin-stroke {
+  animation: signin-drift 2.4s var(--ease-in-out) infinite;
+  animation-delay: var(--stroke-delay, 0s);
+}
+
+.signin-tile {
+  animation: signin-float 7s var(--ease-in-out) infinite;
+  animation-delay: var(--tile-delay, 0s);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .signin-stroke,
+  .signin-tile {
+    animation: none;
+  }
+}

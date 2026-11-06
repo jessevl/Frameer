@@ -5,3 +5,5 @@
 export * from './clay';
 export * from './clayPalette';
 export * from './ClayCanvas';
+export * from './fit';
+export * from './PictureBox';
