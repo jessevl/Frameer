@@ -1,6 +1,6 @@
 /**
  * @file AuthShell.tsx
- * @description The frame of every signed-out screen (sign-in, first-run claim, invitation, password reset): a form column with the app's brand at the top, a status chip naming this server, a title and subtitle, the form, and a footnote, and beside it a slot for the art. Three layouts. `split` (default): the column on the left and the art filling the right on wide screens. `window`: the same inside one rounded window on the canvas, the art hidden below 1024 px. `card`: the brand above one dialog card, no art. The brand, the chip's words, the footnote and the art are the app's; the layout, the heading order and the server chip are here. Also `ServerStatusChip`, `FormError` and `AuthArt` (a coral field with floating tiles and a picture). Import `@frameer/styles/signin.css` once for the art's motion.
+ * @description The frame of every signed-out screen (sign-in, first-run claim, invitation, password reset): a form column with the app's brand at the top, a status chip naming this server, a title and subtitle, the form, and a footnote, and beside it a slot for the art. Three layouts. `split` (default): the column on the left and the art filling the right on wide screens. `window`: the same inside one rounded window on the canvas, the art hidden below 1024 px. `card`: the brand above one dialog card, no art. The brand, the chip's words, the footnote and the art are the app's; the layout, the heading order and the server chip are here. `card` with `bare` renders the children directly in the frame. Also `ServerStatusChip`, `FormError` (no outer margin) and `AuthArt` (a coral field with floating tiles and a picture; `tilesAbove` puts the tiles over the picture). Import `@frameer/styles/signin.css` once for the art's motion.
  * @app SHARED - Generic: knows nothing about any app's brand or server.
  * Ported from drift@frontend/src/features/auth/AuthShell.tsx, lighthouse@frontend/src/components/auth/AuthShell.tsx and yard@frontend/src/ui/AuthFrame.tsx.
  * Used by: the apps' sign-in, claim, invitation and reset routes.
@@ -27,6 +27,8 @@ export interface AuthShellProps {
   art?: React.ReactNode;
   /** In the `card` layout: let the card be 1040 px wide with its children side by side. */
   wide?: boolean;
+  /** In the `card` layout: no heading and no padding; the children fill the frame as they are (a side-by-side wizard brings its own columns and heading). */
+  bare?: boolean;
 }
 
 const Heading: React.FC<{ title: string; subtitle?: string }> = ({ title, subtitle }) => (
@@ -37,7 +39,7 @@ const Heading: React.FC<{ title: string; subtitle?: string }> = ({ title, subtit
 );
 
 /** The frame of the signed-out screens. */
-export const AuthShell: React.FC<AuthShellProps> = ({ variant = 'split', brand, status, title, subtitle, children, footnote, art, wide = false }) => {
+export const AuthShell: React.FC<AuthShellProps> = ({ variant = 'split', brand, status, title, subtitle, children, footnote, art, wide = false, bare = false }) => {
   if (variant === 'card') {
     return (
       <div className="flex min-h-dvh flex-col items-center gap-7 bg-[var(--canvas)] px-4 py-10 sm:px-6">
@@ -48,11 +50,15 @@ export const AuthShell: React.FC<AuthShellProps> = ({ variant = 'split', brand, 
             wide ? 'max-w-[1040px] flex-row flex-wrap' : 'max-w-[440px] flex-col',
           )}
         >
-          <div className="flex flex-1 flex-col gap-5 p-6 sm:p-8">
-            {status}
-            <Heading title={title} subtitle={subtitle} />
-            <div>{children}</div>
-          </div>
+          {bare ? (
+            children
+          ) : (
+            <div className="flex flex-1 flex-col gap-5 p-6 sm:p-8">
+              {status}
+              <Heading title={title} subtitle={subtitle} />
+              <div>{children}</div>
+            </div>
+          )}
         </main>
       </div>
     );
@@ -102,13 +108,13 @@ export const ServerStatusChip: React.FC<{ online: boolean; children: React.React
   </span>
 );
 
-/** The server's answer when a form failed, as it came. The words are in ink (the danger red on its fill is just under 4.5:1 in the light theme); nothing renders without a message. */
+/** The server's answer when a form failed, as it came. The words are in ink (the danger red on its fill is just under 4.5:1 in the light theme); nothing renders without a message. It has no outer margin: the caller spaces it (`className="mb-4"`). */
 export const FormError: React.FC<{ message: string | null; className?: string }> = ({ message, className }) => {
   if (!message) return null;
   return (
     <div
       role="alert"
-      className={cn('mb-4 flex items-start gap-2.5 rounded-[var(--radius-tree)] border border-[var(--color-danger-border)] bg-[var(--color-danger-bg)] p-3 text-sm text-[var(--ink)]', className)}
+      className={cn('flex items-start gap-2.5 rounded-[var(--radius-tree)] border border-[var(--color-danger-border)] bg-[var(--color-danger-bg)] p-3 text-sm text-[var(--ink)]', className)}
     >
       <span className="mt-0.5 flex-shrink-0 text-[var(--color-danger-fg)]">
         <ChromeIcon name="alertTriangle" className="h-4 w-4" aria-hidden="true" />
@@ -130,7 +136,7 @@ export interface AuthTile {
   node?: React.ReactNode;
 }
 
-const AuthTileShape: React.FC<{ tile: AuthTile }> = ({ tile }) => {
+const AuthTileShape: React.FC<{ tile: AuthTile; above: boolean }> = ({ tile, above }) => {
   const stroke = tile.hue ? hueVar(tile.hue, 'stroke') : undefined;
   const style = {
     left: tile.x,
@@ -139,6 +145,7 @@ const AuthTileShape: React.FC<{ tile: AuthTile }> = ({ tile }) => {
     height: tile.size,
     '--tile-rotate': `${tile.rotate}deg`,
     '--tile-delay': `${tile.delay}s`,
+    ...(above ? { zIndex: 2 } : {}),
     ...(stroke ? { borderRadius: Math.round(tile.size * 0.26), border: `2.5px solid ${stroke}` } : {}),
   } as CSSProperties;
   return (
@@ -159,10 +166,12 @@ export interface AuthArtProps {
   children?: React.ReactNode;
   /** The line under the picture. */
   caption?: React.ReactNode;
+  /** Draw the tiles over the picture instead of behind it. */
+  tilesAbove?: boolean;
 }
 
 /** A soft coral field with floating tiles and a centred picture: the right half of the sign-in screen. Decorative, so it is hidden from assistive technology and from screens under 1024 px. */
-export const AuthArt: React.FC<AuthArtProps> = ({ tiles = [], children, caption }) => (
+export const AuthArt: React.FC<AuthArtProps> = ({ tiles = [], children, caption, tilesAbove = false }) => (
   <div
     aria-hidden="true"
     data-auth-art
@@ -170,9 +179,9 @@ export const AuthArt: React.FC<AuthArtProps> = ({ tiles = [], children, caption 
     style={{ background: 'linear-gradient(150deg, color-mix(in oklab, var(--coral) 12%, var(--paper)) 0%, color-mix(in oklab, var(--coral) 28%, var(--paper)) 45%, color-mix(in oklab, var(--coral) 55%, var(--paper)) 100%)' }}
   >
     {tiles.map((tile, index) => (
-      <AuthTileShape key={tile.hue ?? index} tile={tile} />
+      <AuthTileShape key={tile.hue ?? index} tile={tile} above={tilesAbove} />
     ))}
-    {children ? <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">{children}</div> : null}
+    {children ? <div className="absolute left-1/2 top-1/2 z-[1] -translate-x-1/2 -translate-y-1/2">{children}</div> : null}
     {caption ? <p className="absolute inset-x-0 bottom-12 m-0 text-center text-lg font-semibold tracking-tight text-[var(--ink)]">{caption}</p> : null}
   </div>
 );

@@ -76,11 +76,14 @@ export interface ShortcutSheetProps extends Omit<ShortcutListProps, 'caption'> {
   title?: string;
   /** The line under the list. Default "Shortcuts do nothing while you are typing in a field."; pass `null` for none. */
   note?: React.ReactNode | null;
+  /** A picture or lead-in above the list. */
+  header?: React.ReactNode;
 }
 
 /** The shortcut list in a modal. */
-export const ShortcutSheet: React.FC<ShortcutSheetProps> = ({ rows, testId, onClose, isOpen = true, title = 'Keyboard shortcuts', note = 'Shortcuts do nothing while you are typing in a field.' }) => (
+export const ShortcutSheet: React.FC<ShortcutSheetProps> = ({ rows, testId, onClose, isOpen = true, title = 'Keyboard shortcuts', note = 'Shortcuts do nothing while you are typing in a field.', header }) => (
   <Modal isOpen={isOpen} onClose={onClose} title={title} size="sm">
+    {header}
     <ShortcutList rows={rows} testId={testId} caption={title} />
     {note ? <p className="mt-3 text-[12.5px] text-[var(--ink-2)]">{note}</p> : null}
   </Modal>

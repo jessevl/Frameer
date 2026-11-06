@@ -1,24 +1,32 @@
 # Changelog
 
-## Unreleased (v0.3.1)
+## Unreleased (v0.4.0)
 
 ### Added
 - `ConfirmModal showTitle`: shows the title as a visible heading, so the question names the item ("Delete Sports day?").
-
-### Changed
-- Toast: the container sits `--toast-offset` above the bottom (1rem when unset), so an app can lift it over its docked bar or tab bar.
-
-## Unreleased (v0.4.0, parts)
-
-### Added
 - `StageStatus` and `StageStatusButton` (`shell`): the status line at the foot of a stage.
 - `SaveIndicator`: the quiet save state (`idle` hidden or resting, `dot` or `check`).
 - `lib/whatsNew` (`createWhatsNew`, `parseNotes`, `decodeNotes`) and `WhatsNewCard`.
 - `clay/PictureBox` (`PictureBox`, `lazyPicture`) and `clay/fit` (`outlineOf`, `fitTo`, `fitBox`).
 - `AuthShell` (`split`, `window` and `card` layouts), `ServerStatusChip`, `FormError`, `AuthArt`, and `styles/signin.css`.
+- `AuthShell bare`: in the `card` layout the children fill the frame, with no heading or padded wrapper (a side-by-side setup wizard).
+- `AuthArt tilesAbove`: the tiles sit over the centre picture.
+- `ShortcutSheet header`: a slot above the list, for a picture.
+- `lazyPicture(load, 'Name')`: a named export as a lazy component, props inferred.
+- `usePaneFromStore(useStore, keys, options?)`: builds the `PaneControls` from a zustand-like store and the names of its keys. `usePane(controls)` is unchanged.
 - `lib/shortcuts` (`createShortcuts`, `shortcutRows`, `MOD_KEY`), `ShortcutList` and `ShortcutSheet`.
 - `build` entry: the `lazyLucideCatalogue` Vite plugin.
 - Chrome icon names `logOut`, `panelRight`, `copy`, `numberedList`, `redo`, `heading`, `indentMore`, `indentLess`, `clearFormatting`, and `icons/chromeGlyphs` (`chromeGlyphs`, the line-style set).
+
+### Changed
+- Toast: the container sits `--toast-offset` above the bottom (1rem when unset), so an app can lift it over its docked bar or tab bar.
+- `FormError` has no `mb-4` of its own any more: the caller spaces it (`className="mb-4"`). No app imports it from Frameer yet.
+- `ChromeIconProps` accepts `role`, `aria-label`, `aria-labelledby` and `focusable`, so an icon can be labelled.
+- `PictureBox` passes `data-*` and other div props through to the box.
+- `shell/parts` also exports `StageStatus`, `StageStatusButton`, `AuthShell`, `FormError`, `ServerStatusChip` and `AuthArt`; their own paths still work.
+
+### Fixed
+- `lazyPicture` infers its props for a named export mapped to `default` (or given by name) without an explicit generic.
 
 ## v0.3.0 (6 Nov 2026)
 

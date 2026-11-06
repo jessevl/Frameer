@@ -7,26 +7,34 @@
  */
 import React, { lazy, Suspense, type ComponentType, type CSSProperties, type ReactNode } from 'react';
 
-export interface PictureBoxProps {
+export interface PictureBoxProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children' | 'className' | 'style' | 'role' | 'aria-label' | 'aria-hidden'> {
   /** Words for a picture that stands for a whole screen; the box then is `role="img"`. Leave out for decoration. */
   label?: string;
   className?: string;
   style?: CSSProperties;
   /** The lazy picture (made with `lazyPicture`); the box shows nothing until it has loaded. */
   children?: ReactNode;
+  /** `data-*` attributes and other div props (`id`, `onClick`, ...) pass through to the box. */
 }
 
 /** A box that holds its size while a lazy picture loads. */
-export const PictureBox: React.FC<PictureBoxProps> = ({ label, className, style, children }) => {
+export const PictureBox: React.FC<PictureBoxProps> = ({ label, className, style, children, ...rest }) => {
   const a11y = label ? ({ role: 'img', 'aria-label': label } as const) : ({ 'aria-hidden': true } as const);
   return (
-    <div {...a11y} className={className} style={style}>
+    <div {...rest} {...a11y} className={className} style={style}>
       <Suspense fallback={null}>{children}</Suspense>
     </div>
   );
 };
 
-/** A scene's canvas as a lazy component: `lazyPicture(() => import('./SceneCanvas'))`. */
-export function lazyPicture<P extends object>(load: () => Promise<{ default: ComponentType<P> }>): ComponentType<P> {
-  return lazy(load);
+/** A scene's canvas as a lazy component: `lazyPicture(() => import('./SceneCanvas'))` (a default export). */
+export function lazyPicture<P extends object>(load: () => Promise<{ default: ComponentType<P> }>): ComponentType<P>;
+/** A named export as a lazy component, props inferred: `lazyPicture(() => import('./Scenes'), 'Harbour')`. */
+export function lazyPicture<M extends Record<string, unknown>, K extends keyof M & string>(
+  load: () => Promise<M>,
+  name: K,
+): M[K] extends ComponentType<infer P> ? ComponentType<P> : never;
+export function lazyPicture(load: () => Promise<Record<string, unknown>>, name = 'default'): ComponentType<never> {
+  // The overloads fix the exported type; this body only picks the export.
+  return lazy(async () => ({ default: (await load())[name] as ComponentType<never> }));
 }

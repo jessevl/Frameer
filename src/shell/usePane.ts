@@ -75,6 +75,25 @@ export function paneMode({ compact, collapsed, forceFloating = false, none = fal
   return { docked, floating: !docked, forced, none: false };
 }
 
+/** The store keys that hold each of the `PaneControls`, for `usePaneFromStore`. */
+export type PaneStoreKeys<S> = {
+  [K in keyof PaneControls]: { [Key in keyof S]: S[Key] extends PaneControls[K] ? Key : never }[keyof S];
+};
+
+/** `usePane` over a zustand-like store: `usePaneFromStore(useShellStore, { collapsed: 'paneCollapsed', open: 'paneOpen', ... })` reads one key at a time (so a component only re-renders for the pane's own flags) and builds the `PaneControls`. */
+export function usePaneFromStore<S>(useStore: <T>(selector: (state: S) => T) => T, keys: PaneStoreKeys<S>, options: PaneOptions = {}): PaneState {
+  const controls: PaneControls = {
+    collapsed: useStore((s) => s[keys.collapsed]) as boolean,
+    open: useStore((s) => s[keys.open]) as boolean,
+    setOpen: useStore((s) => s[keys.setOpen]) as PaneControls['setOpen'],
+    toggleCollapsed: useStore((s) => s[keys.toggleCollapsed]) as PaneControls['toggleCollapsed'],
+    toggleOpen: useStore((s) => s[keys.toggleOpen]) as PaneControls['toggleOpen'],
+    openOnHover: useStore((s) => s[keys.openOnHover]) as PaneControls['openOnHover'],
+    closeOnLeave: useStore((s) => s[keys.closeOnLeave]) as PaneControls['closeOnLeave'],
+  };
+  return usePane(controls, options);
+}
+
 export function usePane(controls: PaneControls, options: PaneOptions = {}): PaneState {
   const compact = useIsCompact();
   const { docked, floating, forced, none } = paneMode({ compact, collapsed: controls.collapsed, forceFloating: options.forceFloating, none: options.none });

@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 
 /** The props every chrome icon accepts; a Lucide component satisfies them. */
-export interface ChromeIconProps {
+export interface ChromeIconProps extends Pick<React.SVGAttributes<SVGSVGElement>, 'role' | 'aria-label' | 'aria-labelledby' | 'focusable'> {
   className?: string;
   size?: number | string;
   strokeWidth?: number;
