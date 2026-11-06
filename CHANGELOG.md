@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.4.2 (unreleased)
+## v0.4.2 (6 Nov 2026)
 
 ### Added
 - `SidePanel`: `ariaLabel` (default "Side panel"), `testId` and `leavingTestId` (the panel while it slides shut), `ownHeader` (content with its own sticky header: no `--stage-top` inset), `padded={false}` and `scrollContainer={false}`.
