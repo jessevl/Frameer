@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased (v0.3.0)
+## v0.3.0 (6 Nov 2026)
 
 ### Added
 - `PropertyRow` (`icon` or `line`, `label`, `children`, `second`, `onClick`, `tone`), `PropertyGrid` (88px 1fr 1fr), `PanelSection` and `AddChip`.
