@@ -192,7 +192,7 @@ MIT
 - **Context menu items** take `line` (one of the suite's line icons) and `choices`: a compact row of round options, either color swatches or avatars, one choice (`menuitemradio`) or several (`menuitemcheckbox`). The chosen option has a coral ring. Several choices keep the menu open; Up and Down treat the row as one stop, Left and Right move between options. Each option has a name and a tooltip.
 - **`Avatar`** (`{ name, hue?, src?, size?, initials?, ringed?, label? }`) and **`AvatarStack`** (`{ people, label, max? }`). The app picks each person's `HueName`.
 - **`Segmented`** (`{ label, options: { id, label, line?, icon? }[], value, onChange, iconOnly? }`) and **`ThemeChoice`** (`{ value, onChange, iconOnly? }`).
-- **Styles.** Import what the app uses: `@frameer/ui/styles/motion.css`, `density.css`, `hues.css`, `paper.css`, `shell.css`, `print.css`, `reading.css`. `lib/hues` has `HueName` and `hueVar`; `lib/paper` has `paperWash`, `grainField` and `usePaper`, which `paper.css` lays behind `.paper-surface`.
+- **Styles.** Import what the app uses: `@frameer/ui/styles/motion.css`, `density.css`, `hues.css`, `paper.css`, `shell.css`, `print.css`, `reading.css`. `lib/hues` has `HueName` and `hueVar`; `lib/paper` has `paperWash`, `grainField`, `grainPixels` and `usePaper` (which only sets the hour's wash). The grain is four static PNG tiles in `styles/grain/`, made by `node --experimental-strip-types scripts/gen-grain.ts` from `lib/grain.ts` (`grain.test.ts` fails until you rerun it after a change); `paper.css` picks them by screen density, so no script runs for the grain.
 
 ## Shell parts (v0.4)
 

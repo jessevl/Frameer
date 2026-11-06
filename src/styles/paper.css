@@ -1,12 +1,46 @@
 /*
  * @file paper.css
- * @description Paper and a breath of light (D15 D): the grain and the hour's faint wash on the app's paper surfaces (the stage card, the sidebar card, the phone's screen), laid behind their content so type and pictures stay clean. The variables come from `lib/paper.ts`; until the grain is made, only the wash shows. Off in print and with forced colours.
+ * @description Paper and a breath of light (D15 D): the grain and the hour's faint wash on the app's paper surfaces (the stage card, the sidebar card, the phone's screen), laid behind their content so type and pictures stay clean. The wash variables come from `lib/paper.ts`. The grain is four static PNG tiles in `grain/` (made by `scripts/gen-grain.ts`), picked here by screen density, so no script runs for it: a screen under 1.5 device pixels per CSS pixel takes the fainter `-low` tile, and a tile is 256 device pixels, so its CSS size is 256 / density. Off in print and with forced colours.
  * Based on drift@d91d6950:frontend/src/styles/paper.css
  * Used by: the app shell (`.paper-surface`).
  */
 .paper-surface {
+  --paper-grain: url('./grain/light-low.png');
+  --paper-grain-size: 256px;
   position: relative;
   isolation: isolate;
+}
+
+.dark .paper-surface {
+  --paper-grain: url('./grain/dark-low.png');
+}
+
+@media (min-resolution: 1.25dppx) {
+  .paper-surface {
+    --paper-grain-size: 204.8px;
+  }
+}
+
+@media (min-resolution: 1.5dppx) {
+  .paper-surface {
+    --paper-grain: url('./grain/light.png');
+    --paper-grain-size: 170.667px;
+  }
+  .dark .paper-surface {
+    --paper-grain: url('./grain/dark.png');
+  }
+}
+
+@media (min-resolution: 2dppx) {
+  .paper-surface {
+    --paper-grain-size: 128px;
+  }
+}
+
+@media (min-resolution: 3dppx) {
+  .paper-surface {
+    --paper-grain-size: 85.333px;
+  }
 }
 
 .paper-surface::before {
@@ -16,11 +50,11 @@
   z-index: -1;
   pointer-events: none;
   border-radius: inherit;
-  background: var(--paper-wash, none), var(--paper-grain, none) 0 0 / var(--paper-grain-size, 256px);
+  background: var(--paper-wash, none), var(--paper-grain) 0 0 / var(--paper-grain-size);
 }
 
 .dark .paper-surface::before {
-  background: var(--paper-wash-dark, none), var(--paper-grain-dark, none) 0 0 / var(--paper-grain-size, 256px);
+  background: var(--paper-wash-dark, none), var(--paper-grain) 0 0 / var(--paper-grain-size);
 }
 
 @media print, (forced-colors: active) {

@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.4.4 (unreleased)
+
+### Changed
+- Paper grain: the light and dark tiles ship as static PNGs (`src/styles/grain/{light,dark}{,-low}.png`, made once from `lib/grain.ts` by `scripts/gen-grain.ts`) and `paper.css` references them by screen density (the `-low` tile and 256/density sizing replace the script's `dpr < 1.5` rule). Nothing is built or PNG-encoded at start: that was a 256x256 field and two canvas encodes, about 50 ms (200 ms at 4x CPU) in the startup long tasks. `usePaper` stays and only sets the hour's wash; it no longer takes the idle callback. `grain.test.ts` fails when the generator and the shipped PNGs differ. The tiles are written from straight (not premultiplied) pixels, so a speck may differ by one level from the old canvas round trip.
+- `lib/paper` re-exports `GRAIN_SIZE`, `grainField` and the new `grainPixels` from `lib/grain`.
+
 ## v0.4.3 (6 Nov 2026)
 
 ### Added

@@ -62,6 +62,7 @@
     "./styles/density.css": "./src/styles/density.css",
     "./styles/hues.css": "./src/styles/hues.css",
     "./styles/paper.css": "./src/styles/paper.css",
+    "./styles/grain/*": "./src/styles/grain/*",
     "./styles/shell.css": "./src/styles/shell.css",
     "./styles/phone.css": "./src/styles/phone.css",
     "./styles/print.css": "./src/styles/print.css",
