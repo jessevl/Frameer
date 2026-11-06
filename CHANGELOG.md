@@ -5,6 +5,18 @@
 ### Changed
 - Toast: the container sits `--toast-offset` above the bottom (1rem when unset), so an app can lift it over its docked bar or tab bar.
 
+## Unreleased (v0.4.0, parts)
+
+### Added
+- `StageStatus` and `StageStatusButton` (`shell`): the status line at the foot of a stage.
+- `SaveIndicator`: the quiet save state (`idle` hidden or resting, `dot` or `check`).
+- `lib/whatsNew` (`createWhatsNew`, `parseNotes`, `decodeNotes`) and `WhatsNewCard`.
+- `clay/PictureBox` (`PictureBox`, `lazyPicture`) and `clay/fit` (`outlineOf`, `fitTo`, `fitBox`).
+- `AuthShell` (`split`, `window` and `card` layouts), `ServerStatusChip`, `FormError`, `AuthArt`, and `styles/signin.css`.
+- `lib/shortcuts` (`createShortcuts`, `shortcutRows`, `MOD_KEY`), `ShortcutList` and `ShortcutSheet`.
+- `build` entry: the `lazyLucideCatalogue` Vite plugin.
+- Chrome icon names `logOut`, `panelRight`, `copy`, `numberedList`, `redo`, `heading`, `indentMore`, `indentLess`, `clearFormatting`, and `icons/chromeGlyphs` (`chromeGlyphs`, the line-style set).
+
 ## v0.3.0 (6 Nov 2026)
 
 ### Added

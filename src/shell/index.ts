@@ -8,3 +8,5 @@ export { MobileDrawer } from "./MobileDrawer";
 export { RAIL_BUTTON } from "./railStyles";
 export { COMPACT_MAX, PHONE_MAX, useIsCompact, useIsMobile } from "./useShellMode";
 export * from "./parts";
+export { StageStatus, StageStatusButton, type StageStatusProps } from "./StageStatus";
+export { AuthShell, AuthArt, FormError, ServerStatusChip, type AuthShellProps, type AuthArtProps, type AuthTile } from "./AuthShell";

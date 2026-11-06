@@ -134,6 +134,17 @@ Fields are 36 px with 14 px text (44 px and 16 px on a phone). Popovers and the 
 - ErrorBanner, StatusBanner
 - SmartEmptyState
 
+### Parts (v0.4)
+
+- **`StageStatus`** (`@frameer/shell`; `{ parts, children?, trailing?, label?, testId? }`): the status line at the foot of a stage, dot-separated, one polite live region; `StageStatusButton` sits among the parts.
+- **`SaveIndicator`** (`{ status: 'idle' | 'saving' | 'saved' | 'failed', idle?: 'hidden' | 'saved', variant?: 'dot' | 'check', labels?, problem? }`): the quiet save state, which keeps its place.
+- **`createWhatsNew`** (`lib/whatsNew`; `{ seenKey, version, notes }`, notes as base64) and **`WhatsNewCard`** (`{ source, appName, picture?, onSeen? }`). The app reads its own `import.meta.env` values.
+- **`PictureBox`** and **`lazyPicture`** (`@frameer/clay/PictureBox`), and **`fit`** (`outlineOf`, `fitTo`, `fitBox`).
+- **`AuthShell`** (`@frameer/shell`; `variant: 'split' | 'window' | 'card'`, `brand`, `status`, `title`, `subtitle`, `footnote`, `art`), with `ServerStatusChip`, `FormError` and `AuthArt` (`tiles`, `caption`). Import `styles/signin.css` for the art's motion.
+- **`createShortcuts(keymap, options?)`** (`lib/shortcuts`): the keymap as data, `resolve`, a handler registry, `useShortcut` and the one `useListener`; **`ShortcutList`** and **`ShortcutSheet`** (`rows` from `shortcutRows(keymap)`). Generic over the app's scopes; the keymap stays in the app.
+- **Build.** `lazyLucideCatalogue()` (`./build`, a Vite plugin for production builds) keeps the Lucide catalogue out of the entry chunk and fails the build if Frameer's import moved.
+- **Chrome glyphs.** `ChromeIcon` knows `logOut`, `panelRight`, `copy`, `numberedList`, `redo`, `heading`, `indentMore`, `indentLess` and `clearFormatting` (Lucide by default). `chromeGlyphs` (`@frameer/icons`) is the same set, and `check`, `close` and `chevronLeft`, drawn in the line style with no icon library: pass it as `icons` to `ChromeIconsProvider`.
+
 ## Hooks
 
 - `useIsMobile()` - Mobile viewport detection

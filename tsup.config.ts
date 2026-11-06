@@ -13,6 +13,7 @@ export default defineConfig({
     'icons/index': 'src/icons/index.ts',
     'clay/index': 'src/clay/index.ts',
     'shell/index': 'src/shell/index.ts',
+    'build/index': 'src/build/index.ts',
   },
   format: ['esm'],
   dts: true,

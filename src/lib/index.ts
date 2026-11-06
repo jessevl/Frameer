@@ -8,3 +8,5 @@ export * from "./iconUtils";
 export * from "./lucideCatalogue";
 export * from "./hues";
 export * from "./paper";
+export * from "./whatsNew";
+export * from "./shortcuts";
