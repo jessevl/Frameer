@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.4.3 (unreleased)
+
+### Added
+- `SidePanel overlayBelow` (default 1024 px of window; 0 keeps it docked), `usePanelOverlay` and `PANEL_OVERLAY_BELOW`: below it a docked panel opens over the stage with a scrim, its own heading, and Escape or the scrim to close. `DockedBar`'s `panel.overlayBelow` must match, so the bar spans the window and draws no panel half. `floating` is unchanged.
+- `Spinner`: a loading spinner in ink.
+- `.touch-target` (base.css): a 44 px hit area on touch screens, through the element's `::after`.
+- `PropertyGrid labelMax` (default `10rem`).
+
+### Changed
+- `PropertyGrid`: the label column fits the longest label up to `labelMax` instead of 88 px, and a longer label wraps instead of eliding.
+- Disabled `Button`: grey ink on a quiet fill (`--paper-3`) instead of faded colors, so a disabled primary button meets 4.5:1 in dark.
+- Tinted toasts: an opaque paper surface, the type's color on the border and icon, ink words (they failed contrast over the sign-in pages in light).
+
+### Fixed
+- `DockedBar`: the crumbs keep 9 rem and clip; `BarTools` shrinks and scrolls sideways instead of overflowing over the panel half.
+- Touch targets: the toast's dismiss button, `Select` (all sizes) and `Checkbox` have a 44 px hit area on touch.
+
 ## v0.4.2 (6 Nov 2026)
 
 ### Added

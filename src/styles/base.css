@@ -972,3 +972,27 @@ html.dark, body.dark {
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
 }
+
+/* =============================================================================
+   TOUCH TARGET
+   A small control keeps its look and gains a 44 px hit area on touch screens
+   (coarse pointer), through an invisible ::after centred on it. Put it on a
+   button, link or label; it is already on Select, Checkbox and the toast's
+   dismiss button. A native <input> has no ::after: put the class on its label.
+   ============================================================================= */
+
+.touch-target {
+  position: relative;
+}
+
+@media (pointer: coarse) {
+  .touch-target::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+    transform: translate(-50%, -50%);
+  }
+}

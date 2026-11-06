@@ -55,6 +55,7 @@ export type { DataTableColumn, DataTableGroup, DataTableProps } from "./DataTabl
 
 // Display Components
 export { default as Badge } from "./Badge";
+export { Spinner, type SpinnerProps } from "./Spinner";
 export { default as Select } from "./Select";
 export type { SelectOption } from "./Select";
 export { default as Popover } from "./Popover";

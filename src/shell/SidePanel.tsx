@@ -1,19 +1,22 @@
 /**
  * @file SidePanel.tsx
  * @description The right-hand panel, without tabs: one scroll under a heading (a Back arrow while a sub-view shows, the title, a close button) that lives in the docked bar above it on desktop and at the top of the sheet on a phone. On desktop it is docked to the stage's card, on paper, 340 px wide and 480 px while a form is open (`wide` on PanelContent). A page fills it with `PanelContent`, portalled into the body; `children` are drawn in the body too, for an app that picks its panel by route (Drift's registry, Lighthouse's `openSidePanel`).
- * Per-app differences are props: `phone="full"` (a full-screen sheet, shown only while a page has filled it: Harbour, Yard) or `"sheet"` (a bottom sheet: Drift); `requireContent`; `heading` (replaces the heading, in the sheet and, through `PanelHeading`, the docked bar); `slide` (the width opens and shuts: Drift); `floating` (a card that closes on Escape and on a press outside it: Lighthouse); `paper`; `wide`; `empty`.
+ * Per-app differences are props: `phone="full"` (a full-screen sheet, shown only while a page has filled it: Harbour, Yard) or `"sheet"` (a bottom sheet: Drift); `requireContent`; `heading` (replaces the heading, in the sheet and, through `PanelHeading`, the docked bar); `slide` (the width opens and shuts: Drift); `floating` (a card that closes on Escape and on a press outside it: Lighthouse); `overlayBelow` (below this window width, default 1024 px, a docked panel opens over the stage with a scrim and closes on Escape and on the scrim; 0 keeps it docked); `paper`; `wide`; `empty`.
  * `PanelSlide` is the sliding column, used for the panel and for its half of the docked bar so the two move together.
  * Used by: the app shell and DockedBar.
  */
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { MobileSheet } from '@frameer/components';
 import { ChromeIcon } from '@frameer/components/ui/ChromeIcons';
+import { useMediaQuery } from '@frameer/hooks/useMobileDetection';
 import { useIsMobile } from './useShellMode';
 import { STAGE_SCROLL, stageScroll } from './stageScroll';
 import { useStageStore } from './stageStore';
 
 export const PANEL_WIDTH = 340;
 export const PANEL_WIDTH_WIDE = 480;
+/** Below this window width (px) the panel opens over the stage instead of docking beside it. */
+export const PANEL_OVERLAY_BELOW = 1024;
 const DEFAULT_TITLE = 'Details';
 const ROUND =
   'flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-[var(--ink-2)] outline-none hover:bg-[var(--hover)] hover:text-[var(--ink)] focus-visible:ring-2 focus-visible:ring-[var(--coral-line)]';
@@ -22,6 +25,11 @@ const ROUND =
 export function usePanelWidth(wide = false): number {
   const formOpen = useStageStore((s) => s.panelWide);
   return wide || formOpen ? PANEL_WIDTH_WIDE : PANEL_WIDTH;
+}
+
+/** True while the panel should float over the stage: the window is narrower than `below` px (0 turns it off). The phone shell has its own sheet, so callers check `useIsMobile` first. The docked bar uses it too, so it draws no panel half then. */
+export function usePanelOverlay(below: number = PANEL_OVERLAY_BELOW): boolean {
+  return useMediaQuery(below > 0 ? `(max-width: ${below - 1}px)` : 'not all');
 }
 
 export interface PanelHeadingProps {
@@ -127,6 +135,8 @@ export interface SidePanelProps {
   slide?: boolean;
   /** A card over the stage: a dialog that closes on Escape and on a press outside it. */
   floating?: boolean;
+  /** Window width (px) below which a docked panel overlays the stage instead (floating, with a scrim, closing on Escape and on the scrim). Default 1024; 0 keeps it docked at every width. `DockedBar`'s `panel.overlayBelow` must match. */
+  overlayBelow?: number;
   /** A press on an element matching this selector does not dismiss a floating card (the docked bar's toggle, menus). */
   ignore?: string;
   paper?: boolean;
@@ -135,13 +145,18 @@ export interface SidePanelProps {
   className?: string;
 }
 
-export function SidePanel({ open, onClose, enabled = true, empty, label = DEFAULT_TITLE, ariaLabel = 'Side panel', testId = 'side-panel', leavingTestId, ownHeader = false, padded = true, scrollContainer = true, children, heading, phone = 'full', requireContent = true, slide = false, floating = false, ignore, paper = true, wide = false, className = '' }: SidePanelProps) {
+export function SidePanel({ open, onClose, enabled = true, empty, label = DEFAULT_TITLE, ariaLabel = 'Side panel', testId = 'side-panel', leavingTestId, ownHeader = false, padded = true, scrollContainer = true, children, heading, phone = 'full', requireContent = true, slide = false, floating = false, overlayBelow = PANEL_OVERLAY_BELOW, ignore, paper = true, wide = false, className = '' }: SidePanelProps) {
   const isMobile = useIsMobile();
   const filled = useStageStore((s) => s.panelTitle !== null);
   const width = usePanelWidth(wide);
   const ref = useRef<HTMLElement>(null);
   const shown = open && enabled;
-  const dismissing = shown && floating && !isMobile;
+  const narrow = usePanelOverlay(overlayBelow);
+  const overlay = !isMobile && !floating && narrow;
+  const dismissing = shown && (floating || overlay) && !isMobile;
+  const title = useStageStore((st) => st.panelTitle);
+  const back = useStageStore((st) => st.panelBack);
+  const closeFromStore = useStageStore((st) => st.panelClose);
 
   useEffect(() => {
     if (!dismissing) return;
@@ -181,15 +196,31 @@ export function SidePanel({ open, onClose, enabled = true, empty, label = DEFAUL
       ref={ref}
       aria-label={ariaLabel}
       role={floating ? 'dialog' : undefined}
-      className={`${paper ? 'paper-surface ' : ''}flex ${slide ? 'h-full' : 'flex-shrink-0 transition-[width] duration-150 motion-reduce:transition-none'} flex-col border-l border-[var(--line)] bg-[var(--paper)] [--stage-top:var(--bar-height)] ${className}`}
-      style={slide ? undefined : { width }}
+      className={
+        overlay
+          ? `${paper ? 'paper-surface ' : ''}absolute inset-y-0 right-0 flex max-w-full flex-col border-l border-[var(--line)] bg-[var(--paper)] shadow-[var(--shadow-float)] [--stage-top:0px] ${className}`
+          : `${paper ? 'paper-surface ' : ''}flex ${slide ? 'h-full' : 'flex-shrink-0 transition-[width] duration-150 motion-reduce:transition-none'} flex-col border-l border-[var(--line)] bg-[var(--paper)] [--stage-top:var(--bar-height)] ${className}`
+      }
+      style={overlay || !slide ? { width } : undefined}
       data-testid={slide && !shown && leavingTestId ? leavingTestId : testId}
+      data-overlay={overlay ? '' : undefined}
     >
+      {/* Overlaid, the bar draws no panel half, so the heading sits in the panel itself. */}
+      {overlay ? <div className="flex h-[var(--bar-height)] flex-shrink-0 items-center border-b border-[var(--line)] px-3">{heading ?? <PanelHeading title={title ?? label} onBack={back} onClose={closeFromStore ?? onClose} />}</div> : null}
       <SidePanelBody empty={empty} label={label} ownHeader={ownHeader} padded={padded} scrollContainer={scrollContainer}>
         {children}
       </SidePanelBody>
     </aside>
   );
+  if (overlay) {
+    // A scrim over the window with the panel at its right edge. The window-level press handler closes it, so the scrim only has to be there to be pressed.
+    return shown ? (
+      <div role="dialog" aria-modal="true" aria-label={ariaLabel} className="fixed inset-0 z-[60]" data-testid={`${testId}-overlay`}>
+        <div aria-hidden="true" className="absolute inset-0 bg-black/30" data-testid={`${testId}-scrim`} />
+        {aside}
+      </div>
+    ) : null;
+  }
   if (slide) {
     return (
       <PanelSlide shown={shown} width={width}>

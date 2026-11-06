@@ -190,7 +190,7 @@ export interface BarToolsProps {
 export function BarTools({ leading, trailing, panelToggle, divider = true }: BarToolsProps) {
   const tools = useRegisteredStageTools();
   return (
-    <div role="toolbar" aria-label="Tools" className="flex flex-shrink-0 items-center gap-0.5">
+    <div role="toolbar" aria-label="Tools" data-bar-tools="" className="flex min-w-0 flex-shrink items-center gap-0.5 overflow-x-auto overflow-y-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [&>*]:flex-shrink-0">
       {leading}
       {groupTools(tools).map((entry) => (entry.kind === 'tool' ? <ToolButton key={entry.tool.id} tool={entry.tool} /> : <SectionSwitch key={entry.name} name={entry.name} tools={entry.tools} />))}
       {trailing}

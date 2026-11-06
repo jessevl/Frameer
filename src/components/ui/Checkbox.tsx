@@ -47,6 +47,7 @@ const Checkbox: React.FC<CheckboxProps> = ({
       disabled={disabled}
       className={cn(
         sizeClasses[size],
+        'touch-target',
         'rounded-md border-2 flex items-center justify-center transition-all flex-shrink-0',
         checked
           ? 'bg-[var(--color-control-checked-bg)] border-[var(--color-control-checked-border)] text-[var(--color-control-checked-fg)]'

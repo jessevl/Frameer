@@ -27,9 +27,11 @@ const Button: React.FC<ButtonProps> = ({
   className = '',
   ...props
 }) => {
-  const baseClasses = 'inline-flex items-center justify-center gap-2 font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed border';
+  const baseClasses = 'inline-flex items-center justify-center gap-2 font-medium transition-colors duration-200 disabled:cursor-not-allowed border';
   
   // Using semantic token CSS variables for automatic light/dark mode switching
+  // A disabled button is drawn as a quiet fill with grey ink (4.5:1 in both themes) instead of fading its colors: text on a half-faded coral fell under 4.5:1 in dark.
+  const DISABLED = 'disabled:bg-[var(--paper-3)] disabled:text-[var(--ink-2)] disabled:border-[var(--line-2)] disabled:hover:bg-[var(--paper-3)] disabled:hover:border-[var(--line-2)] disabled:hover:text-[var(--ink-2)]';
   const variants = {
     primary: [
       'bg-[var(--color-button-primary-bg)]',
@@ -83,7 +85,7 @@ const Button: React.FC<ButtonProps> = ({
   
   return (
     <button
-      className={`${baseClasses} ${variants[variant]} ${sizes[size]} ${className}`}
+      className={`${baseClasses} ${variants[variant]} ${DISABLED} ${sizes[size]} ${className}`}
       {...props}
     >
       {icon && <span className="flex-shrink-0">{icon}</span>}

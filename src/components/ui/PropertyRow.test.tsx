@@ -39,7 +39,7 @@ describe('PropertyRow', () => {
         <PropertyRow icon={icon} label="Where">Home</PropertyRow>
       </PropertyGrid>,
     );
-    expect((container.firstElementChild as HTMLElement).style.gridTemplateColumns).toBe('88px 1fr 1fr');
+    expect((container.firstElementChild as HTMLElement).style.gridTemplateColumns).toBe('fit-content(10rem) 1fr 1fr');
     const day = screen.getByTestId('prop-day');
     expect(day.children).toHaveLength(3);
     expect(screen.getByTestId('prop-where').children[1]).toHaveClass('col-span-2');

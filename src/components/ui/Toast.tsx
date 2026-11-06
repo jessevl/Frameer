@@ -169,34 +169,35 @@ export function toastWithAction(
 // TOAST COMPONENT
 // ============================================================================
 
+// Tinted toasts sit on an opaque paper surface with the type's color on the border and the icon, and ink for the words: a translucent tint over a blurred page left the text's contrast to whatever lay underneath (it failed on the sign-in pages in light).
 const typeConfig = {
   success: {
     icon: 'checkCircle' as ChromeIconName,
-    bgClass: 'bg-[var(--color-success)]/10',
-    borderClass: 'border border-[var(--color-success)]/15',
+    bgClass: 'bg-[var(--paper)]',
+    borderClass: 'border border-[var(--color-success)]/40',
     iconClass: 'text-[var(--color-success)]',
-    textClass: 'text-[var(--color-success)]',
+    textClass: 'text-[var(--ink)]',
   },
   error: {
     icon: 'alertCircle' as ChromeIconName,
-    bgClass: 'bg-[var(--color-danger)]/10',
-    borderClass: 'border border-[var(--color-danger)]/15',
+    bgClass: 'bg-[var(--paper)]',
+    borderClass: 'border border-[var(--color-danger)]/40',
     iconClass: 'text-[var(--color-danger)]',
-    textClass: 'text-[var(--color-danger)]',
+    textClass: 'text-[var(--ink)]',
   },
   warning: {
     icon: 'alertTriangle' as ChromeIconName,
-    bgClass: 'bg-[var(--color-warning)]/10',
-    borderClass: 'border border-[var(--color-warning)]/15',
+    bgClass: 'bg-[var(--paper)]',
+    borderClass: 'border border-[var(--color-warning)]/40',
     iconClass: 'text-[var(--color-warning)]',
-    textClass: 'text-[var(--color-warning)]',
+    textClass: 'text-[var(--ink)]',
   },
   info: {
     icon: 'info' as ChromeIconName,
-    bgClass: 'bg-[var(--color-accent-muted)]',
-    borderClass: 'border border-[var(--color-accent-emphasis)]/15',
+    bgClass: 'bg-[var(--paper)]',
+    borderClass: 'border border-[var(--color-accent-emphasis)]/40',
     iconClass: 'text-[var(--color-accent-fg)]',
-    textClass: 'text-[var(--color-accent-fg)]',
+    textClass: 'text-[var(--ink)]',
   },
 };
 
@@ -293,8 +294,8 @@ const ToastItemComponent: React.FC<ToastItemComponentProps> = ({ toast, onRemove
         <button
           onClick={handleRemove}
           className={`
-            p-1 rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-colors
-            ${pill ? 'text-[var(--paper)]' : config.iconClass}
+            touch-target p-1 rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-colors
+            ${pill ? 'text-[var(--paper)]' : 'text-[var(--ink-2)]'}
           `}
           aria-label="Dismiss"
         >

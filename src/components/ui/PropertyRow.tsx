@@ -1,6 +1,6 @@
 /**
  * @file PropertyRow.tsx
- * @description The side panel's property row and its grid. A row is a 40 px tile on paper-2 with an icon (a Drift line icon by `line`, or any node by `icon`), a quiet label and the value on the right. `tone` colors the icon: `accent` (coral, Drift and Yard) or `grey` (Harbour, where coral marks actions only). Inside a `PropertyGrid` the row lays its label in an 88 px column and its value across the two value columns, or two values side by side when `second` is given. With `onClick` the whole row is one button, so its children must not be interactive.
+ * @description The side panel's property row and its grid. A row is a 40 px tile on paper-2 with an icon (a Drift line icon by `line`, or any node by `icon`), a quiet label and the value on the right. `tone` colors the icon: `accent` (coral, Drift and Yard) or `grey` (Harbour, where coral marks actions only). Inside a `PropertyGrid` the row lays its label in the grid's label column (as wide as the longest label, up to 10 rem, then it wraps) and its value across the two value columns, or two values side by side when `second` is given. With `onClick` the whole row is one button, so its children must not be interactive.
  * Replaces the planneer `PropertyRow` (label, icon, value, active), which had no users in Harbour, Drift, Lighthouse or Yard.
  * Ported from drift@d91d6950:frontend/src/app/shell/panels/infoParts.tsx (`Property`) and yard@0b9f18f:frontend/src/ui/Property.tsx.
  * Used by: the apps' side panels (event, care, info, app detail).
@@ -54,7 +54,7 @@ export function PropertyRow({ icon, line, label, children, second, onClick, tone
     <>
       <span className="flex min-w-0 items-center gap-2.5">
         {mark}
-        <span className="truncate text-[var(--ink-2)]">{label}</span>
+        <span className="min-w-0 text-[var(--ink-2)] [overflow-wrap:anywhere]">{label}</span>
       </span>
       <span className={cn(valueClass, second === undefined && 'col-span-2')}>{children}</span>
       {second !== undefined ? <span className={valueClass}>{second}</span> : null}
@@ -79,11 +79,11 @@ export function PropertyRow({ icon, line, label, children, second, onClick, tone
   );
 }
 
-/** A label column of 88 px and two value columns; rows lay themselves across it. */
-export function PropertyGrid({ children, className }: { children: ReactNode; className?: string }) {
+/** The label column is as wide as the longest label up to `labelMax` (default 10 rem; a longer label wraps), then two value columns; rows lay themselves across it. */
+export function PropertyGrid({ children, className, labelMax = '10rem' }: { children: ReactNode; className?: string; labelMax?: string }) {
   return (
     <InGrid.Provider value>
-      <div className={cn('grid gap-y-1.5', className)} style={{ gridTemplateColumns: '88px 1fr 1fr' }}>
+      <div className={cn('grid gap-y-1.5', className)} style={{ gridTemplateColumns: `fit-content(${labelMax}) 1fr 1fr` }}>
         {children}
       </div>
     </InGrid.Provider>

@@ -8,7 +8,7 @@ export { DockedBar, type DockedBarPanel, type DockedBarProps } from './DockedBar
 export { FloatingPane, type FloatingPaneProps } from './FloatingPane';
 export { HOVER_CLOSE_MS, HOVER_OPEN_MS, paneMode, usePane, usePaneFromStore, type PaneStoreKeys, type PaneControls, type PaneHover, type PaneOptions, type PaneState } from './usePane';
 
-export { PANEL_WIDTH, PANEL_WIDTH_WIDE, PanelHeading, PanelSlide, SidePanel, SidePanelHeading, usePanelWidth, type PanelHeadingProps, type SidePanelProps } from './SidePanel';
+export { PANEL_WIDTH, PANEL_OVERLAY_BELOW, PANEL_WIDTH_WIDE, PanelHeading, PanelSlide, SidePanel, SidePanelHeading, usePanelOverlay, usePanelWidth, type PanelHeadingProps, type SidePanelProps } from './SidePanel';
 export { PanelContent, StageCrumb, type PanelContentProps } from './StageParts';
 export { useStageStore } from './stageStore';
 export { PANEL_PARAM, panelSearch, parsePanelStack, poppedSearch, pushedSearch } from './panelStack';

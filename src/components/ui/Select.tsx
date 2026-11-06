@@ -291,9 +291,9 @@ const SelectRoot: React.FC<SelectProps> = ({
   };
 
   const triggerClass = className
-    ? cn('inline-flex items-center justify-between gap-1.5 text-left', fullWidth && 'w-full', className)
+    ? cn('touch-target inline-flex items-center justify-between gap-1.5 text-left', fullWidth && 'w-full', className)
     : cn(
-        'inline-flex max-w-full items-center justify-between gap-2 rounded-[var(--radius-glyph)] text-left font-medium text-[var(--ink)] transition-colors',
+        'touch-target inline-flex max-w-full items-center justify-between gap-2 rounded-[var(--radius-glyph)] text-left font-medium text-[var(--ink)] transition-colors',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--coral-line)] disabled:cursor-not-allowed disabled:opacity-50',
         SIZE_CLASSES[size], VARIANT_CLASSES[variant], fullWidth && 'w-full',
       );
