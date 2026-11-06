@@ -14,8 +14,8 @@ import React, { type ReactNode } from 'react';
 import { Modal, Text, ModalFooter } from '@frameer/components/ui';
 import { useConfirmStore, type ConfirmVariant } from '@frameer/stores/confirmStore';
 
-/** `children` names what is lost (a list, a count); the store's own `children` from requestConfirm shows too. */
-const ConfirmModal: React.FC<{ children?: ReactNode }> = ({ children }) => {
+/** `children` names what is lost (a list, a count); the store's own `children` from requestConfirm shows too. With `showTitle` the title ("Delete Sports day?") is shown as the heading; without it the title only names the dialog for screen readers. */
+const ConfirmModal: React.FC<{ children?: ReactNode; showTitle?: boolean }> = ({ children, showTitle = false }) => {
   const { 
     isOpen, 
     title, 
@@ -36,7 +36,7 @@ const ConfirmModal: React.FC<{ children?: ReactNode }> = ({ children }) => {
       isOpen={isOpen} 
       onClose={cancel} 
       title={title}
-      hideHeader
+      hideHeader={!showTitle}
       footer={
         <ModalFooter
           onCancel={cancel}

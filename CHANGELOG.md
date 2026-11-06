@@ -2,6 +2,9 @@
 
 ## Unreleased (v0.3.1)
 
+### Added
+- `ConfirmModal showTitle`: shows the title as a visible heading, so the question names the item ("Delete Sports day?").
+
 ### Changed
 - Toast: the container sits `--toast-offset` above the bottom (1rem when unset), so an app can lift it over its docked bar or tab bar.
 

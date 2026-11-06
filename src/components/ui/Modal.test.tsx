@@ -107,4 +107,11 @@ describe('ConfirmModal', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
     expect(onConfirm).toHaveBeenCalledOnce();
   });
+
+  it('shows the title as a heading with showTitle, so the question names the item', async () => {
+    render(<ConfirmModal showTitle />);
+    act(() => useConfirmStore.getState().requestConfirm({ title: 'Delete Sports day?', message: 'This removes the event.', confirmLabel: 'Delete', variant: 'danger', onConfirm: vi.fn() }));
+    expect(await screen.findByRole('heading', { name: 'Delete Sports day?' })).toBeVisible();
+    expect(await axeViolations()).toEqual([]);
+  });
 });
