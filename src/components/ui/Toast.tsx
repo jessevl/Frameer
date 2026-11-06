@@ -333,8 +333,8 @@ export const ToastContainer: React.FC = () => {
     <div 
       className={`fixed z-[150] flex flex-col gap-2 max-w-sm ${
         isMobile 
-          ? 'bottom-4 right-4' 
-          : 'bottom-4 left-1/2 -translate-x-1/2'
+          ? 'bottom-[var(--toast-offset,1rem)] right-4' 
+          : 'bottom-[var(--toast-offset,1rem)] left-1/2 -translate-x-1/2'
       }`}
       style={{ 
         paddingBottom: 'env(safe-area-inset-bottom)',

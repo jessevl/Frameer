@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased (v0.3.1)
+
+### Changed
+- Toast: the container sits `--toast-offset` above the bottom (1rem when unset), so an app can lift it over its docked bar or tab bar.
+
 ## v0.3.0 (6 Nov 2026)
 
 ### Added
