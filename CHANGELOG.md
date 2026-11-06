@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased (v0.4.0)
+## v0.4.0 (6 Nov 2026)
 
 ### Added
 - `ConfirmModal showTitle`: shows the title as a visible heading, so the question names the item ("Delete Sports day?").
