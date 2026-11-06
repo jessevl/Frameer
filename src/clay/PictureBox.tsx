@@ -11,6 +11,8 @@ export interface PictureBoxProps extends Omit<React.HTMLAttributes<HTMLDivElemen
   /** Words for a picture that stands for a whole screen; the box then is `role="img"`. Leave out for decoration. */
   label?: string;
   className?: string;
+  /** The element drawn: a `div` (default) or a `span`, which can sit inside a button (a picture in a button is phrasing content). */
+  as?: 'div' | 'span';
   style?: CSSProperties;
   /** The lazy picture (made with `lazyPicture`); the box shows nothing until it has loaded. */
   children?: ReactNode;
@@ -18,12 +20,13 @@ export interface PictureBoxProps extends Omit<React.HTMLAttributes<HTMLDivElemen
 }
 
 /** A box that holds its size while a lazy picture loads. */
-export const PictureBox: React.FC<PictureBoxProps> = ({ label, className, style, children, ...rest }) => {
+export const PictureBox: React.FC<PictureBoxProps> = ({ label, className, style, as = 'div', children, ...rest }) => {
   const a11y = label ? ({ role: 'img', 'aria-label': label } as const) : ({ 'aria-hidden': true } as const);
+  const Box = as;
   return (
-    <div {...rest} {...a11y} className={className} style={style}>
+    <Box {...rest} {...a11y} className={className} style={style}>
       <Suspense fallback={null}>{children}</Suspense>
-    </div>
+    </Box>
   );
 };
 

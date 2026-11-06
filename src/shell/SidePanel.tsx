@@ -79,15 +79,17 @@ export function PanelSlide({ shown, width = PANEL_WIDTH, className = '', childre
 }
 
 /** The page's content is portalled into the slot; without a page panel the slot shows what the panel is for. */
-function SidePanelBody({ empty, label, children }: { empty?: string; label: string; children?: ReactNode }) {
+function SidePanelBody({ empty, label, children, ownHeader = false, padded = true, scrollContainer = true }: { empty?: string; label: string; children?: ReactNode; ownHeader?: boolean; padded?: boolean; scrollContainer?: boolean }) {
   const filled = useStageStore((s) => s.panelTitle !== null);
   const setTarget = useStageStore((s) => s.setPanelTarget);
+  // The inset keeps content under the docked bar; content with its own sticky header, or an unpadded body, takes none (the scroll padding stays so a row scrolled into view clears a sticky header).
+  const inset = padded && !ownHeader ? STAGE_SCROLL : '[scroll-padding-top:var(--stage-top)]';
   return (
-    <div id="side-panel-body" role="region" aria-label={label} {...stageScroll} className={`min-h-0 flex-1 overflow-y-auto ${STAGE_SCROLL}`}>
-      {/* The page's content fills the panel's height, so its footer can sit at the bottom. */}
-      <div ref={setTarget} className="flex min-h-full flex-col" />
+    <div id="side-panel-body" role="region" aria-label={label} {...(scrollContainer ? stageScroll : {})} className={`min-h-0 flex-1 overflow-y-auto ${inset}`}>
+      {/* A page's content fills the panel's height, so its footer can sit at the bottom; an empty target takes no height, so `children` start right at the top. */}
+      <div ref={setTarget} className={filled ? 'flex min-h-full flex-col' : 'flex flex-col'} />
       {children}
-      {filled || children || !empty ? null : <p className="px-5 py-4 text-[13.5px] text-[var(--ink-2)]">{empty}</p>}
+      {filled || children || !empty ? null : <p className={`${padded ? 'px-5 py-4 ' : ''}text-[13.5px] text-[var(--ink-2)]`}>{empty}</p>}
     </div>
   );
 }
@@ -103,6 +105,18 @@ export interface SidePanelProps {
   empty?: string;
   /** The body's accessible name. */
   label?: string;
+  /** The panel's accessible name on desktop (the title of what fills it, say). Default "Side panel". */
+  ariaLabel?: string;
+  /** `data-testid` of the panel. Default `side-panel`. */
+  testId?: string;
+  /** `data-testid` of the panel while it slides shut (`slide`); `testId` when left out. */
+  leavingTestId?: string;
+  /** The content brings its own sticky header: the body adds no `--stage-top` inset. */
+  ownHeader?: boolean;
+  /** False: the body adds no inset and no padding (content that lays itself out). Default true. */
+  padded?: boolean;
+  /** False: the body is not marked as a stage-scroll container (`data-stage-scroll`). Default true. */
+  scrollContainer?: boolean;
   children?: ReactNode;
   /** Replaces the heading on a phone (the docked bar's half is the app's, drawn through DockedBar's `panel.heading`). */
   heading?: ReactNode;
@@ -121,7 +135,7 @@ export interface SidePanelProps {
   className?: string;
 }
 
-export function SidePanel({ open, onClose, enabled = true, empty, label = DEFAULT_TITLE, children, heading, phone = 'full', requireContent = true, slide = false, floating = false, ignore, paper = true, wide = false, className = '' }: SidePanelProps) {
+export function SidePanel({ open, onClose, enabled = true, empty, label = DEFAULT_TITLE, ariaLabel = 'Side panel', testId = 'side-panel', leavingTestId, ownHeader = false, padded = true, scrollContainer = true, children, heading, phone = 'full', requireContent = true, slide = false, floating = false, ignore, paper = true, wide = false, className = '' }: SidePanelProps) {
   const isMobile = useIsMobile();
   const filled = useStageStore((s) => s.panelTitle !== null);
   const width = usePanelWidth(wide);
@@ -154,7 +168,7 @@ export function SidePanel({ open, onClose, enabled = true, empty, label = DEFAUL
       <MobileSheet isOpen={open && (filled || !requireContent)} onClose={onClose} title={label} maxHeight={full ? '100dvh' : undefined} className={full ? 'h-[100dvh] !rounded-none' : undefined}>
         <div className={full ? 'flex h-full flex-col' : 'flex max-h-[70vh] flex-col'}>
           <div className="flex flex-shrink-0 border-b border-[var(--line)] px-3.5 pb-3 pt-1">{heading ?? <SidePanelHeading />}</div>
-          <SidePanelBody empty={empty} label={label}>
+          <SidePanelBody empty={empty} label={label} ownHeader={ownHeader} padded={padded} scrollContainer={scrollContainer}>
             {children}
           </SidePanelBody>
         </div>
@@ -165,13 +179,13 @@ export function SidePanel({ open, onClose, enabled = true, empty, label = DEFAUL
   const aside = (
     <aside
       ref={ref}
-      aria-label="Side panel"
+      aria-label={ariaLabel}
       role={floating ? 'dialog' : undefined}
       className={`${paper ? 'paper-surface ' : ''}flex ${slide ? 'h-full' : 'flex-shrink-0 transition-[width] duration-150 motion-reduce:transition-none'} flex-col border-l border-[var(--line)] bg-[var(--paper)] [--stage-top:var(--bar-height)] ${className}`}
       style={slide ? undefined : { width }}
-      data-testid="side-panel"
+      data-testid={slide && !shown && leavingTestId ? leavingTestId : testId}
     >
-      <SidePanelBody empty={empty} label={label}>
+      <SidePanelBody empty={empty} label={label} ownHeader={ownHeader} padded={padded} scrollContainer={scrollContainer}>
         {children}
       </SidePanelBody>
     </aside>

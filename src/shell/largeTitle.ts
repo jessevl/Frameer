@@ -14,16 +14,19 @@ export function collapseProgress(scrollTop: number): number {
 }
 
 /**
- * Tracks the scroll of the stage that holds `ref` (its closest `root`, `main` by default). Scroll events do not bubble, so a capturing listener catches the list's own scroller or the stage's. `key` restarts it (the route).
+ * Tracks the scroll of the stage that holds `ref` (its closest `root`, `main` by default). Scroll events do not bubble, so a capturing listener catches the list's own scroller or the stage's. `key` restarts it (the route). `scrollers` says which scrollers count: a selector they match or a predicate (every scroller when left out), so a horizontal strip does not reset the collapse; pass a stable value.
  */
-export function useLargeTitleScroll(ref: RefObject<HTMLElement | null>, enabled: boolean, key: string, root = 'main'): void {
+export function useLargeTitleScroll(ref: RefObject<HTMLElement | null>, enabled: boolean, key: string, root = 'main', scrollers?: string | ((element: HTMLElement) => boolean)): void {
   useEffect(() => {
     const stage = ref.current?.closest<HTMLElement>(root);
     if (!stage || !enabled) return;
     stage.dataset.largeTitle = '';
     stage.style.setProperty('--title-p', '0');
     const onScroll = (event: Event) => {
-      if (event.target instanceof HTMLElement) stage.style.setProperty('--title-p', String(collapseProgress(event.target.scrollTop)));
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+      if (typeof scrollers === 'string' ? !target.matches(scrollers) : scrollers && !scrollers(target)) return;
+      stage.style.setProperty('--title-p', String(collapseProgress(target.scrollTop)));
     };
     stage.addEventListener('scroll', onScroll, { capture: true, passive: true });
     return () => {
@@ -31,5 +34,5 @@ export function useLargeTitleScroll(ref: RefObject<HTMLElement | null>, enabled:
       delete stage.dataset.largeTitle;
       stage.style.removeProperty('--title-p');
     };
-  }, [ref, enabled, key, root]);
+  }, [ref, enabled, key, root, scrollers]);
 }

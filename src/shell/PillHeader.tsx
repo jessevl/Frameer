@@ -12,7 +12,7 @@ import { AppLink } from './AppLink';
 
 export interface Crumb {
   key?: string;
-  label: string;
+  label: ReactNode;
   href?: string;
   /** The current crumb; the last one when no crumb says so. */
   current?: boolean;
@@ -94,7 +94,7 @@ export function PillHeader({ crumbs, bar = false, stretch = false, onBack, title
               );
             const context: CrumbContext = { index, first: index === 0, current, content };
             return (
-              <li key={crumb.key ?? crumb.label} className={`flex min-w-0 items-center gap-1.5 ${current ? '' : 'max-sm:hidden'}`}>
+              <li key={crumb.key ?? (typeof crumb.label === 'string' ? crumb.label : index)} className={`flex min-w-0 items-center gap-1.5 ${current ? '' : 'max-sm:hidden'}`}>
                 {index > 0 ? (renderSeparator ? renderSeparator(crumb, context) : <Chevron />) : null}
                 {renderCrumb ? renderCrumb(crumb, context) : content}
                 {crumb.count ? <span className="ml-1 flex-shrink-0 text-[12.5px] font-normal text-[var(--ink-2)] max-sm:hidden">{crumb.count}</span> : null}

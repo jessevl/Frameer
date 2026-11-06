@@ -67,17 +67,23 @@ export interface StageTool {
   node?: ReactNode;
 }
 
-interface StageToolsValue {
+export interface StageToolsValue {
   tools: StageTool[];
   setTools: (tools: StageTool[]) => void;
 }
 
-const StageToolsContext = createContext<StageToolsValue>({ tools: [], setTools: () => undefined });
+/** The registry's context, for an app that provides it itself (a test, a shell with its own provider) or reads it whole (`useStageToolsRegistry`). */
+export const StageToolsContext = createContext<StageToolsValue>({ tools: [], setTools: () => undefined });
 
 export function StageToolsProvider({ children }: { children: ReactNode }) {
   const [tools, setTools] = useState<StageTool[]>([]);
   const value = useMemo(() => ({ tools, setTools }), [tools]);
   return <StageToolsContext.Provider value={value}>{children}</StageToolsContext.Provider>;
+}
+
+/** The registry whole: the tools the view registered and the setter that replaces them (what `useStageTools` calls). */
+export function useStageToolsRegistry(): StageToolsValue {
+  return useContext(StageToolsContext);
 }
 
 /** The tools the current view registered. */

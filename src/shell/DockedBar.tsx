@@ -25,9 +25,15 @@ export interface DockedBarProps {
   middle?: ReactNode;
   trailing?: ReactNode;
   panel?: DockedBarPanel;
+  /** `data-testid` of the bar. */
+  testId?: string;
+  /** The bar stops at the docked panel's edge instead of spanning it; the panel then draws its own heading (`panel.heading` and `panel.toggle` are not drawn). */
+  stopAtPanel?: boolean;
+  /** `data-*` attributes (`data-story`, `data-panel`) pass through to the bar. */
+  [data: `data-${string}`]: string | number | boolean | undefined;
 }
 
-export function DockedBar({ crumbs, middle, trailing, panel }: DockedBarProps) {
+export function DockedBar({ crumbs, middle, trailing, panel, testId, stopAtPanel = false, ...rest }: DockedBarProps) {
   const width = usePanelWidth(panel?.wide);
   const half = panel ? (
     <>
@@ -35,15 +41,22 @@ export function DockedBar({ crumbs, middle, trailing, panel }: DockedBarProps) {
       {panel.toggle}
     </>
   ) : null;
+  const data = Object.fromEntries(Object.entries(rest).filter(([key]) => key.startsWith('data-')));
   const halfClass = 'flex h-full items-center gap-2 border-l border-[var(--line)] pl-3 pr-3.5';
   return (
-    <div data-docked-bar className="absolute inset-x-0 top-0 z-20 flex h-[var(--bar-height)] items-center border-b border-[var(--line)] bg-[var(--bar)] backdrop-blur-xl backdrop-saturate-150">
+    <div
+      {...data}
+      data-docked-bar=""
+      data-testid={testId}
+      style={stopAtPanel ? { right: panel?.open ? width : 0 } : undefined}
+      className="absolute inset-x-0 top-0 z-20 flex h-[var(--bar-height)] items-center border-b border-[var(--line)] bg-[var(--bar)] backdrop-blur-xl backdrop-saturate-150"
+    >
       <div className="@container/bar flex h-full min-w-0 flex-1 items-center gap-2 pl-2.5 pr-3.5">
         <div className="flex min-w-[9rem] flex-1">{crumbs}</div>
         {middle}
         {trailing}
       </div>
-      {panel?.slide ? (
+      {stopAtPanel ? null : panel?.slide ? (
         <PanelSlide shown={panel.open} width={width} className={halfClass}>
           {half}
         </PanelSlide>

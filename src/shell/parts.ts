@@ -19,9 +19,9 @@ export { STAGE_SCROLL, scrollStageToTop, stageScroll } from './stageScroll';
 
 export { PillHeader, type Crumb, type CrumbContext, type PillHeaderProps } from './PillHeader';
 export { BarTools, PanelToggle, groupTools, type BarToolsProps } from './BarTools';
-export { StageToolsProvider, anchorOf, useRegisteredStageTools, useStageTools, type StageTool, type ToolAnchor, type ToolIcon } from './stageTools';
+export { StageToolsContext, StageToolsProvider, anchorOf, useRegisteredStageTools, useStageTools, useStageToolsRegistry, type StageToolsValue, type StageTool, type ToolAnchor, type ToolIcon } from './stageTools';
 
-export { PhoneHeader, PhoneTool, type PhoneBack, type PhoneHeaderProps } from './PhoneHeader';
+export { PhoneHeader, PhoneTool, type PhoneBack, type PhoneHeaderProps, type PhoneToolProps } from './PhoneHeader';
 export { COLLAPSE_PX, collapseProgress, useLargeTitleScroll } from './largeTitle';
 export { PhoneTabBar, type PhoneTab, type PhoneTabBarProps } from './PhoneTabBar';
 export { PhoneViewSwitch } from './PhoneViewSwitch';

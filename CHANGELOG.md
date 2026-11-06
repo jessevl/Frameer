@@ -1,5 +1,23 @@
 # Changelog
 
+## v0.4.2 (unreleased)
+
+### Added
+- `SidePanel`: `ariaLabel` (default "Side panel"), `testId` and `leavingTestId` (the panel while it slides shut), `ownHeader` (content with its own sticky header: no `--stage-top` inset), `padded={false}` and `scrollContainer={false}`.
+- `DockedBar`: `data-*` attributes and `testId` pass through to the bar; `stopAtPanel` ends the bar at the docked panel's edge.
+- `PhoneHeader`: `subtitleLabel`, `subtitleTestId` and `scrollers` (a selector or predicate naming the scrollers that collapse the large title); `useLargeTitleScroll` takes the same as its fifth argument.
+- `PhoneTool`: `onClick` gets the event, and the ref is forwarded (`PhoneToolProps`). `AppLink` forwards its ref.
+- `StageToolsContext`, `useStageToolsRegistry` and `StageToolsValue` (`shell/parts`).
+- `PictureBox as="span"`, so it can sit inside a button.
+- `ShortcutRow.keys` takes a combination as an array (`['Ctrl', 'K']`), drawn as keycaps joined by "+"; `ShortcutKey` type.
+
+### Changed
+- `Crumb.label` is a `ReactNode`; a crumb with a node label needs a `key`.
+
+### Fixed
+- `SidePanel`: the empty portal target no longer takes `min-h-full`, which pushed `children` below a full panel height.
+- `PhoneHeader`: the subtitle button's name is no longer fixed to "<title>: <subtitle>" (Lighthouse showed "Today: x" before v0.4.1).
+
 ## v0.4.1 (6 Nov 2026)
 
 ### Fixed

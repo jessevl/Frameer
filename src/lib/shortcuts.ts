@@ -31,9 +31,13 @@ export interface Shortcut<S extends string = string> {
   group?: string;
 }
 
+/** One step of a row: a key, or a combination held together. */
+export type ShortcutKey = string | readonly string[];
+
 /** What the list shows for one shortcut. */
 export interface ShortcutRow {
-  keys: readonly string[];
+  /** What to press. A string is one keycap; the keys of a row read in sequence ("g then e"). An array is a combination held together, drawn as keycaps joined by "+" (`['Ctrl', 'K']`). */
+  keys: readonly ShortcutKey[];
   label: string;
   group?: string;
 }

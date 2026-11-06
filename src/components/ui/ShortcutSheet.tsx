@@ -1,21 +1,35 @@
 /**
  * @file ShortcutSheet.tsx
- * @description The list of keyboard shortcuts and the sheet that shows it. `ShortcutList` is a table of keys and what they do, built from the rows the app gives (`shortcutRows(keymap)` plus any keys the keymap does not hold, such as a Ctrl+Enter that a form handles itself); rows with a `group` sit under group headings. `ShortcutSheet` is the list in a modal, as `?` opens it. A key is shown in a keycap; a sequence reads "g then m". The table is focusable so it can be scrolled with the keyboard.
+ * @description The list of keyboard shortcuts and the sheet that shows it. `ShortcutList` is a table of keys and what they do, built from the rows the app gives (`shortcutRows(keymap)` plus any keys the keymap does not hold, such as a Ctrl+Enter that a form handles itself); rows with a `group` sit under group headings. `ShortcutSheet` is the list in a modal, as `?` opens it. A key is shown in a keycap; a sequence reads "g then m". A combination (`['Ctrl', 'K']`) reads "Ctrl + K". The table is focusable so it can be scrolled with the keyboard.
  * @app SHARED - Generic: the rows come from the app's keymap.
  * Used by: the apps' shells (the `?` sheet) and their Shortcuts settings pages.
  */
 import React from 'react';
-import type { ShortcutRow } from '@frameer/lib/shortcuts';
+import type { ShortcutKey, ShortcutRow } from '@frameer/lib/shortcuts';
 import Modal from './Modal';
 
 const KEYCAP = 'inline-flex min-w-[24px] items-center justify-center rounded-md border border-[var(--line-2)] bg-[var(--paper-2)] px-1.5 py-0.5 font-mono text-[12px] text-[var(--ink)]';
 
-const Keys: React.FC<{ keys: readonly string[] }> = ({ keys }) => (
+const Combo: React.FC<{ keys: ShortcutKey }> = ({ keys }) =>
+  typeof keys === 'string' ? (
+    <kbd className={KEYCAP}>{keys}</kbd>
+  ) : (
+    <span className="inline-flex items-center gap-0.5" data-testid="shortcut-combo">
+      {keys.map((key, i) => (
+        <span key={`${key}${i}`} className="inline-flex items-center gap-0.5">
+          {i > 0 ? <span aria-hidden="true" className="text-[12px] text-[var(--ink-2)]">+</span> : null}
+          <kbd className={KEYCAP}>{key}</kbd>
+        </span>
+      ))}
+    </span>
+  );
+
+const Keys: React.FC<{ keys: readonly ShortcutKey[] }> = ({ keys }) => (
   <span className="inline-flex items-center gap-1">
     {keys.map((key, i) => (
-      <span key={`${key}${i}`} className="inline-flex items-center gap-1">
+      <span key={`${typeof key === 'string' ? key : key.join('+')}${i}`} className="inline-flex items-center gap-1">
         {i > 0 ? <span className="text-[12px] text-[var(--ink-2)]">then</span> : null}
-        <kbd className={KEYCAP}>{key}</kbd>
+        <Combo keys={key} />
       </span>
     ))}
   </span>
@@ -47,7 +61,7 @@ export const ShortcutList: React.FC<ShortcutListProps> = ({ rows, caption = 'Key
           const heading = row.group && row.group !== lastGroup ? row.group : null;
           lastGroup = row.group ?? lastGroup;
           return (
-            <React.Fragment key={`${row.label}:${row.keys.join('+')}:${index}`}>
+            <React.Fragment key={`${row.label}:${row.keys.map((k) => (typeof k === 'string' ? k : k.join('+'))).join(',')}:${index}`}>
               {heading ? (
                 <tr>
                   <th scope="colgroup" colSpan={2} className="pb-1 pt-4 text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--ink-2)]">

@@ -5,7 +5,7 @@
  * Needs the styles in `@frameer/ui/styles/phone.css`.
  * Used by: the app shell's phone layout.
  */
-import { useRef, type ReactNode } from 'react';
+import { forwardRef, useRef, type MouseEvent, type ReactNode, type Ref } from 'react';
 import { ChromeIcon } from '@frameer/components/ui/ChromeIcons';
 import { AppLink } from './AppLink';
 import { useLargeTitleScroll } from './largeTitle';
@@ -22,6 +22,12 @@ export interface PhoneHeaderProps {
   title: string;
   subtitle?: string;
   onSubtitle?: () => void;
+  /** The subtitle button's accessible name reads "<label>: <subtitle>"; the title when left out (Lighthouse names it "Today"). */
+  subtitleLabel?: string;
+  /** `data-testid` of the subtitle (the button or the quiet line). */
+  subtitleTestId?: string;
+  /** Which scrollers collapse the large title: a selector they match, or a predicate; every scroller when left out (a horizontal strip then needs one). */
+  scrollers?: string | ((element: HTMLElement) => boolean);
   /** The mark at the row's start; replaced by `back` on a nested page. */
   leading?: ReactNode;
   back?: PhoneBack;
@@ -38,10 +44,10 @@ export interface PhoneHeaderProps {
   scrollRoot?: string;
 }
 
-export function PhoneHeader({ title, subtitle, onSubtitle, leading, back, actions, tools, center, compact = false, largeTitle = true, decorative = false, headingId = 'stage-title', scrollKey = '', scrollRoot = 'main' }: PhoneHeaderProps) {
+export function PhoneHeader({ title, subtitle, onSubtitle, subtitleLabel, subtitleTestId, scrollers, leading, back, actions, tools, center, compact = false, largeTitle = true, decorative = false, headingId = 'stage-title', scrollKey = '', scrollRoot = 'main' }: PhoneHeaderProps) {
   const ref = useRef<HTMLElement>(null);
   const large = largeTitle && !compact;
-  useLargeTitleScroll(ref, large, scrollKey, scrollRoot);
+  useLargeTitleScroll(ref, large, scrollKey, scrollRoot, scrollers);
   const Heading = decorative ? 'h2' : 'h1';
   return (
     <>
@@ -74,12 +80,12 @@ export function PhoneHeader({ title, subtitle, onSubtitle, leading, back, action
             {title}
           </Heading>
           {subtitle && onSubtitle ? (
-            <button type="button" className="fr-lt-sub" aria-haspopup="dialog" aria-label={`${title}: ${subtitle}`} onClick={onSubtitle}>
+            <button type="button" className="fr-lt-sub" aria-haspopup="dialog" aria-label={`${subtitleLabel ?? title}: ${subtitle}`} data-testid={subtitleTestId} onClick={onSubtitle}>
               {subtitle}
               <ChromeIcon name="chevronDown" aria-hidden="true" className="h-3 w-3" />
             </button>
           ) : subtitle ? (
-            <span className="fr-lt-sub" data-quiet>{subtitle}</span>
+            <span className="fr-lt-sub" data-quiet data-testid={subtitleTestId}>{subtitle}</span>
           ) : null}
         </div>
       ) : null}
@@ -87,18 +93,28 @@ export function PhoneHeader({ title, subtitle, onSubtitle, leading, back, action
   );
 }
 
-/** One button of the tools pill, 44 px: a link with `href`, else a button. `label` is its name; the icon is the children. */
-export function PhoneTool({ label, onClick, href, children, ...rest }: { label: string; onClick?: () => void; href?: string; children: ReactNode; 'aria-haspopup'?: 'dialog' | 'menu'; 'aria-expanded'?: boolean }) {
+export interface PhoneToolProps {
+  label: string;
+  /** Gets the click event, so an app can anchor a menu on `event.currentTarget`. */
+  onClick?: (event: MouseEvent<HTMLElement>) => void;
+  href?: string;
+  children: ReactNode;
+  'aria-haspopup'?: 'dialog' | 'menu';
+  'aria-expanded'?: boolean;
+}
+
+/** One button of the tools pill, 44 px: a link with `href`, else a button. `label` is its name; the icon is the children. The ref reaches the element drawn (the button, or the link). */
+export const PhoneTool = forwardRef<HTMLElement, PhoneToolProps>(function PhoneTool({ label, onClick, href, children, ...rest }, ref) {
   if (href !== undefined) {
     return (
-      <AppLink href={href} className="fr-pt" aria-label={label}>
+      <AppLink ref={ref as Ref<HTMLAnchorElement>} href={href} className="fr-pt" aria-label={label} onClick={onClick}>
         {children}
       </AppLink>
     );
   }
   return (
-    <button type="button" className="fr-pt" onClick={onClick} aria-label={label} {...rest}>
+    <button ref={ref as Ref<HTMLButtonElement>} type="button" className="fr-pt" onClick={onClick} aria-label={label} {...rest}>
       {children}
     </button>
   );
-}
+});

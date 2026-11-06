@@ -3,10 +3,10 @@
  * @description A real `<a href>` that navigates inside the app on a plain click and leaves modified clicks (new tab, download) to the browser.
  * Used by: the rail, the panes and the stage header, wherever the route is only known as a path string.
  */
-import type { AnchorHTMLAttributes, MouseEvent } from 'react';
+import { forwardRef, type AnchorHTMLAttributes, type MouseEvent } from 'react';
 import { useRouter } from '@tanstack/react-router';
 
-export function AppLink({ href, onClick, ...rest }: AnchorHTMLAttributes<HTMLAnchorElement> & { href: string }) {
+export const AppLink = forwardRef<HTMLAnchorElement, AnchorHTMLAttributes<HTMLAnchorElement> & { href: string }>(function AppLink({ href, onClick, ...rest }, ref) {
   const router = useRouter();
 
   const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
@@ -16,5 +16,5 @@ export function AppLink({ href, onClick, ...rest }: AnchorHTMLAttributes<HTMLAnc
     router.history.push(href);
   };
 
-  return <a href={href} onClick={handleClick} {...rest} />;
-}
+  return <a ref={ref} href={href} onClick={handleClick} {...rest} />;
+});
