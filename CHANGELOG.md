@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.4.5 (7 Nov 2026)
+
+### Fixed
+- SidePanel: floating over the stage (below 1024px) the panel sits at the right edge and its content scrolls; it no longer carries `paper-surface`, whose `position: relative` beat the `absolute` utility and left the card at the left, as tall as its content. A floating panel whose content goes away (the page closed it through its own route) closes with it instead of staying as an empty card until the next press; a panel opened empty on purpose stays open.
+
+### Changed
+- `useContextMenu`: every context menu is one width (`w-64`, 256px) instead of sizing to its longest label between 200 and 320px, so the menus of an app look alike. `FloatingSurface` still caps it on narrow windows.
+
 ## v0.4.4 (6 Nov 2026)
 
 ### Changed
