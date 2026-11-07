@@ -1,6 +1,6 @@
 /**
  * @file AuthShell.fixes.test.tsx
- * @description The v0.4 adoption fixes: the `bare` card, FormError without a margin, AuthArt `tilesAbove`, and the parts barrel's exports, with axe.
+ * @description The v0.4 adoption fixes: the `bare` card, FormError without a margin, AuthArt `tilesAbove`, and the parts barrel's exports, with axe. Also that every layout scrolls itself, since base.css turns off page scrolling.
  */
 import React from 'react';
 import { describe, expect, it } from 'vitest';
@@ -23,6 +23,17 @@ describe('AuthShell fixes', () => {
     expect(screen.getAllByRole('heading')).toHaveLength(1);
     expect(screen.getByTestId('wizard').parentElement).toBe(screen.getByRole('main'));
     expect(await axeViolations()).toEqual([]);
+  });
+
+  it.each(['split', 'window', 'card'] as const)('puts the %s layout in a window-high box that scrolls, as the page cannot', (variant) => {
+    render(
+      <AuthShell brand={<span>Yard</span>} title="Set up" variant={variant}>
+        <p>form</p>
+      </AuthShell>,
+    );
+    const box = screen.getByTestId('auth-scroll');
+    expect(box).toHaveClass('h-dvh', 'overflow-y-auto');
+    expect(box).toContainElement(screen.getByRole('main'));
   });
 
   it('keeps the heading and padding in a card that is not bare', () => {
