@@ -158,6 +158,20 @@ export function SidePanel({ open, onClose, enabled = true, empty, label = DEFAUL
   const back = useStageStore((st) => st.panelBack);
   const closeFromStore = useStageStore((st) => st.panelClose);
 
+  // Floating over the stage, a panel whose page has gone (the page closed its content through its own route, not the panel's close button) closes with it, instead of staying as an empty card until the next press.
+  const wasFilled = useRef(false);
+  useEffect(() => {
+    if (!overlay || !shown) {
+      wasFilled.current = false;
+      return;
+    }
+    if (filled) wasFilled.current = true;
+    else if (wasFilled.current) {
+      wasFilled.current = false;
+      onClose();
+    }
+  }, [overlay, shown, filled, onClose]);
+
   useEffect(() => {
     if (!dismissing) return;
     const onKey = (event: KeyboardEvent) => {
@@ -198,7 +212,7 @@ export function SidePanel({ open, onClose, enabled = true, empty, label = DEFAUL
       role={floating ? 'dialog' : undefined}
       className={
         overlay
-          ? `${paper ? 'paper-surface ' : ''}absolute inset-y-0 right-0 flex max-w-full flex-col border-l border-[var(--line)] bg-[var(--paper)] shadow-[var(--shadow-float)] [--stage-top:0px] ${className}`
+          ? `absolute inset-y-0 right-0 flex max-w-full flex-col border-l border-[var(--line)] bg-[var(--paper)] shadow-[var(--shadow-float)] [--stage-top:0px] ${className}`
           : `${paper ? 'paper-surface ' : ''}flex ${slide ? 'h-full' : 'flex-shrink-0 transition-[width] duration-150 motion-reduce:transition-none'} flex-col border-l border-[var(--line)] bg-[var(--paper)] [--stage-top:var(--bar-height)] ${className}`
       }
       style={overlay || !slide ? { width } : undefined}
@@ -213,7 +227,7 @@ export function SidePanel({ open, onClose, enabled = true, empty, label = DEFAUL
     </aside>
   );
   if (overlay) {
-    // A scrim over the window with the panel at its right edge. The window-level press handler closes it, so the scrim only has to be there to be pressed.
+    // A scrim over the window (the panel carries no `paper-surface` here: its `position: relative` beats the `absolute` utility and left the card at the scrim's left edge, as tall as its content, so it neither sat at the right nor scrolled) with the panel at its right edge. The window-level press handler closes it, so the scrim only has to be there to be pressed.
     return shown ? (
       <div role="dialog" aria-modal="true" aria-label={ariaLabel} className="fixed inset-0 z-[60]" data-testid={`${testId}-overlay`}>
         <div aria-hidden="true" className="absolute inset-0 bg-black/30" data-testid={`${testId}-scrim`} />

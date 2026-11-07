@@ -55,6 +55,32 @@ describe('SidePanel overlay below the breakpoint', () => {
     expect(onClose).toHaveBeenCalledTimes(2);
   });
 
+  it('is positioned at the right edge, full height, without the relative paper surface', () => {
+    media(tablet);
+    render(<SidePanel open onClose={vi.fn()} />);
+    const panel = screen.getByTestId('side-panel');
+    expect(panel.className).toContain('absolute');
+    expect(panel.className).toContain('right-0');
+    expect(panel.className).not.toContain('paper-surface');
+  });
+
+  it('closes with its page: once the content it showed has gone, an overlaid panel asks to close', () => {
+    media(tablet);
+    const onClose = vi.fn();
+    render(<SidePanel open onClose={onClose} />);
+    act(() => useStageStore.getState().setPanelTitle('Event'));
+    expect(onClose).not.toHaveBeenCalled();
+    act(() => useStageStore.getState().setPanelTitle(null));
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not close an overlaid panel that was opened empty', () => {
+    media(tablet);
+    const onClose = vi.fn();
+    render(<SidePanel open onClose={onClose} />);
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
   it('draws its own heading while overlaid, because the bar has no panel half then', () => {
     media(tablet);
     render(<SidePanel open onClose={vi.fn()} />);

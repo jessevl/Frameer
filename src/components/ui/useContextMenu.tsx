@@ -122,7 +122,7 @@ export function useContextMenu(items: () => ContextMenuItem[], options?: Context
   };
 
   const menu = state ? (
-    <FloatingSurface anchor={state.anchor} label={label} role="menu" onClose={close} returnFocus={state.returnFocus} className="min-w-[200px] max-w-[320px] p-1">
+    <FloatingSurface anchor={state.anchor} label={label} role="menu" onClose={close} returnFocus={state.returnFocus} className="w-64 p-1">
       <ContextMenuContent items={items()} onItemClick={choose} touchFriendly={phone} autoFocus />
     </FloatingSurface>
   ) : null;

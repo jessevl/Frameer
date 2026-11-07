@@ -277,3 +277,20 @@ describe('ContextMenu (the wrapper)', () => {
     expect(onItemClick).toHaveBeenCalledWith(expect.objectContaining({ id: 'rename' }));
   });
 });
+
+describe('menu size', () => {
+  it('is one width whatever the labels say, so every menu in an app looks alike', () => {
+    const short = () => [{ id: 'a', label: 'Open', onClick: vi.fn() }];
+    const long = () => [{ id: 'a', label: 'Make an event from this mail with a very long name', onClick: vi.fn() }];
+    const widths = [short, long].map((items) => {
+      const { unmount } = render(<Row items={items} />);
+      fireEvent.contextMenu(row());
+      const cls = menu().className;
+      unmount();
+      return cls;
+    });
+    expect(widths[0]).toBe(widths[1]);
+    expect(widths[0]).toContain('w-64');
+    expect(widths[0]).not.toContain('min-w');
+  });
+});
