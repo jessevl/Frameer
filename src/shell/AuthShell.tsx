@@ -1,6 +1,8 @@
 /**
  * @file AuthShell.tsx
  * @description The frame of every signed-out screen (sign-in, first-run claim, invitation, password reset): a form column with the app's brand at the top, a status chip naming this server, a title and subtitle, the form, and a footnote, and beside it a slot for the art. Three layouts. `split` (default): the column on the left and the art filling the right on wide screens. `window`: the same inside one rounded window on the canvas, the art hidden below 1024 px. `card`: the brand above one dialog card, no art. The brand, the chip's words, the footnote and the art are the app's; the layout, the heading order and the server chip are here. `card` with `bare` renders the children directly in the frame. Also `ServerStatusChip`, `FormError` (no outer margin) and `AuthArt` (a coral field with floating tiles and a picture; `tilesAbove` puts the tiles over the picture). Import `@frameer/styles/signin.css` once for the art's motion.
+ * Every layout scrolls itself (`Scroller`): base.css turns off page scrolling for the app shell, so a frame that only
+ * grows the page would cut off a long form (a setup wizard on a laptop screen) for anyone without a Tab key.
  * @app SHARED - Generic: knows nothing about any app's brand or server.
  * Ported from drift@frontend/src/features/auth/AuthShell.tsx, lighthouse@frontend/src/components/auth/AuthShell.tsx and yard@frontend/src/ui/AuthFrame.tsx.
  * Used by: the apps' sign-in, claim, invitation and reset routes.
@@ -38,29 +40,38 @@ const Heading: React.FC<{ title: string; subtitle?: string }> = ({ title, subtit
   </div>
 );
 
+/** The window-high scroll box around each layout; the layouts inside keep their own `min-h-dvh`. */
+const Scroller: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div data-testid="auth-scroll" className="h-dvh overflow-y-auto overscroll-contain">
+    {children}
+  </div>
+);
+
 /** The frame of the signed-out screens. */
 export const AuthShell: React.FC<AuthShellProps> = ({ variant = 'split', brand, status, title, subtitle, children, footnote, art, wide = false, bare = false }) => {
   if (variant === 'card') {
     return (
-      <div className="flex min-h-dvh flex-col items-center gap-7 bg-[var(--canvas)] px-4 py-10 sm:px-6">
-        <div className="flex items-center gap-3">{brand}</div>
-        <main
-          className={cn(
-            'flex w-full overflow-hidden rounded-[var(--radius-card)] border border-[var(--line)] bg-[var(--paper)] shadow-[var(--shadow-pill)]',
-            wide ? 'max-w-[1040px] flex-row flex-wrap' : 'max-w-[440px] flex-col',
-          )}
-        >
-          {bare ? (
-            children
-          ) : (
-            <div className="flex flex-1 flex-col gap-5 p-6 sm:p-8">
-              {status}
-              <Heading title={title} subtitle={subtitle} />
-              <div>{children}</div>
-            </div>
-          )}
-        </main>
-      </div>
+      <Scroller>
+        <div className="flex min-h-dvh flex-col items-center gap-7 bg-[var(--canvas)] px-4 py-10 sm:px-6">
+          <div className="flex items-center gap-3">{brand}</div>
+          <main
+            className={cn(
+              'flex w-full overflow-hidden rounded-[var(--radius-card)] border border-[var(--line)] bg-[var(--paper)] shadow-[var(--shadow-pill)]',
+              wide ? 'max-w-[1040px] flex-row flex-wrap' : 'max-w-[440px] flex-col',
+            )}
+          >
+            {bare ? (
+              children
+            ) : (
+              <div className="flex flex-1 flex-col gap-5 p-6 sm:p-8">
+                {status}
+                <Heading title={title} subtitle={subtitle} />
+                <div>{children}</div>
+              </div>
+            )}
+          </main>
+        </div>
+      </Scroller>
     );
   }
   const column = (
@@ -81,19 +92,23 @@ export const AuthShell: React.FC<AuthShellProps> = ({ variant = 'split', brand, 
   );
   if (variant === 'window') {
     return (
-      <main className="grid min-h-dvh place-items-center bg-[var(--canvas)] p-0 text-[var(--ink)] lg:p-10">
-        <div className="grid w-full max-w-[1360px] grid-cols-1 overflow-hidden bg-[var(--paper)] lg:min-h-[calc(100dvh-80px)] lg:grid-cols-[520px_minmax(0,1fr)] lg:rounded-[26px] lg:border lg:border-[var(--line-2)] lg:shadow-[var(--shadow-pill)]">
-          {column}
-          {art}
-        </div>
-      </main>
+      <Scroller>
+        <main className="grid min-h-dvh place-items-center bg-[var(--canvas)] p-0 text-[var(--ink)] lg:p-10">
+          <div className="grid w-full max-w-[1360px] grid-cols-1 overflow-hidden bg-[var(--paper)] lg:min-h-[calc(100dvh-80px)] lg:grid-cols-[520px_minmax(0,1fr)] lg:rounded-[26px] lg:border lg:border-[var(--line-2)] lg:shadow-[var(--shadow-pill)]">
+            {column}
+            {art}
+          </div>
+        </main>
+      </Scroller>
     );
   }
   return (
-    <main className="flex min-h-dvh bg-[var(--paper)]">
-      {column}
-      {art}
-    </main>
+    <Scroller>
+      <main className="flex min-h-dvh bg-[var(--paper)]">
+        {column}
+        {art}
+      </main>
+    </Scroller>
   );
 };
 
