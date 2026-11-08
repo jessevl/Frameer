@@ -90,14 +90,46 @@ const sheet = (p: string, id: string, x: number, y: number, w: number, h: number
   return `<path d="${rr(x, y, w, h, r)}" fill="url(#${p}${id})"${t}/><path d="${rr(x + 1.5, y + 1.5, w - 3, h - 3, r - 1.5)}" fill="none" stroke="#FFFFFF" stroke-opacity="${op}" stroke-width="3"${t}/>`;
 };
 
-/** How the sheets behind a card sit: stacked straight up, or fanned. */
-export type Layout = 'straight' | 'fan' | 'papers';
+/**
+ * How the sheets behind a card sit. Each app's mark has its own: `straight` (Drift: stacked straight up), `fan` (Lighthouse: turned either way), `horizon` (Harbour: the straight stack on its side, showing left and right), `cascade` (Yard: stepping up and to the right, each sheet smaller). `papers` draws none (the folder draws its own).
+ */
+export type Layout = 'straight' | 'fan' | 'horizon' | 'cascade' | 'papers';
 
-/** The one or two sheets behind a card (one at small sizes, where more would be mush). */
+/** One sheet: its rounded rectangle and its turn (degrees about the 512 grid's centre). */
+export interface SheetRect extends Bounds {
+  r: number;
+  rot: number;
+}
+
+/** Where the sheets behind a card of bounds `f` sit, back to front: two at full size, one when `small` (more would be mush). Flat drawings fill the same rectangles in one paint. */
+export function sheetRects(f: Bounds & { r: number }, layout: Layout, small: boolean): SheetRect[] {
+  const { x, y, w, h, r } = f;
+  const s = (sx: number, sy: number, sw: number, sh: number, sr: number, rot = 0): SheetRect => ({ x: sx, y: sy, w: sw, h: sh, r: sr, rot });
+  switch (layout) {
+    case 'straight':
+      return small ? [s(x + 28, y - 28, w - 56, h, r - 8)] : [s(x + 56, y - 40, w - 112, h - 24, r - 16), s(x + 28, y - 20, w - 56, h - 4, r - 8)];
+    case 'fan':
+      return small ? [s(x, y, w, h, r, 8)] : [s(x, y, w, h, r, -7), s(x, y, w, h, r, 6)];
+    case 'horizon':
+      return small ? [s(x - 28, y + 28, w + 56, h - 56, r - 8)] : [s(x - 40, y + 60, w + 80, h - 120, r - 16), s(x - 20, y + 30, w + 40, h - 60, r - 8)];
+    case 'cascade':
+      return small ? [s(x + 22, y - 18, w - 12, h - 12, r - 4)] : [s(x + 46, y - 34, w - 36, h - 36, r - 12), s(x + 24, y - 18, w - 16, h - 16, r - 6)];
+    case 'papers':
+      return [];
+  }
+}
+
+/** The one or two sheets behind a card, in glass: the back one in `s3`, the front one (and the only one when small) in `s2`. */
 export function behind(p: string, f: Bounds & { r: number }, layout: Layout, small: boolean): string {
-  if (layout === 'straight') return small ? sheet(p, 's2', f.x + 28, f.y - 28, f.w - 56, f.h, f.r - 8, 0, 0.6) : sheet(p, 's3', f.x + 56, f.y - 40, f.w - 112, f.h - 24, f.r - 16, 0, 0.5) + sheet(p, 's2', f.x + 28, f.y - 20, f.w - 56, f.h - 4, f.r - 8, 0, 0.6);
-  if (layout === 'fan') return small ? sheet(p, 's2', f.x, f.y, f.w, f.h, f.r, 8, 0.6) : sheet(p, 's3', f.x, f.y, f.w, f.h, f.r, -7, 0.5) + sheet(p, 's2', f.x, f.y, f.w, f.h, f.r, 6, 0.6);
-  return '';
+  const rects = sheetRects(f, layout, small);
+  return rects.map((q, i) => (i === rects.length - 1 ? sheet(p, 's2', q.x, q.y, q.w, q.h, q.r, q.rot, 0.6) : sheet(p, 's3', q.x, q.y, q.w, q.h, q.r, q.rot, 0.5))).join('');
+}
+
+/** The sheets behind a flat (no glass) card, in one paint. */
+export function flatSheets(f: Bounds & { r: number }, layout: Layout, small: boolean, fill: string): string {
+  return sheetRects(f, layout, small)
+    .map((q) => `<path d="${rr(q.x, q.y, q.w, q.h, q.r)}" ${paint('fill', fill)}${q.rot ? ` transform="rotate(${q.rot} 256 256)"` : ''}/>`)
+    .join('');
 }
 
 /** The back of a folder and the papers in it. The pocket (the glass front, `SHAPES.pocket`) is drawn after it, in a `gi-pocket` group that tips open on hover and while files are dragged over the folder. */

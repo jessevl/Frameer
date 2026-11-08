@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- Icon kit (`icons/glass`): two more arrangements of the sheets behind a card, so each app's mark has its own. `horizon` (Harbour) is the straight stack on its side, showing left and right of the card; `cascade` (Yard) steps up and to the right, each sheet smaller than the one in front. `straight` (Drift) and `fan` (Lighthouse) are unchanged, byte for byte (`glass.test.ts`).
+- `sheetRects(f, layout, small)`: the sheets' rectangles and turns, back to front, and `flatSheets(f, layout, small, fill)`: the same sheets in one paint, for the flat drawings that had their own copy of the straight stack's geometry.
+
 ## v0.4.5 (7 Nov 2026)
 
 ### Fixed
