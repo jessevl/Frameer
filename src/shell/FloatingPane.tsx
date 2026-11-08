@@ -80,7 +80,7 @@ export function FloatingPane({ pane, children, testId = 'compact-pane', ignore =
       onPointerEnter={pane.hover.onPointerEnter}
       onPointerLeave={pane.hover.onPointerLeave}
       onClick={(event) => followSelector && (event.target as HTMLElement).closest(followSelector) && pane.close()}
-      className={`fixed bottom-[10px] left-[82px] top-[10px] z-30 w-[230px] overflow-hidden rounded-[var(--radius-card)] border border-[var(--line)] bg-[var(--paper-2)] shadow-[var(--shadow-float)] transition-[transform,opacity] duration-[var(--dur-gentle)] ease-[var(--spring)] motion-reduce:transition-none ${
+      className={`fixed bottom-[10px] left-[82px] top-[10px] z-30 w-[230px] overflow-hidden rounded-[var(--radius-card)] border border-[var(--line)] bg-[var(--paper)] shadow-[var(--shadow-float)] transition-[transform,opacity] duration-[var(--dur-gentle)] ease-[var(--spring)] motion-reduce:transition-none ${
         shown ? 'translate-x-0 opacity-100' : 'pointer-events-none -translate-x-3 opacity-0'
       } ${className}`}
     >

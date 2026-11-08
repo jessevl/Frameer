@@ -63,6 +63,11 @@ describe('Rail', () => {
     expect(hover.onPointerEnter).toHaveBeenCalledTimes(2);
   });
 
+  it('cuts its line icons out of --paper, the sidebar card\'s fill', async () => {
+    await renderInRouter(<Rail mark={MARK} markLabel="Home" markHref="/" sections={SECTIONS} activeId="cal" />);
+    expect(screen.getByTestId('rail')).toHaveClass('[--icon-bg:var(--paper)]');
+  });
+
   it('draws a footer link like a section with RailLink', async () => {
     await renderInRouter(<RailLink section={{ id: 'settings', label: 'Settings', line: 'settings', to: '/settings' }} active />);
     expect(screen.getByRole('link', { name: 'Settings' })).toHaveAttribute('aria-current', 'page');

@@ -98,7 +98,7 @@ export function MobileDrawer({ isOpen, onClose, title, children, closeIcon }: Mo
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
         style={{ transform: shown ? `translateX(${drag}px)` : 'translateX(-100%)', paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}
-        className={`absolute inset-y-0 left-0 flex w-[min(86vw,340px)] flex-col bg-[var(--paper-2)] shadow-[var(--shadow-float)] ${reducedMotion || drag !== 0 ? '' : 'transition-transform duration-200'}`}
+        className={`absolute inset-y-0 left-0 flex w-[min(86vw,340px)] flex-col bg-[var(--paper)] shadow-[var(--shadow-float)] ${reducedMotion || drag !== 0 ? '' : 'transition-transform duration-200'}`}
       >
         <div className="flex flex-shrink-0 items-center justify-between border-b border-[var(--line)] py-1.5 pl-4 pr-2">
           <h2 className="text-[15px] font-semibold text-[var(--ink)]">{title}</h2>

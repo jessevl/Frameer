@@ -171,7 +171,8 @@ html.dark, body.dark {
    Base and glow effects for paper-like content surfaces
    ============================================================================= */
 
-/* Base paper surface */
+/* Base paper surface. --paper is the intended fill of every paper card, the sidebar card included (white, as the stage):
+   the sidebar's hover pane and phone drawer use --paper too. --paper-2 is for panels set on paper, not for the cards. */
 .paper-surface {
   position: relative;
   background-color: var(--color-surface-primary);

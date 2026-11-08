@@ -99,6 +99,11 @@ function pane(over: Partial<PaneState> = {}): PaneState {
 }
 
 describe('FloatingPane', () => {
+  it('is the sidebar on its own paper, --paper like the docked sidebar card, not --paper-2', () => {
+    render(<FloatingPane pane={pane()}>x</FloatingPane>);
+    expect(screen.getByTestId('compact-pane')).toHaveClass('bg-[var(--paper)]');
+  });
+
   it('is not drawn when the pane is docked or closed', () => {
     const { rerender } = render(<FloatingPane pane={pane({ floating: false, open: false })}>x</FloatingPane>);
     expect(screen.queryByTestId('compact-pane')).toBeNull();

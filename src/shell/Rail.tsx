@@ -77,7 +77,7 @@ export function Rail({ mark, markLabel, markHref, onMark, sections, activeId, le
   const navHover = hoverScope === 'sections' ? hover : undefined;
   return (
     <div
-      className="flex w-[62px] flex-shrink-0 flex-col items-center gap-2 overflow-y-auto py-3 [--icon-bg:var(--paper-2)]"
+      className="flex w-[62px] flex-shrink-0 flex-col items-center gap-2 overflow-y-auto py-3 [--icon-bg:var(--paper)]"
       data-testid="rail"
       onPointerEnter={rootHover?.onPointerEnter}
       onPointerLeave={rootHover?.onPointerLeave}
