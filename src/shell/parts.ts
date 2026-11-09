@@ -4,6 +4,7 @@
  * Used by: index.ts.
  */
 export { Rail, RailLink, RAIL_ACTIVE, type RailProps, type RailSection } from './Rail';
+export { RailFoot, type RailFootProps } from './RailFoot';
 export { DockedBar, type DockedBarPanel, type DockedBarProps } from './DockedBar';
 export { FloatingPane, type FloatingPaneProps } from './FloatingPane';
 export { HOVER_CLOSE_MS, HOVER_OPEN_MS, paneMode, usePane, usePaneFromStore, type PaneStoreKeys, type PaneControls, type PaneHover, type PaneOptions, type PaneState } from './usePane';
