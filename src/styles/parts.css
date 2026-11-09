@@ -184,12 +184,13 @@
   border-top: 0;
 }
 .fr-fact-row dt {
-  flex: 1;
-  min-width: 0;
+  /* Keeps its own width so a wide value (a number and a gauge) never runs into it; the gap of the row separates them. */
+  flex: 1 0 auto;
   color: var(--ink-2);
 }
 .fr-fact-row dd {
   margin: 0;
+  min-width: 0;
   font-weight: 550;
   text-align: right;
   font-variant-numeric: tabular-nums;
