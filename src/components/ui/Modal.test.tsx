@@ -115,3 +115,18 @@ describe('ConfirmModal', () => {
     expect(await axeViolations()).toEqual([]);
   });
 });
+
+describe('Modal titleStyle', () => {
+  it('draws the title as a small uppercase kicker by default', () => {
+    render(<Modal isOpen onClose={vi.fn()} title="Edit"><p>Body</p></Modal>);
+    expect(screen.getByRole('heading', { name: 'Edit' }).className).toContain('uppercase');
+  });
+
+  it('draws a plain big heading with titleStyle="heading"', () => {
+    render(<Modal isOpen onClose={vi.fn()} title="Move Photos" titleStyle="heading"><p>Body</p></Modal>);
+    const h = screen.getByRole('heading', { name: 'Move Photos' });
+    expect(h.className).not.toContain('uppercase');
+    expect(h.className).toContain('font-bold');
+    expect(h.className).toContain('text-[26px]');
+  });
+});
