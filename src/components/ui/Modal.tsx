@@ -19,6 +19,8 @@ interface ModalProps {
   showCloseButton?: boolean;
   /** Force full-screen on mobile (default: true for lg/xl sizes) */
   mobileFullScreen?: boolean;
+  /** How the title is drawn: a small uppercase kicker (default) or a plain heading in ink (24 to 26 px, weight 700, sentence case). */
+  titleStyle?: 'kicker' | 'heading';
   /** Custom z-index (default: 260, above the mobile drawer layer) */
   zIndex?: number;
 }
@@ -33,6 +35,7 @@ const Modal: React.FC<ModalProps> = ({
   hideHeader = false,
   showCloseButton = true,
   mobileFullScreen,
+  titleStyle = 'kicker',
   zIndex = 260,
 }) => {
   // Animate on mount
@@ -73,6 +76,11 @@ const Modal: React.FC<ModalProps> = ({
 
   if (!isOpen || !portalContainer) return null;
 
+  const heading = titleStyle === 'heading';
+  const titleClass = heading
+    ? 'text-[24px] md:text-[26px] leading-8 font-bold tracking-[-0.025em] text-[var(--color-text-primary)]'
+    : 'text-[10px] font-bold text-[var(--color-text-tertiary)] uppercase tracking-widest';
+
   const sizeClasses = {
     sm: 'max-w-sm',
     md: 'max-w-md',
@@ -102,7 +110,7 @@ const Modal: React.FC<ModalProps> = ({
       >
         {/* Mobile header with close button */}
         <div className="flex-shrink-0 flex items-center justify-between px-4 pt-5 pb-1">
-          <h2 className="text-[10px] font-bold text-[var(--color-text-tertiary)] uppercase tracking-widest truncate">
+          <h2 className={`${titleClass} ${heading ? '' : 'truncate'}`}>
             {title || ''}
           </h2>
           {showCloseButton && (
@@ -162,7 +170,7 @@ const Modal: React.FC<ModalProps> = ({
         {/* Header */}
         {!hideHeader && title && (
           <div className="px-6 pt-5 pb-1">
-            <h2 className="text-[10px] font-bold text-[var(--color-text-tertiary)] uppercase tracking-widest pr-8">
+            <h2 className={`${titleClass} pr-8`}>
               {title}
             </h2>
           </div>
