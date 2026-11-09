@@ -49,7 +49,7 @@ let last = 0;
 let themeWatch: MutationObserver | null = null;
 let views: IntersectionObserver | null = null;
 
-const reducedMotion = () => typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const reducedMotion = () => typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const wants = (s: Scene) => s.visible && (s.live || s.moving) && !reducedMotion();
 
 function loop(now: number) {
@@ -68,6 +68,12 @@ let visiting: ReturnType<typeof setInterval> | null = null;
 function watchVisitors() {
   if (visiting) return;
   visiting = setInterval(() => {
+    // The page (or a test's DOM) is gone: stop the timer instead of reaching for a window that is not there.
+    if (typeof window === 'undefined') {
+      if (visiting) clearInterval(visiting);
+      visiting = null;
+      return;
+    }
     const now = performance.now();
     if (reducedMotion()) return;
     scenes.forEach((s) => {
