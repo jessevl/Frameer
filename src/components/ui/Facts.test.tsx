@@ -3,6 +3,7 @@
  * @description Facts: the rows render label and value, and the row's style keeps the label's width and a gap so a wide value cannot run into it.
  */
 import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { Fact, Facts } from './Facts';
@@ -21,7 +22,7 @@ describe('Facts', () => {
   });
 
   it('gives the row a gap and lets the label keep its width', () => {
-    const css = readFileSync(new URL('../../styles/parts.css', import.meta.url), 'utf8');
+    const css = readFileSync(resolve(__dirname, '../../styles/parts.css'), 'utf8');
     expect(css).toMatch(/\.fr-fact-row \{[^}]*gap: 12px/);
     expect(css).toMatch(/\.fr-fact-row dt \{[^}]*flex: 1 0 auto/);
   });
