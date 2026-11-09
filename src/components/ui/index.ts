@@ -85,6 +85,24 @@ export type { SelectionPillAction, SelectionPillProps } from "./SelectionPill";
 export { FloatingSurface, usePhoneWidth } from "./FloatingSurface";
 export type { FloatingAnchor } from "./FloatingSurface";
 
+// Data parts (styles/parts.css)
+export { StatusWord } from "./StatusWord";
+export type { StatusTone } from "./StatusWord";
+export { Facts, Fact } from "./Facts";
+export { FactTag } from "./FactTag";
+export { GlyphTile } from "./GlyphTile";
+export type { GlyphSize } from "./GlyphTile";
+export { Steps, Step } from "./Steps";
+export type { StepState } from "./Steps";
+export { TickGauge } from "./TickGauge";
+export { DotMeter } from "./DotMeter";
+export type { DotSegment } from "./DotMeter";
+export { SegmentBar } from "./SegmentBar";
+export type { BarSegment, SegmentBarProps } from "./SegmentBar";
+export { FreePill } from "./FreePill";
+export type { FreePillProps } from "./FreePill";
+export type { MeterLevel } from "./meter";
+
 // Date and time pickers (also at @frameer/components/ui/date, with the wall-date helpers)
 export { CalendarGrid, DateField, TimeField, TimeRangeFields, DateRangeFields, DateTimeField } from "./date";
 export type {

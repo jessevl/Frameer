@@ -67,7 +67,8 @@
     "./styles/phone.css": "./src/styles/phone.css",
     "./styles/print.css": "./src/styles/print.css",
     "./styles/reading.css": "./src/styles/reading.css",
-    "./styles/signin.css": "./src/styles/signin.css"
+    "./styles/signin.css": "./src/styles/signin.css",
+    "./styles/parts.css": "./src/styles/parts.css"
   },
   "files": [
     "dist",

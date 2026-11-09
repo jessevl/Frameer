@@ -1,0 +1,307 @@
+/*
+ * @file parts.css
+ * @description The look of Frameer's small data parts: SegmentBar, DotMeter, FreePill, FactTag, StatusWord, GlyphTile, Facts, TickGauge and Steps. Tokens only; shades are mixed with color-mix. Segment and dot colours come from the caller (inline), so an app maps its own kinds to colours.
+ * Moved from Yard (D-47) so Drift, Harbour and Lighthouse can reuse them.
+ * Used by: the parts above.
+ */
+
+/* The bar: rounded segments, the room left as dots. */
+.fr-bar {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  width: 100%;
+  min-width: 0;
+}
+.fr-seg {
+  display: block;
+  height: 100%;
+  flex: 0 1 auto;
+  min-width: 5px;
+  border-radius: 99px;
+  outline: none;
+}
+.fr-seg:focus-visible {
+  box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px var(--coral-line);
+}
+.fr-free {
+  flex: 1;
+  align-self: stretch;
+  min-width: 8px;
+  background-image: radial-gradient(circle, var(--line-2) 1.55px, transparent 1.9px);
+  background-size: 7px 100%;
+  background-repeat: repeat-x;
+  background-position: 1px center;
+}
+
+/* Dot meter: 2 rows of 10, column by column. */
+.fr-dots {
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(2, 3px);
+  grid-auto-columns: 3px;
+  gap: 2px;
+  flex: none;
+}
+.fr-dots i {
+  display: block;
+  width: 3px;
+  height: 3px;
+  border-radius: 1px;
+  background: var(--line-2);
+}
+
+/* The space pill. */
+.fr-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line-2);
+  background: var(--paper);
+  font-size: 12.5px;
+  color: var(--ink);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.fr-pill b {
+  font-weight: 600;
+}
+.fr-pill em {
+  font-style: normal;
+  color: var(--ink-3);
+}
+.fr-pill[data-level='watch'] {
+  border-color: color-mix(in srgb, var(--hue-orange-stroke) 45%, var(--line-2));
+}
+.fr-pill[data-level='watch'] b {
+  color: var(--hue-orange-ink);
+}
+.fr-pill[data-level='critical'] {
+  border-color: color-mix(in srgb, var(--hue-red-stroke) 45%, var(--line-2));
+}
+.fr-pill[data-level='critical'] b {
+  color: var(--hue-red-ink);
+}
+
+/* Tags. */
+.fr-fact-tag {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line-2);
+  background: var(--paper);
+  font-size: 12.5px;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+/* A status: a dot with a soft ring and a word. */
+.fr-status {
+  --dot: var(--hue-green-stroke);
+  --ring: var(--hue-green-fill);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12.5px;
+  font-weight: 550;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.fr-status-dot {
+  width: 7px;
+  height: 7px;
+  flex: none;
+  border-radius: 99px;
+  background: var(--dot);
+  box-shadow: 0 0 0 3px var(--ring);
+}
+.fr-status[data-tone='warn'] {
+  --dot: var(--hue-orange-stroke);
+  --ring: var(--hue-orange-fill);
+  color: var(--hue-orange-ink);
+}
+.fr-status[data-tone='bad'] {
+  --dot: var(--hue-red-stroke);
+  --ring: var(--hue-red-fill);
+  color: var(--hue-red-ink);
+}
+.fr-status[data-tone='quiet'] {
+  --dot: var(--hue-gray-stroke);
+  --ring: var(--hue-gray-fill);
+  font-weight: 500;
+  color: var(--ink-2);
+}
+
+/* Glyph tile. */
+.fr-glyph {
+  --icon-bg: var(--paper);
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--ink-2);
+  box-shadow: var(--shadow-card);
+}
+.fr-glyph[data-size='30'] {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+}
+.fr-glyph[data-size='52'] {
+  width: 52px;
+  height: 52px;
+  border-radius: 15px;
+}
+
+/* Facts: label and value rows in a soft group. */
+.fr-facts {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  overflow: hidden;
+  border-radius: 16px;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+}
+.fr-fact-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 42px;
+  padding: 9px 14px;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+}
+.fr-fact-row:first-child {
+  border-top: 0;
+}
+.fr-fact-row dt {
+  flex: 1;
+  min-width: 0;
+  color: var(--ink-2);
+}
+.fr-fact-row dd {
+  margin: 0;
+  font-weight: 550;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Tick gauge. */
+.fr-ticks {
+  position: relative;
+  display: inline-flex;
+  gap: 2px;
+  align-items: center;
+  height: 16px;
+}
+.fr-ticks i {
+  width: 2px;
+  height: 12px;
+  border-radius: 1px;
+}
+.fr-ticks i[data-faded='true'] {
+  opacity: 0.28;
+}
+.fr-ticks b {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 2px;
+  margin-left: -1px;
+  border-radius: 2px;
+  background: var(--ink);
+}
+
+/* Steps. */
+.fr-steps {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.fr-step {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  column-gap: 16px;
+}
+.fr-step-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.fr-step-rail i {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 99px;
+  border: 1.6px solid var(--line-2);
+  background: var(--paper);
+  color: var(--ink-3);
+  font: 600 12px/1 var(--font-mono);
+  font-style: normal;
+}
+.fr-step-rail svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: white;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.fr-step-rail u {
+  flex: 1;
+  width: 2px;
+  margin: 6px 0;
+  border-radius: 2px;
+  background: var(--line-2);
+}
+.fr-step:last-child .fr-step-rail u {
+  display: none;
+}
+.fr-step[data-state='done'] .fr-step-rail i {
+  background: var(--hue-green-stroke);
+  border-color: var(--hue-green-stroke);
+}
+.fr-step[data-state='done'] .fr-step-rail u {
+  background: var(--hue-green-stroke);
+}
+.fr-step[data-state='current'] .fr-step-rail i {
+  border-color: var(--coral-strong);
+  color: var(--coral-ink);
+}
+.fr-step-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  padding-bottom: 22px;
+}
+.fr-step:last-child .fr-step-body {
+  padding-bottom: 0;
+}
+.fr-step-title {
+  margin: 0;
+  padding-top: 1px;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.028em;
+  line-height: 1.12;
+  color: var(--ink);
+}
+.fr-step[data-state='todo'] .fr-step-title {
+  color: var(--ink-2);
+}
+

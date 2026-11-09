@@ -3,6 +3,8 @@
 ## Unreleased
 
 ### Added
+- Data parts, moved from Yard (`styles/parts.css`, import it beside `tokens.css`; additive, no existing export changes). `StatusWord` (ok, warn, bad, quiet and always a word), `Facts` and `Fact`, `FactTag` (the quiet outline pill; `Badge` is the tinted chip), `GlyphTile` (30, 40 or 52 px row icon), `Steps` and `Step`, `TickGauge`.
+- `SegmentBar` (segments `{ id, label, value, color }`, total, height, `format`, `level`, `onActive`; a meter with an sr-only description and the room left as dots, the behaviour of Drift's StorageBar), `DotMeter` (20 dots from `{ color, value }` segments), `FreePill` (dot meter, bold free, muted size, `level` normal, watch or critical) and the `MeterLevel` type.
 - Icon kit (`icons/glass`): two more arrangements of the sheets behind a card, so each app's mark has its own. `horizon` (Harbour) is the straight stack on its side, showing left and right of the card; `cascade` (Yard) steps up and to the right, each sheet smaller than the one in front. `straight` (Drift) and `fan` (Lighthouse) are unchanged, byte for byte (`glass.test.ts`).
 - `sheetRects(f, layout, small)`: the sheets' rectangles and turns, back to front, and `flatSheets(f, layout, small, fill)`: the same sheets in one paint, for the flat drawings that had their own copy of the straight stack's geometry.
 
