@@ -127,10 +127,6 @@ export { default as Dropdown, DropdownItem } from "./Dropdown";
 // Typography
 export { H1, H2, H3, H4, Text, TextSmall, Label } from "./Typography";
 
-// Icon Utilities
-export { Icon, withStandardIcon } from "./Icon";
-export type { IconProps } from "./Icon";
-
 // Animations
 export { SmartEmptyState, CompactEmptyState } from "./SmartEmptyState";
 

@@ -21,7 +21,7 @@ export function anchorOf(element: Element): ToolAnchor {
   return { x: rect.left, y: rect.bottom + 4, rect: { left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom } };
 }
 
-/** Any icon component that takes a class and a stroke width (a Lucide icon). */
+/** Any icon component that takes a class and a stroke width (an app's icon component, such as a line drawing wrapped for its toolbar). */
 export type ToolIcon = ComponentType<{ className?: string; strokeWidth?: number; 'aria-hidden'?: boolean | 'true' }>;
 
 export interface StageTool {

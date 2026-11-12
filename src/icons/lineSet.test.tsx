@@ -18,7 +18,7 @@ const motion = readFileSync(join(SRC, 'styles/motion.css'), 'utf8');
 const names = allLineNames();
 
 /** The files that may name `lucide-react`: the catalogue a user's custom icon is drawn from (LucideIcon, IconPicker and GlassIcon draw through it), its build helper and that helper's test. */
-const LUCIDE_ALLOWED = ['lib/lucideCatalogue.ts', 'components/ui/Icon.tsx', 'build/lazyLucideCatalogue.ts', 'build/lazyLucideCatalogue.test.ts'];
+const LUCIDE_ALLOWED = ['lib/lucideCatalogue.ts', 'build/lazyLucideCatalogue.ts', 'build/lazyLucideCatalogue.test.ts'];
 /** The modules that draw from the catalogue: a user's custom icon by its runtime name (LucideIcon, an item's GlassIcon mark) and the picker's grid. `lib/index.ts` re-exports it for the apps. */
 const CATALOGUE_USERS = ['components/ui/IconPicker.tsx', 'components/ui/LucideIcon.tsx', 'icons/GlassIcon.tsx', 'lib/index.ts'];
 /** Any way a module can load lucide-react: a static or type import, a bare import, a dynamic import, a require. */

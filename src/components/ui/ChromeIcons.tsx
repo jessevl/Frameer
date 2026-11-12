@@ -9,7 +9,7 @@ import React, { createContext, useContext, useMemo } from 'react';
 import { LineIcon } from '../../icons/LineIcon';
 import type { BaseLineName } from '../../icons/line';
 
-/** The props every chrome icon accepts; a Lucide component satisfies them. */
+/** The props every chrome icon accepts (an app's replacement takes the same). */
 export interface ChromeIconProps extends Pick<React.SVGAttributes<SVGSVGElement>, 'role' | 'aria-label' | 'aria-labelledby' | 'focusable'> {
   className?: string;
   size?: number | string;
