@@ -1,6 +1,6 @@
 /**
  * @file chromeGlyphs.test.tsx
- * @description The line-style chrome glyphs: each draws one 24 px SVG that assistive technology skips, takes size, class and stroke width, is a chrome icon name, and replaces Lucide when given to ChromeIconsProvider; plus the Lucide defaults of the new names; axe.
+ * @description The chrome glyphs: each draws one Drift line drawing that assistive technology skips, takes size and class (the line weight is the set's), is a chrome icon name, and is the same drawing Frameer's chrome draws by default, given to ChromeIconsProvider or not; axe.
  */
 import React from 'react';
 import { describe, expect, it } from 'vitest';
@@ -23,30 +23,22 @@ describe('chromeGlyphs', () => {
     const svg = container.querySelector('svg');
     expect(svg).toHaveAttribute('aria-hidden', 'true');
     expect(svg).toHaveAttribute('width', '16');
-    expect(svg).toHaveAttribute('stroke-width', '2');
-    expect(svg).toHaveClass('h-4');
-    expect(svg?.querySelector('path, rect')).not.toBeNull();
+    expect(svg).toHaveClass('h-4', 'gi-line', 'gi-inherit');
+    expect(svg).toHaveAttribute('data-line');
+    expect(svg?.innerHTML).not.toContain('stroke-width="2"');
   });
 
-  it('replaces Lucide through the provider', () => {
-    const { container } = render(
-      <ChromeIconsProvider icons={chromeGlyphs}>
-        <ChromeIcon name="logOut" />
-      </ChromeIconsProvider>,
-    );
-    expect(container.querySelector('svg')).toHaveAttribute('data-chrome', 'logOut');
-    expect(container.querySelector('svg')).toHaveAttribute('stroke-width', '1.7');
-  });
-
-  it('draws the new names in Lucide without a provider', () => {
-    const { container } = render(
-      <>
-        {NAMES.map((name) => (
-          <ChromeIcon key={name} name={name} />
-        ))}
-      </>,
-    );
-    expect(container.querySelectorAll('svg[data-chrome]')).toHaveLength(NAMES.length);
+  it('draws the same line drawing through the provider as Frameer does without one', () => {
+    for (const name of NAMES) {
+      const given = render(
+        <ChromeIconsProvider icons={chromeGlyphs}>
+          <ChromeIcon name={name} />
+        </ChromeIconsProvider>,
+      ).container.querySelector('svg');
+      const plain = render(<ChromeIcon name={name} />).container.querySelector('svg');
+      expect(given).toHaveAttribute('data-chrome', name);
+      expect(given?.getAttribute('data-line')).toBe(plain?.getAttribute('data-line'));
+    }
   });
 
   it('has no axe violations', async () => {

@@ -2,16 +2,12 @@
 
 /**
  * @file ChromeIcons.tsx
- * @description Icon provider for Frameer's own chrome (chevrons, close buttons, toast and banner glyphs, the icon picker grid, the empty states and `common/Icons`). Frameer draws Lucide by default; an app wraps its tree in `ChromeIconsProvider` to swap any named icon for its own drawing (its animated rendering included) and to give every remaining Lucide icon a house style (class and stroke width), so chrome and the app's toolbars never mix two icon families. Every icon `ChromeIcon` draws carries `data-chrome="<name>"`; hover motion is the app's CSS on that attribute, triggered from the host button the way the app's own buttons do it.
+ * @description Icon provider for Frameer's own chrome (chevrons, close buttons, toast and banner glyphs, the empty states and `common/Icons`). Every chrome icon is a Drift line drawing (`LineIcon`, taking the text color of its button, with its parts' hover gesture from styles/motion.css); an app wraps its tree in `ChromeIconsProvider` to swap any named icon for its own drawing. Lucide is drawn only by a runtime name (a user's custom icon, the icon picker grid); the provider's `style` is the house style for those. Every icon `ChromeIcon` draws carries `data-chrome="<name>"`.
  * @app SHARED - Generic: knows nothing about any app's icon set.
  */
 import React, { createContext, useContext, useMemo } from 'react';
-import {
-  AlertCircle, AlertTriangle, Bug, CalendarDays, CalendarRange, Check, CheckCircle, ChevronDown, ChevronLeft, ChevronRight,
-  FileText, Folder, Home, Inbox, Info, Layers, ListTodo, Loader2, Pencil, Plus, RefreshCw, Search, SearchX, Sparkles, StickyNote,
-  Undo2, WifiOff, X, Copy, Heading, IndentDecrease, IndentIncrease, ListOrdered, LogOut, PanelRight, Redo2, RemoveFormatting,
-  AlignCenter, AlignLeft, AlignRight, ArrowLeft, ArrowRight, ArrowUpDown, Bold, Bookmark, Clock, Code, Columns2, Columns3, Download, Ellipsis, ExternalLink, Filter, Flag, Hash, Highlighter, Image, Italic, LayoutGrid, Lightbulb, Link, List, ListTree, Menu, Mic, Minus, Paperclip, Pause, Pin, Play, Quote, Repeat, Settings, Strikethrough, Table, Table2, Timer, Trash2, Type, Underline, Upload, User, Video,
-} from 'lucide-react';
+import { LineIcon } from '../../icons/LineIcon';
+import type { BaseLineName } from '../../icons/line';
 
 /** The props every chrome icon accepts; a Lucide component satisfies them. */
 export interface ChromeIconProps extends Pick<React.SVGAttributes<SVGSVGElement>, 'role' | 'aria-label' | 'aria-labelledby' | 'focusable'> {
@@ -26,95 +22,113 @@ export interface ChromeIconProps extends Pick<React.SVGAttributes<SVGSVGElement>
 
 export type ChromeIconComponent = React.ComponentType<ChromeIconProps>;
 
+/** The Drift line drawing of each chrome icon. */
 const DEFAULTS = {
-  alertCircle: AlertCircle,
-  alertTriangle: AlertTriangle,
-  bug: Bug,
-  calendarDays: CalendarDays,
-  calendarRange: CalendarRange,
-  check: Check,
-  checkCircle: CheckCircle,
-  chevronDown: ChevronDown,
-  chevronLeft: ChevronLeft,
-  chevronRight: ChevronRight,
-  clearFormatting: RemoveFormatting,
-  close: X,
-  copy: Copy,
-  heading: Heading,
-  indentLess: IndentDecrease,
-  indentMore: IndentIncrease,
-  logOut: LogOut,
-  numberedList: ListOrdered,
-  panelRight: PanelRight,
-  redo: Redo2,
-  fileText: FileText,
-  folder: Folder,
-  home: Home,
-  inbox: Inbox,
-  info: Info,
-  layers: Layers,
-  listTodo: ListTodo,
-  loader: Loader2,
-  pencil: Pencil,
-  plus: Plus,
-  refresh: RefreshCw,
-  search: Search,
-  searchEmpty: SearchX,
-  sparkles: Sparkles,
-  stickyNote: StickyNote,
-  undo: Undo2,
-  wifiOff: WifiOff,
-  alignCenter: AlignCenter,
-  alignLeft: AlignLeft,
-  alignRight: AlignRight,
-  arrowLeft: ArrowLeft,
-  arrowRight: ArrowRight,
-  bold: Bold,
-  bookmark: Bookmark,
-  clock: Clock,
-  code: Code,
-  download: Download,
-  externalLink: ExternalLink,
-  filter: Filter,
-  flag: Flag,
-  hash: Hash,
-  highlighter: Highlighter,
-  image: Image,
-  italic: Italic,
-  kanbanView: Columns3,
-  lightbulb: Lightbulb,
-  link: Link,
-  listView: List,
-  menu: Menu,
-  mic: Mic,
-  minus: Minus,
-  more: Ellipsis,
-  paperclip: Paperclip,
-  pause: Pause,
-  pin: Pin,
-  play: Play,
-  quote: Quote,
-  repeat: Repeat,
-  settings: Settings,
-  sort: ArrowUpDown,
-  splitView: Columns2,
-  strikethrough: Strikethrough,
-  table: Table2,
-  tableOfContents: ListTree,
-  tableView: Table,
-  timer: Timer,
-  trash: Trash2,
-  type: Type,
-  underline: Underline,
-  upload: Upload,
-  user: User,
-  video: Video,
-  viewSwitcher: LayoutGrid,
-} satisfies Record<string, ChromeIconComponent>;
+  alertCircle: 'alert',
+  alertTriangle: 'warning',
+  bug: 'bug',
+  calendarDays: 'upcoming',
+  calendarRange: 'calendarrange',
+  check: 'check',
+  checkCircle: 'checkcircle',
+  chevronDown: 'chevrondown',
+  chevronLeft: 'chevronleft',
+  chevronRight: 'chevronright',
+  clearFormatting: 'clearformat',
+  close: 'close',
+  copy: 'clipboard',
+  heading: 'heading',
+  indentLess: 'outdent',
+  indentMore: 'indent',
+  logOut: 'logout',
+  numberedList: 'numbered',
+  panelRight: 'panel',
+  redo: 'redo',
+  fileText: 'pages',
+  folder: 'folder',
+  home: 'home',
+  inbox: 'inbox',
+  info: 'info',
+  layers: 'alltasks',
+  listTodo: 'listtodo',
+  loader: 'loader',
+  pencil: 'rename',
+  plus: 'plus',
+  refresh: 'refresh',
+  search: 'search',
+  searchEmpty: 'searchx',
+  sparkles: 'memories',
+  stickyNote: 'note',
+  undo: 'undo',
+  wifiOff: 'wifioff',
+  alignCenter: 'aligncenter',
+  alignLeft: 'alignleft',
+  alignRight: 'alignright',
+  arrowLeft: 'arrowleft',
+  arrowRight: 'arrowright',
+  bold: 'bold',
+  bookmark: 'bookmark',
+  clock: 'recent',
+  code: 'code',
+  download: 'download',
+  externalLink: 'share',
+  filter: 'filter',
+  flag: 'flag',
+  hash: 'hash',
+  highlighter: 'highlight',
+  image: 'cover',
+  italic: 'italic',
+  kanbanView: 'board',
+  lightbulb: 'idea',
+  link: 'copylink',
+  listView: 'list',
+  menu: 'menu',
+  mic: 'mic',
+  minus: 'minus',
+  more: 'more',
+  paperclip: 'attach',
+  pause: 'pause',
+  pin: 'pin',
+  play: 'play',
+  quote: 'quote',
+  repeat: 'repeat',
+  settings: 'settings',
+  sort: 'sort',
+  splitView: 'columns',
+  strikethrough: 'strike',
+  table: 'table',
+  tableOfContents: 'toc',
+  tableView: 'table',
+  timer: 'timer',
+  trash: 'trash',
+  type: 'text',
+  underline: 'underline',
+  upload: 'upload',
+  user: 'user',
+  video: 'videos',
+  viewSwitcher: 'allboards',
+  // The plain icons of common/Icons.
+  sidebar: 'panel',
+  allTasks: 'alltasks',
+  today: 'upcoming',
+  upcoming: 'recent',
+  completed: 'checkcircle',
+  collection: 'duplicates',
+  viewOptions: 'sliders',
+  layout: 'layout',
+  cardView: 'allboards',
+  skip: 'skip',
+  chart: 'chartcolumn',
+  listChecks: 'listchecks',
+  whiteboard: 'whiteboards',
+  textFormat: 'text',
+  readingPane: 'columns3',
+  readingPaneOff: 'columns',
+} satisfies Record<string, BaseLineName>;
 
 export type ChromeIconName = keyof typeof DEFAULTS;
 
-/** Class and stroke width applied to icons that stay Lucide (named defaults and the picker grid). */
+/** Class and stroke width for the icons Frameer still draws from Lucide: only an icon drawn by a runtime name (a user's custom icon, the icon picker grid). */
 export interface ChromeIconStyle {
   className?: string;
   strokeWidth?: number;
@@ -123,7 +137,7 @@ export interface ChromeIconStyle {
 export interface ChromeIconsConfig {
   /** Replacements by name; they draw themselves in the app's style. */
   icons?: Partial<Record<ChromeIconName, ChromeIconComponent>>;
-  /** House style for every icon Frameer still takes from Lucide. */
+  /** House style for the Lucide icons of the custom-icon path (LucideIcon, the icon picker). */
   style?: ChromeIconStyle;
 }
 
@@ -134,7 +148,7 @@ export const ChromeIconsProvider: React.FC<ChromeIconsConfig & { children: React
   return <ChromeIconsContext.Provider value={value}>{children}</ChromeIconsContext.Provider>;
 };
 
-/** The house style for Lucide icons Frameer draws by name (empty without a provider). */
+/** The house style for the Lucide icons Frameer draws by runtime name (empty without a provider). */
 export function useChromeIconStyle(): ChromeIconStyle {
   return useContext(ChromeIconsContext).style ?? {};
 }
@@ -144,14 +158,22 @@ export function chromeClass(style: ChromeIconStyle, className?: string): string 
   return [style.className, className].filter(Boolean).join(' ') || undefined;
 }
 
-/** Draws one named chrome icon: the app's replacement when the provider has one, else Lucide in the provider's style. */
+/** The line drawing of a chrome icon. */
+export const chromeLineName = (name: ChromeIconName): BaseLineName => DEFAULTS[name];
+
+/** A chrome icon component that draws one Drift line drawing: it takes the chrome props (`className`, `size`, the aria props; `strokeWidth` is the set's own). */
+export function lineChrome(line: BaseLineName): ChromeIconComponent {
+  const Line: ChromeIconComponent = ({ className, size, strokeWidth: _strokeWidth, style, ...rest }) => (
+    <LineIcon {...rest} name={line} size={typeof size === 'number' ? size : 24} className={className} style={style} inherit />
+  );
+  return Line;
+}
+
+const LINES = Object.fromEntries(Object.entries(DEFAULTS).map(([name, line]) => [name, lineChrome(line)])) as Record<ChromeIconName, ChromeIconComponent>;
+
+/** Draws one named chrome icon: the app's replacement when the provider has one, else its Drift line drawing. */
 export const ChromeIcon: React.FC<ChromeIconProps & { name: ChromeIconName }> = ({ name, className, strokeWidth, ...rest }) => {
-  const { icons, style } = useContext(ChromeIconsContext);
-  const override = icons?.[name];
-  if (override) {
-    const Custom = override;
-    return <Custom className={className} strokeWidth={strokeWidth} data-chrome={name} {...rest} />;
-  }
-  const Default = DEFAULTS[name];
-  return <Default className={chromeClass(style ?? {}, className)} strokeWidth={style?.strokeWidth ?? strokeWidth} data-chrome={name} {...rest} />;
+  const { icons } = useContext(ChromeIconsContext);
+  const Icon = icons?.[name] ?? LINES[name];
+  return <Icon className={className} strokeWidth={strokeWidth} data-chrome={name} {...rest} />;
 };

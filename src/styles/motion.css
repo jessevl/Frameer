@@ -255,26 +255,61 @@
   transform: skewX(-8deg) scaleY(0.86);
 }
 
+/* A drawing the caller switches on (a starred star, a favorite heart: `data-on`, set by LineIcon's `on`) shows its fill in the icon's own color. */
+.gi-line[data-on='true'] { --icon-on: currentColor; }
+.gi-line[data-on='true'] .fon { opacity: 1; }
+
 /*
- * Frameer's chrome icons (ChromeIconsProvider; `data-chrome="<name>"` on each svg). The ones the provider fills with a generic Lucide geometry have no named parts, so the whole icon makes its gesture when the button, row or link around it is hovered or focused; the ones drawn from the Drift kit (search, inbox, folder ...) keep their own part motion above. Skipped with reduced motion.
+ * The parts of the wider set (arrows, marks, text, things, layout, photo). One small vocabulary: `go*` nudges along the way the part points (a turned chevron's `go` follows its turn), `cw`/`ccw`/`half` turn, `twist` (close) and `shake` (alerts) wobble and settle, `grow` (plus, shapes), `press` (pause, stamp, bookmark), `lean` (italic, code), `ink` draws a stroke in (check, underline, charts), `u1`-`u3` grow bars from their foot, `swing`, `flap`, `ring`, `spinx`, `pull`, `tilt`, and the pivots of a clock hand, a needle and a balance beam. Only gestures, no loops; off with reduced motion.
  */
+.gi-line :is(.go, .go-l, .go-u, .go-d, .go-ur, .go-ul, .go-dr, .go-dl, .cw, .ccw, .half, .twist, .shake, .grow, .press, .lean, .u1, .u2, .u3, .swing, .flap, .ring, .spinx, .pull, .tilt, .hand, .ndl, .beam) {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.gi-line .ink { stroke-dasharray: 10; }
+.gi-line :is(.u1, .u2, .u3) { transform-origin: center bottom; }
+.gi-line .swing { transform-origin: center top; }
+.gi-line .flap { transform-origin: left center; }
+.gi-line .tilt { transform-origin: center bottom; }
+.gi-line :is(.half, .vb.cw) { transform-box: view-box; transform-origin: 12px 12px; }
+.gi-line .hand { transform-box: view-box; transform-origin: 12px 13px; }
+.gi-line .ndl { transform-box: view-box; transform-origin: 12px 14.6px; }
+.gi-line .beam { transform-box: view-box; transform-origin: 12px 7.4px; }
 @media (prefers-reduced-motion: no-preference) {
-  .gi-line[data-chrome] {
-    transition: color var(--dur-base), transform var(--dur-gentle) var(--spring);
+  .gi-line :is(.go, .go-l, .go-u, .go-d, .go-ur, .go-ul, .go-dr, .go-dl, .cw, .ccw, .half, .grow, .lean, .pull, .tilt, .hand, .ndl, .beam) {
+    transition: transform var(--dur-gentle) var(--spring);
   }
-  :is(.icon-hv, button, a, [role='menuitem'], [role='option'], [role='treeitem'], [role='tab']):is(:hover, :focus-visible) .gi-line[data-chrome] {
-    &[data-chrome='chevronRight'] { transform: translateX(2px); }
-    &[data-chrome='chevronLeft'] { transform: translateX(-2px); }
-    &[data-chrome='chevronDown'] { transform: translateY(2px); }
-    &:is([data-chrome='close'], [data-chrome='plus']) { transform: rotate(90deg); }
-    &[data-chrome='check'] { transform: scale(1.18); }
-    &[data-chrome='refresh'] { transform: rotate(180deg); }
-    &[data-chrome='undo'] { transform: rotate(-20deg); }
-    &[data-chrome='home'] { transform: translateY(-1px); }
-    &:is([data-chrome='info'], [data-chrome='alertCircle'], [data-chrome='alertTriangle'], [data-chrome='checkCircle'], [data-chrome='bug'], [data-chrome='wifiOff']) { transform: scale(1.1); }
-    &[data-chrome='pencil'] { transform: translate(1px, -1px) rotate(-8deg); }
-    &[data-chrome='stickyNote'] { transform: rotate(-6deg); }
-    &[data-chrome='calendarRange'] { transform: translateY(-1px); }
+  :is(.icon-hv, button, a, [role='menuitem'], [role='option'], [role='treeitem'], [role='tab']):is(:hover, :focus-visible) .gi-line {
+    & .go { transform: translateX(1.8px); }
+    & .go-l { transform: translateX(-1.8px); }
+    & .go-u { transform: translateY(-1.8px); }
+    & .go-d { transform: translateY(1.8px); }
+    & .go-ur { transform: translate(1.3px, -1.3px); }
+    & .go-ul { transform: translate(-1.3px, -1.3px); }
+    & .go-dr { transform: translate(1.3px, 1.3px); }
+    & .go-dl { transform: translate(-1.3px, 1.3px); }
+    & .cw { transform: rotate(24deg); }
+    & .ccw { transform: rotate(-24deg); }
+    & .half { transform: rotate(180deg); transition-duration: 0.6s; }
+    & .twist { animation: gi-twist 0.5s var(--ease-in-out); }
+    & .shake { animation: gi-rub 0.5s var(--ease-in-out); }
+    & .grow { transform: scale(1.14); }
+    & .press { animation: gi-dip 0.45s var(--spring); }
+    & .lean { transform: skewX(-9deg); }
+    & .ink { animation: gi-ink 0.55s var(--ease-out); }
+    & .ink2 { animation-delay: 0.12s; animation-fill-mode: backwards; }
+    & .u1 { animation: gi-bar 0.5s var(--spring); }
+    & .u2 { animation: gi-bar 0.5s var(--spring) 0.07s backwards; }
+    & .u3 { animation: gi-bar 0.5s var(--spring) 0.14s backwards; }
+    & .swing { animation: gi-swing 0.7s var(--ease-in-out); }
+    & .flap { animation: gi-flap 0.7s var(--ease-in-out); }
+    & .ring { animation: gi-ring 0.6s var(--ease-in-out); }
+    & .spinx { animation: gi-spinx 0.6s var(--ease-in-out); }
+    & .pull { transform: translate(1.2px, -1.2px); }
+    & .tilt { transform: rotate(-6deg); }
+    & .hand { transform: rotate(90deg); }
+    & .ndl { transform: rotate(32deg); }
+    & .beam { transform: rotate(-9deg); }
   }
 }
 
@@ -300,6 +335,12 @@
 @keyframes gi-swing { 25% { transform: rotate(-12deg); } 60% { transform: rotate(7deg); } }
 @keyframes gi-wave { 25% { transform: rotate(-10deg); } 60% { transform: rotate(8deg); } }
 @keyframes gi-drawl { from { stroke-dashoffset: 30; } }
+@keyframes gi-twist { 40% { transform: rotate(18deg); } 75% { transform: rotate(-5deg); } }
+@keyframes gi-ink { from { stroke-dashoffset: 10; } }
+@keyframes gi-bar { from { transform: scaleY(0.35); } }
+@keyframes gi-flap { 30% { transform: skewY(-7deg); } 65% { transform: skewY(4deg); } }
+@keyframes gi-ring { 20% { transform: rotate(-12deg); } 45% { transform: rotate(10deg); } 70% { transform: rotate(-5deg); } }
+@keyframes gi-spinx { 50% { transform: scaleX(0.3); } }
 @keyframes gi-rub { 25% { transform: translateX(-1.5px); } 50% { transform: translateX(1.5px); } 75% { transform: translateX(-1px); } }
 
 @media (prefers-reduced-motion: reduce) {

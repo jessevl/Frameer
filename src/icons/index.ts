@@ -6,7 +6,7 @@
 export { GlassIcon } from "./GlassIcon";
 export { LineIcon, type LineName } from "./LineIcon";
 export { SectionPicture } from "./SectionPicture";
-export { registerLineIcons, type ExtraLineNames, type LineDef, type LineKit } from "./line";
+export { allLineNames, registerLineIcons, type BaseLineName, type ExtraLineNames, type LineDef, type LineKit } from "./line";
 export { KIND_ART, SECTION_ART, type KindKey, type SectionKey } from "./kinds";
 export { paletteOf, type Palette } from "./palette";
 export { chromeGlyphs, LogOutGlyph, PanelRightGlyph, ChevronLeftGlyph, CloseGlyph, CopyGlyph, CheckGlyph, NumberedListGlyph, RedoGlyph, HeadingGlyph, IndentMoreGlyph, IndentLessGlyph, ClearFormattingGlyph } from "./chromeGlyphs";

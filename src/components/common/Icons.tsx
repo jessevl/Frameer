@@ -14,7 +14,7 @@
  * - Priority: FlagIcon and priority-related icons
  * 
  * All icons accept a `className` prop for styling with Tailwind.
- * The ones a chrome icon exists for (home, inbox, chevrons, close, plus, check, search) are drawn through `ChromeIcon`, so an app's `ChromeIconsProvider` swaps them for its own set; the rest are plain SVGs.
+ * Every icon but the journal calendar (which prints the day's number) is drawn through `ChromeIcon`: a Drift line drawing by default, which an app's `ChromeIconsProvider` can swap for its own.
  */
 import React from 'react';
 import { ChromeIcon } from '../ui/ChromeIcons';
@@ -23,44 +23,17 @@ export const HomeIcon: React.FC<{ className?: string }> = ({ className }) => <Ch
 
 export const SettingsIcon: React.FC<{ className?: string }> = ({ className }) => <ChromeIcon name="settings" className={className} />;
 
-export const SidebarIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    {/* outer rounded rectangle */}
-    <rect x="2" y="2" width="20" height="20" rx="3" />
-    {/* vertical divider at ~2/5 */}
-    <line x1="9.6" y1="4" x2="9.6" y2="20" />
-    {/* three short horizontal lines in the left part */}
-    <line x1="4.5" y1="7.5" x2="7" y2="7.5" />
-    <line x1="4.5" y1="12" x2="7" y2="12" />
-    <line x1="4.5" y1="16.5" x2="7" y2="16.5" />
-  </svg>
-);
+export const SidebarIcon: React.FC<{ className?: string }> = ({ className }) => <ChromeIcon name="sidebar" className={className} />;
 
-export const AllTasksIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-  </svg>
-);
+export const AllTasksIcon: React.FC<{ className?: string }> = ({ className }) => <ChromeIcon name="allTasks" className={className} />;
 
 export const InboxIcon: React.FC<{ className?: string }> = ({ className }) => <ChromeIcon name="inbox" className={className} />;
 
-export const TodayIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-  </svg>
-);
+export const TodayIcon: React.FC<{ className?: string }> = ({ className }) => <ChromeIcon name="today" className={className} />;
 
-export const UpcomingIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-  </svg>
-);
+export const UpcomingIcon: React.FC<{ className?: string }> = ({ className }) => <ChromeIcon name="upcoming" className={className} />;
 
-export const CompletedIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-  </svg>
-);
+export const CompletedIcon: React.FC<{ className?: string }> = ({ className }) => <ChromeIcon name="completed" className={className} />;
 
 export const ChevronRightIcon: React.FC<{ className?: string }> = ({ className }) => <ChromeIcon name="chevronRight" className={className} />;
 
@@ -136,59 +109,25 @@ export const ArrowLeftIcon: React.FC<{ className?: string }> = ({ className }) =
 export const SearchIcon: React.FC<{ className?: string }> = ({ className }) => <ChromeIcon name="search" className={className} />;
 
 // Collection icon - stacked pages style (for pages and cards)
-export const CollectionIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <rect x="4" y="6" width="12" height="14" rx="1.5" />
-    <path d="M8 6V4.5A1.5 1.5 0 019.5 3h9A1.5 1.5 0 0120 4.5v11a1.5 1.5 0 01-1.5 1.5H17" />
-  </svg>
-);
+export const CollectionIcon: React.FC<{ className?: string }> = ({ className }) => <ChromeIcon name="collection" className={className} />;
 
 // Sidebar collection icon - 4 dots in 2x2 grid (fits between chevrons in sidebar)
-export const SidebarCollectionIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg className={className} viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-    <circle cx="5" cy="5" r="1.5" />
-    <circle cx="11" cy="5" r="1.5" />
-    <circle cx="5" cy="11" r="1.5" />
-    <circle cx="11" cy="11" r="1.5" />
-  </svg>
-);
+export const SidebarCollectionIcon: React.FC<{ className?: string }> = ({ className }) => <ChromeIcon name="cardView" className={className} />;
 
 // Sort icon - for sorting options
 export const SortIcon: React.FC<{ className?: string }> = ({ className }) => <ChromeIcon name="sort" className={className} />;
 
 // View options/settings icon - horizontal sliders
-export const ViewOptionsIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <line x1="3" y1="6" x2="21" y2="6" />
-    <line x1="3" y1="12" x2="21" y2="12" />
-    <line x1="3" y1="18" x2="21" y2="18" />
-    <circle cx="8" cy="6" r="2" fill="currentColor" />
-    <circle cx="16" cy="12" r="2" fill="currentColor" />
-    <circle cx="10" cy="18" r="2" fill="currentColor" />
-  </svg>
-);
+export const ViewOptionsIcon: React.FC<{ className?: string }> = ({ className }) => <ChromeIcon name="viewOptions" className={className} />;
 
 // Layout icon - for view options
-export const LayoutIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-    <line x1="3" y1="9" x2="21" y2="9" />
-    <line x1="9" y1="21" x2="9" y2="9" />
-  </svg>
-);
+export const LayoutIcon: React.FC<{ className?: string }> = ({ className }) => <ChromeIcon name="layout" className={className} />;
 
 // Filter icon - funnel shape
 export const FilterIcon: React.FC<{ className?: string }> = ({ className }) => <ChromeIcon name="filter" className={className} />;
 
 // Card view icon (grid layout)
-export const CardViewIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <rect x="3" y="3" width="7" height="7" rx="1" />
-    <rect x="14" y="3" width="7" height="7" rx="1" />
-    <rect x="14" y="14" width="7" height="7" rx="1" />
-    <rect x="3" y="14" width="7" height="7" rx="1" />
-  </svg>
-);
+export const CardViewIcon: React.FC<{ className?: string }> = ({ className }) => <ChromeIcon name="cardView" className={className} />;
 
 // More horizontal icon (three dots)
 export const MoreHorizontalIcon: React.FC<{ className?: string }> = ({ className }) => <ChromeIcon name="more" className={className} />;
@@ -200,37 +139,16 @@ export const PlayIcon: React.FC<{ className?: string }> = ({ className }) => <Ch
 export const PauseIcon: React.FC<{ className?: string }> = ({ className }) => <ChromeIcon name="pause" className={className} />;
 
 // Skip forward icon
-export const SkipIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-    <polygon points="5,4 15,12 5,20" />
-    <rect x="17" y="4" width="3" height="16" rx="1" />
-  </svg>
-);
+export const SkipIcon: React.FC<{ className?: string }> = ({ className }) => <ChromeIcon name="skip" className={className} />;
 
 // Timer/stopwatch icon
 export const TimerIcon: React.FC<{ className?: string }> = ({ className }) => <ChromeIcon name="timer" className={className} />;
 
 // Chart/analytics icon for productivity dashboard
-export const ChartIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="M3 3v18h18" />
-    <path d="M18 17V9" />
-    <path d="M13 17V5" />
-    <path d="M8 17v-3" />
-  </svg>
-);
+export const ChartIcon: React.FC<{ className?: string }> = ({ className }) => <ChromeIcon name="chart" className={className} />;
 
 // Subtask/checklist icon - list with checkmarks
-export const ListChecksIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="M10 6h11" />
-    <path d="M10 12h11" />
-    <path d="M10 18h11" />
-    <path d="M3 6l2 2 4-4" />
-    <path d="M3 12l2 2 4-4" />
-    <path d="M3 18l2 2 4-4" />
-  </svg>
-);
+export const ListChecksIcon: React.FC<{ className?: string }> = ({ className }) => <ChromeIcon name="listChecks" className={className} />;
 
 // Repeat icon for recurring tasks
 export const RepeatIcon: React.FC<{ className?: string }> = ({ className }) => <ChromeIcon name="repeat" className={className} />;
@@ -278,26 +196,13 @@ export const PinIcon: React.FC<{ className?: string }> = ({ className }) => <Chr
 export const LightbulbIcon: React.FC<{ className?: string }> = ({ className }) => <ChromeIcon name="lightbulb" className={className} />;
 
 // Whiteboard/Canvas icon - pencil drawing on canvas
-export const WhiteboardIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <rect x="3" y="3" width="18" height="18" rx="2" />
-    <path d="M7 17l4-4 4 4" />
-    <path d="M17 7l-3 3" />
-    <circle cx="8" cy="8" r="1.5" fill="currentColor" />
-  </svg>
-);
+export const WhiteboardIcon: React.FC<{ className?: string }> = ({ className }) => <ChromeIcon name="whiteboard" className={className} />;
 
 // Menu/Hamburger icon - three horizontal lines
 export const MenuIcon: React.FC<{ className?: string }> = ({ className }) => <ChromeIcon name="menu" className={className} />;
 
 // Text Format icon - stylized 'Aa' for text formatting
-export const TextFormatIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="M4 7V4h16v3" />
-    <path d="M12 4v16" />
-    <path d="M8 20h8" />
-  </svg>
-);
+export const TextFormatIcon: React.FC<{ className?: string }> = ({ className }) => <ChromeIcon name="textFormat" className={className} />;
 
 // ============================================================================
 // TEXT FORMATTING ICONS - For rich text editor toolbar
@@ -349,44 +254,9 @@ export const BookmarkIcon: React.FC<{ className?: string }> = ({ className }) =>
 export const MicIcon: React.FC<{ className?: string }> = ({ className }) => <ChromeIcon name="mic" className={className} />;
 
 // Reading Pane / Three-column layout icon
-export const ReadingPaneIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    {/* Outer rounded rectangle */}
-    <rect x="2" y="3" width="20" height="18" rx="2" />
-    {/* First vertical divider (sidebar) */}
-    <line x1="7" y1="3" x2="7" y2="21" />
-    {/* Second vertical divider (reading pane) */}
-    <line x1="14" y1="3" x2="14" y2="21" />
-    {/* Sidebar items */}
-    <line x1="3.5" y1="7" x2="5.5" y2="7" />
-    <line x1="3.5" y1="10" x2="5.5" y2="10" />
-    {/* List items */}
-    <line x1="8.5" y1="7" x2="12.5" y2="7" />
-    <line x1="8.5" y1="10" x2="12.5" y2="10" />
-    <line x1="8.5" y1="13" x2="12.5" y2="13" />
-    {/* Preview content */}
-    <line x1="15.5" y1="7" x2="20.5" y2="7" />
-    <line x1="15.5" y1="10" x2="20.5" y2="10" />
-    <line x1="15.5" y1="13" x2="19" y2="13" />
-  </svg>
-);
+export const ReadingPaneIcon: React.FC<{ className?: string }> = ({ className }) => <ChromeIcon name="readingPane" className={className} />;
 
 // Reading Pane Off icon (two-column layout)
-export const ReadingPaneOffIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    {/* Outer rounded rectangle */}
-    <rect x="2" y="3" width="20" height="18" rx="2" />
-    {/* Single vertical divider (sidebar only) */}
-    <line x1="7" y1="3" x2="7" y2="21" />
-    {/* Sidebar items */}
-    <line x1="3.5" y1="7" x2="5.5" y2="7" />
-    <line x1="3.5" y1="10" x2="5.5" y2="10" />
-    {/* Main content items (full width) */}
-    <line x1="9" y1="7" x2="20" y2="7" />
-    <line x1="9" y1="10" x2="20" y2="10" />
-    <line x1="9" y1="13" x2="20" y2="13" />
-    <line x1="9" y1="16" x2="16" y2="16" />
-  </svg>
-);
+export const ReadingPaneOffIcon: React.FC<{ className?: string }> = ({ className }) => <ChromeIcon name="readingPaneOff" className={className} />;
 
 // Named exports only — avoid default object export to satisfy lint rules
