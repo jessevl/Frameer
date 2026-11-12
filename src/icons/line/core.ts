@@ -16,6 +16,9 @@ const PIN = 'M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20
 const CLAP_TOP = 'M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3z';
 const CLAP_BODY = 'M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z';
 
+/** The sync mark's strokes: the D and three staggered lines (`s1` to `s3` drift). Drift's app icon draws the same strokes on its glass card. */
+export const SYNC_STROKES = ['M10 5h2a7 7 0 0 1 0 14h-2', 'M4 12h6', 'M6 8h3', 'M6 16h3'] as const;
+
 const calendar = (h: LineKit, journal: boolean) =>
   calendarHead(h)
   + (journal
@@ -33,7 +36,7 @@ export const GLYPHS = {
   trash: { name: 'Trash', draw: (h) => h.g('M5.8 7.6h12.4l-1 11.8a1.8 1.8 0 0 1-1.8 1.6H8.6a1.8 1.8 0 0 1-1.8-1.6Z') + h.i('M10 11.2v5.6M14 11.2v5.6', h.sw * 0.9) + `<g class="lid">${h.g(rr(3.8, 4.6, 16.4, 2.8, 1.4))}${h.i('M9.4 4.6V3.6a1.2 1.2 0 0 1 1.2-1.2h2.8a1.2 1.2 0 0 1 1.2 1.2v1')}</g>` },
   folder: { name: 'Drop onto a folder', draw: (h) => `<path d="M3 18V6a1.5 1.5 0 0 1 1.5-1.5h4l2 2h9A1.5 1.5 0 0 1 21 8v10Z" fill="${h.faint}" stroke="currentColor" stroke-width="${h.sw}" stroke-linejoin="round"/>` + h.g('M3 19.5h18l-1.2-9H4.2Z', 'front') },
   upload: { name: 'Upload', draw: (h) => h.g(C24(12, 12, 9)) + `<circle class="prog" cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="${h.sw + 0.4}" stroke-linecap="round" transform="rotate(-90 12 12)"/><g class="arrow">${h.i('M12 16V8.5M8.8 11.5L12 8.3l3.2 3.2', h.sw + 0.3)}</g>` },
-  sync: { name: 'Syncing', fixed: true, draw: (h) => h.back('M10 5h2a7 7 0 0 1 0 14h-2Z') + h.i('M10 5h2a7 7 0 0 1 0 14h-2', 2.4) + h.i('M4 12h6', 2.4, 's1') + h.i('M6 8h3', 2.4, 's2') + h.i('M6 16h3', 2.4, 's3') },
+  sync: { name: 'Syncing', fixed: true, draw: (h) => h.back(`${SYNC_STROKES[0]}Z`) + SYNC_STROKES.map((d, i) => h.i(d, 2.4, i ? `s${i}` : '')).join('') },
   share: { name: 'Share or open', draw: (h) => h.g(rr(3.5, 6.5, 13.5, 13.5, 3.2)) + `<g class="arr">${h.i('M14 3.5h6.5V10M20.5 3.5l-8.5 8.5', h.sw + 0.3)}</g>` },
   new: { name: 'New', fixed: true, draw: (h) => `<circle cx="12" cy="12" r="10" fill="currentColor"/><path d="${C24(12, 12, 10)}" fill="url(#${h.p}gl)"/><g class="pl">${h.i('M12 7.5v9M7.5 12h9', 2.2, '', '#FFFFFF')}</g>` },
   // The create icon turned inside out for a coral button (the disc would vanish into it): a white disc with a coral plus, the same gesture.

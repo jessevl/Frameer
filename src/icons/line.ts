@@ -42,9 +42,22 @@ const BASE = Object.values(GROUPS).reduce<Record<string, LineDef>>((all, group) 
 export const allLineNames = (): BaseLineName[] => Object.keys(BASE) as BaseLineName[];
 const extra = new Map<string, LineDef>();
 
-/** Adds an app's own drawings (Yard's section icons) to the set. Call it when the app's module loads, before the first icon renders. */
-export function registerLineIcons(defs: Record<string, LineDef>): void {
-  for (const [name, def] of Object.entries(defs)) extra.set(name, def);
+/**
+ * A set of app drawings whose names are all new: a name the set already draws is typed `never`, so reusing one fails to compile.
+ * An app drawing never replaces Frameer's (Frameer's chrome would silently draw the app's): draw the shared meaning once, in the set.
+ */
+export type NewLineDefs<T extends Record<string, LineDef>> = T & { [K in Extract<keyof T, BaseLineName>]: never };
+
+/**
+ * Adds an app's own drawings (the ones only that app needs) to the set. Call it when the app's module loads, before the first icon renders.
+ * Throws when a name is already drawn by the set, so a collision fails the app's tests (and its first render) instead of overriding Frameer's drawing.
+ * Registering an app name again replaces it: that is the app's module reloaded (hot reload, a test's fresh import).
+ */
+export function registerLineIcons<T extends Record<string, LineDef>>(defs: NewLineDefs<T>): void {
+  for (const [name, def] of Object.entries(defs as Record<string, LineDef>)) {
+    if (Object.prototype.hasOwnProperty.call(BASE, name)) throw new Error(`The line icon "${name}" is Frameer's; an app may not draw it again. Use Frameer's drawing, or give the app's own drawing a name of its own.`);
+    extra.set(name, def);
+  }
 }
 
 const defOf = (name: LineName): LineDef => {

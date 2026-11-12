@@ -1,7 +1,7 @@
 /**
  * @file glass.ts
  * @description The glass drawing kit, ported from the icon generator page (drift-icons): shapes in a 512 grid, the shared gradient and filter definitions, the glass front (body, specular, sweep, inner glow, rim), the sheets behind a card, the folder, and the small helpers the marks of every kind are made of. Everything returns SVG markup as strings, so the same code renders in React (GlassIcon) and in Node (scripts/render-app-icons.mjs). Every id starts with a per-instance prefix, so two icons on a page never share a gradient.
- * Used by: kinds.ts, appIcon.ts, GlassIcon.
+ * Used by: kinds.ts, appMark.ts, GlassIcon and the apps' mark drawings.
  */
 import { paint, type Palette } from './palette.ts';
 

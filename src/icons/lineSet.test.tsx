@@ -1,13 +1,13 @@
 /**
  * @file lineSet.test.tsx
- * @description The whole Drift line set and the rule that Frameer's chrome uses it: every drawing renders in both line weights with the surface-colored fill where it occludes, every part class a drawing moves has a rule in styles/motion.css, every new gesture is off under reduced motion, every chrome icon (and every icon of common/Icons and ThemeChoice) is a line drawing and never Lucide geometry, and only the custom-icon path imports `lucide-react`.
+ * @description The whole Drift line set and the rule that Frameer's chrome uses it: every drawing renders in both line weights with the surface-colored fill where it occludes, every part class a drawing moves has a rule in styles/motion.css, every new gesture is off under reduced motion, an app's registration never replaces a drawing of the set, every chrome icon (and every icon of common/Icons and ThemeChoice) is a line drawing and never Lucide geometry, and only the custom-icon path imports `lucide-react`.
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 import { render } from '@testing-library/react';
-import { allLineNames, lineLabel, lineMarkup } from './line';
+import { allLineNames, lineLabel, lineMarkup, registerLineIcons, type LineDef } from './line';
 import { LineIcon } from './LineIcon';
 import { ChromeIcon, chromeLineName, type ChromeIconName } from '../components/ui/ChromeIcons';
 import * as CommonIcons from '../components/common/Icons';
@@ -17,8 +17,12 @@ const SRC = resolve(import.meta.dirname, '..');
 const motion = readFileSync(join(SRC, 'styles/motion.css'), 'utf8');
 const names = allLineNames();
 
-/** The files that may import `lucide-react`: the catalogue a user's custom icon is drawn from (and its build helper), and the wrapper that draws a Lucide component a caller hands it. */
-const LUCIDE_ALLOWED = ['lib/lucideCatalogue.ts', 'components/ui/Icon.tsx', 'build/lazyLucideCatalogue.ts', 'build/lazyLucideCatalogue.test.ts', 'icons/lineSet.test.tsx'];
+/** The files that may name `lucide-react`: the catalogue a user's custom icon is drawn from (LucideIcon, IconPicker and GlassIcon draw through it), its build helper and that helper's test. */
+const LUCIDE_ALLOWED = ['lib/lucideCatalogue.ts', 'components/ui/Icon.tsx', 'build/lazyLucideCatalogue.ts', 'build/lazyLucideCatalogue.test.ts'];
+/** The modules that draw from the catalogue: a user's custom icon by its runtime name (LucideIcon, an item's GlassIcon mark) and the picker's grid. `lib/index.ts` re-exports it for the apps. */
+const CATALOGUE_USERS = ['components/ui/IconPicker.tsx', 'components/ui/LucideIcon.tsx', 'icons/GlassIcon.tsx', 'lib/index.ts'];
+/** Any way a module can load lucide-react: a static or type import, a bare import, a dynamic import, a require. */
+const LUCIDE_IMPORT = /from\s+['"]lucide-react|import\s+['"]lucide-react|import\(\s*['"]lucide-react|require\(\s*['"]lucide-react/;
 
 const files = (dir: string): string[] => readdirSync(dir).flatMap((f) => {
   const p = join(dir, f);
@@ -63,6 +67,23 @@ describe('the Drift line set', () => {
   });
 });
 
+describe('an app\'s own drawings', () => {
+  const own: LineDef = { name: 'Own', draw: (h) => h.g('M4 4h16v16H4Z') };
+
+  it('are added beside the set', () => {
+    registerLineIcons({ lineSetTestOwn: own });
+    expect(lineLabel('lineSetTestOwn' as Parameters<typeof lineLabel>[0])).toBe('Own');
+  });
+
+  it('never replace one of the set: a name Frameer draws throws', () => {
+    // Written as a literal (`registerLineIcons({ people: own })`) it does not compile either: NewLineDefs types the name never.
+    const clash: Record<string, LineDef> = { people: own };
+    expect(() => registerLineIcons(clash)).toThrow(/"people" is Frameer's/);
+    expect(lineLabel('people')).toBe('People');
+    expect(lineMarkup('people', 'x', 20).inner).not.toContain('M4 4h16v16H4Z');
+  });
+});
+
 describe('Frameer chrome in the line set', () => {
   const chromeNames = ['alertCircle', 'alertTriangle', 'bug', 'check', 'checkCircle', 'chevronDown', 'chevronLeft', 'chevronRight', 'close', 'loader', 'plus', 'refresh', 'searchEmpty', 'undo', 'wifiOff', 'quote', 'mic', 'pin', 'lightbulb', 'tableOfContents', 'layout', 'skip'] as ChromeIconName[];
 
@@ -88,7 +109,13 @@ describe('Frameer chrome in the line set', () => {
   });
 
   it('imports lucide-react only on the custom-icon path', () => {
-    const offenders = files(SRC).filter((f) => /from\s+['"]lucide-react|import\(\s*['"]lucide-react/.test(readFileSync(f, 'utf8'))).map((f) => relative(SRC, f)).filter((f) => !LUCIDE_ALLOWED.includes(f));
+    const offenders = files(SRC).filter((f) => f !== import.meta.filename && LUCIDE_IMPORT.test(readFileSync(f, 'utf8'))).map((f) => relative(SRC, f).replace(/\\/g, '/')).filter((f) => !LUCIDE_ALLOWED.includes(f));
     expect(offenders).toEqual([]);
+  });
+
+  it('draws from the Lucide catalogue only for a custom icon', () => {
+    const users = files(SRC).filter((f) => !/\.test\.tsx?$/.test(f) && /from\s+['"][^'"]*lucideCatalogue['"]|export \* from ["']\.\/lucideCatalogue/.test(readFileSync(f, 'utf8'))).map((f) => relative(SRC, f).replace(/\\/g, '/'));
+    expect(users).toContain('components/ui/LucideIcon.tsx');
+    expect(users.filter((f) => !CATALOGUE_USERS.includes(f))).toEqual([]);
   });
 });

@@ -1,6 +1,6 @@
 /**
  * @file things.ts
- * @description Drift line drawings of things: calendars with a check or a clock, bookmarks, the flag, files (plain, edited, new, sheet), new folder and folder tree, globe, mail, phone and smartphone, monitor, plug, music, film strip, slides, sticky note, timer, play and pause, sound on and off, picture in picture, the open book, people (one, two, checked, edited), databases, gauge, light bulb, pushpin, sliders, stamp, bandage and pipette, and the suite's chrome things (bell, box, send, wrap, USB, terminal, cloud, server).
+ * @description Drift line drawings of things: calendars with a check or a clock, bookmarks, the flag, files (plain, edited, new, sheet), new folder and folder tree, globe, mail, phone and smartphone, monitor, plug, music, film strip, slides, sticky note, timer, play and pause, sound on and off, picture in picture, the open book, people (one, two, checked, edited), databases, gauge, light bulb, pushpin, sliders, stamp, bandage and pipette, and the suite's chrome things (bell, box, send, wrap, USB, terminal, cloud, server, processor, power, log).
  * Used by: line.ts.
  */
 import { C24, calendarHead, dot, FOLDER_FRONT, folderBack, ink, part, rr, type LineDef, type LineKit } from './kit.ts';
@@ -46,7 +46,8 @@ export const THINGS = {
   pip: { name: 'Picture in picture', draw: (h) => h.g(rr(2.5, 4, 19, 15, 3)) + `<g class="go-dr"><path d="${rr(11.6, 11, 7.4, 5.6, 1.6)}" fill="${h.mid}" stroke="currentColor" stroke-width="${h.sw}"/></g>` },
   book: { name: 'Book', draw: (h) => h.g('M12 6.4C10 5 7.6 4.4 3.5 4.4v13.8c4.1 0 6.5.6 8.5 2Z') + h.g('M12 6.4c2-1.4 4.4-2 8.5-2v13.8c-4.1 0-6.5.6-8.5 2Z', 'lift') + h.i('M15 8.6c1-.4 2.2-.6 3.4-.6M15 11.8c1-.4 2.2-.6 3.4-.6', h.sw * 0.8) },
   user: { name: 'Person', draw: (h) => h.g(C24(12, 8, 4), 'lift') + h.g('M4.5 20.5a7.5 7.5 0 0 1 15 0Z') },
-  people: { name: 'People', draw: (h) => part('ca', h.g(C24(16.4, 8.2, 3.2)) + h.g('M12 19.6a5.2 5.2 0 0 1 9.8-2.4v2.4Z')) + part('cb', h.g(C24(8.6, 8.6, 3.7)) + h.g('M2.4 20.4a6.2 6.2 0 0 1 12.4 0Z')) },
+  // The one in front outlined, the one behind in a flat tint: two outlined people blur into one shape at rail size.
+  people: { name: 'People', draw: (h) => part('ca', `<path d="${C24(17, 8.6, 2.8)}" fill="${h.mid}"/><path d="M15.4 13.6a5 5 0 0 1 6.2 5.4h-4.4Z" fill="${h.mid}"/>`) + part('cb', h.g(C24(9, 8, 3.6)) + h.g('M2.8 19.5a6.2 6.2 0 0 1 12.4 0Z')) },
   usercheck: { name: 'Assigned to', draw: (h) => person(h) + ink(h, 'M15.4 11.8l2 2 4.2-4.6', h.sw + 0.1) },
   useredit: { name: 'Edited by', draw: (h) => person(h) + part('pen', h.g('M18.4 10.8a1.7 1.7 0 0 1 2.4 2.4l-5 5-3 .8.8-3Z')) },
   database: { name: 'Database', draw: (h) => db(h) },
@@ -58,7 +59,7 @@ export const THINGS = {
   stamp: { name: 'Clone', draw: (h) => part('press', h.g(C24(12, 5.6, 2.9)) + h.g('M10.4 8.4h3.2l.9 4.8h-5Z') + h.g(rr(4, 13.2, 16, 4.2, 1.6))) + ink(h, 'M5.5 20.8h13') },
   bandage: { name: 'Heal', draw: (h) => `<g transform="rotate(-45 12 12)"><g class="press">${h.g(rr(2.2, 8, 19.6, 8, 4))}<path d="${rr(8.6, 8, 6.8, 8, 0.5)}" fill="${h.soft}"/>${[[10.4, 10.6], [13.6, 10.6], [10.4, 13.4], [13.6, 13.4], [12, 12]].map(([x, y]) => dot(x ?? 0, y ?? 0, 0.75)).join('')}</g></g>` },
   pipette: { name: 'Pick a color', draw: (h) => `<g transform="rotate(45 12 12)">${part('lift', h.g(rr(9.4, 1.2, 5.2, 6.8, 2.6)) + h.g(rr(7.8, 7.8, 8.4, 2.6, 1.3)) + h.g('M10.4 10.4h3.2v8.4L12 21.4l-1.6-2.6Z'))}</g>` + dot(4.6, 20.4, 1.1, 'crm') },
-  // Suite chrome (Yard's status chips and tools): bell, box, send, wrap, USB, terminal, cloud and server.
+  // Suite chrome (Yard's status chips, tools and sections): bell, box, send, wrap, USB, terminal, cloud, processor, power, log and server.
   bell: { name: 'Notifications', draw: (h) => part('swing', h.g('M6 10.2a6 6 0 0 1 12 0v4l1.6 2.7a.8.8 0 0 1-.7 1.2H5.1a.8.8 0 0 1-.7-1.2L6 14.2Z') + h.i('M10 20.6a2.2 2.2 0 0 0 4 0')) + dot(12, 3.2, 1.1) },
   box: { name: 'Container', draw: (h) => h.g('M3.8 7.6 12 3.6l8.2 4v9.2L12 20.8l-8.2-4Z') + h.i('M12 11.6v9.2', h.sw * 0.9) + h.g('M3.8 7.6 12 3.6l8.2 4-8.2 4Z', 'lift') },
   send: { name: 'Send', draw: (h) => part('go-ur', h.g('M3.6 11.2 20.4 3.6l-7.6 16.8-2.4-6.8Z') + h.i('M10.4 13.6 20.2 3.8', h.sw * 0.9)) },
@@ -66,5 +67,8 @@ export const THINGS = {
   usb: { name: 'USB', draw: (h) => part('go-u', h.g(rr(8.4, 2.8, 7.2, 7.4, 1.4)) + `<path d="${rr(10, 5, 1.5, 1.8, 0.4)}${rr(12.5, 5, 1.5, 1.8, 0.4)}" fill="currentColor"/>`) + h.g(rr(6.6, 10, 10.8, 11.2, 2.6)) },
   terminal: { name: 'Terminal', draw: (h) => h.g(rr(2.5, 4, 19, 16, 3.2)) + h.i('M6.6 9.4 9.6 12l-3 2.6', h.sw, 'go') + ink(h, 'M12 15.2h5.2') },
   cloud: { name: 'Cloud', draw: (h) => h.g('M7.2 18.5a4.2 4.2 0 0 1-.6-8.4 5.8 5.8 0 0 1 11.2 1.6 3.4 3.4 0 0 1-.4 6.8Z', 'lift') },
+  cpu: { name: 'Processor', draw: (h) => h.g(rr(5, 5, 14, 14, 3)) + part('pop', `<path d="${rr(9, 9, 6, 6, 1.4)}" fill="currentColor"/>`) + h.i('M9 2.5V5M15 2.5V5M9 19v2.5M15 19v2.5M2.5 9H5M2.5 15H5M19 9h2.5M19 15h2.5', 1.5) },
+  power: { name: 'Power', draw: (h) => h.g('M7 6.5a7 7 0 1 0 10 0') + h.i('M12 3.5v8', h.sw, 'lift') },
+  log: { name: 'Log', draw: (h) => h.g(rr(2.5, 3.5, 19, 17, 4.5)) + h.i('M6.5 9h11', 1.5, 'r1') + h.i('M6.5 12.5h8', 1.5, 'r2') + h.i('M6.5 16h10', 1.5, 'r3') },
   server: { name: 'Server', draw: (h) => [3.5, 13.3].map((y, i) => part(i ? 'l3' : 'l1', h.g(rr(3, y, 18, 7.2, 2.4)) + dot(6.8, y + 3.6, 1.1, i ? '' : 'day') + `<circle cx="10" cy="${y + 3.6}" r="1.1" fill="${h.soft}"/>` + h.i(`M14 ${y + 3.6}h3.6`, h.sw * 0.9))).join('') },
 } satisfies Record<string, LineDef>;
