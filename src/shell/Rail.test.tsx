@@ -63,9 +63,10 @@ describe('Rail', () => {
     expect(hover.onPointerEnter).toHaveBeenCalledTimes(2);
   });
 
-  it('cuts its line icons out of --paper, the sidebar card\'s fill', async () => {
+  it('cuts its line icons out of the surface it stands on: --rail-surface, else paper', async () => {
     await renderInRouter(<Rail mark={MARK} markLabel="Home" markHref="/" sections={SECTIONS} activeId="cal" />);
-    expect(screen.getByTestId('rail')).toHaveClass('[--icon-bg:var(--paper)]');
+    expect(screen.getByTestId('rail')).toHaveClass('[--icon-bg:var(--rail-surface,var(--paper))]');
+    expect(screen.getByRole('link', { name: 'Calendar' }).className).toContain('[--icon-bg:var(--paper)]');
   });
 
   it('draws a footer link like a section with RailLink', async () => {

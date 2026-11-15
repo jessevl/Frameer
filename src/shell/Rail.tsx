@@ -3,6 +3,7 @@
  * @description The 62 px rail: the app's mark (it leads home), the sections as round icon buttons in a nav, and a footer at the bottom. The active section is a paper circle with the pill shadow. Resting the pointer on the sections opens the floating pane when the pane is not docked (`hover`, from `usePane`).
  * What differs per app is a prop or a slot: `leading` (Drift's and Lighthouse's Search button, after the mark), `between` (Drift's smart entries, after the sections), `footer` (sync badge, Settings link, account), `renderSection` (Harbour wraps its Mail and Calendar buttons to take drops), a section with `onSelect` instead of `to` (Lighthouse's buttons), `hoverScope="rail"` (Lighthouse opens the pane from the whole rail), and `markHref` or `onMark`.
  * `RailLink` is one button, for a footer link (Settings) drawn like the sections.
+ * The icons occlude with `--rail-surface` (paper when unset): `AppFrame` sets it to the canvas, where the rail stands; the active section's circle stays paper.
  * Used by: the app shell.
  */
 import { Fragment, type ReactElement, type ReactNode } from 'react';
@@ -77,7 +78,7 @@ export function Rail({ mark, markLabel, markHref, onMark, sections, activeId, le
   const navHover = hoverScope === 'sections' ? hover : undefined;
   return (
     <div
-      className="flex w-[62px] flex-shrink-0 flex-col items-center gap-2 overflow-y-auto py-3 [--icon-bg:var(--paper)]"
+      className="flex w-[62px] flex-shrink-0 flex-col items-center gap-2 overflow-y-auto py-3 [--icon-bg:var(--rail-surface,var(--paper))]"
       data-testid="rail"
       onPointerEnter={rootHover?.onPointerEnter}
       onPointerLeave={rootHover?.onPointerLeave}

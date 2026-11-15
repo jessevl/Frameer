@@ -4,7 +4,8 @@
  * Why: a narrow desktop window must never squeeze the stage; the pane is there when asked for and gone when not.
  * It stays mounted for the length of the slide-out so the exit is seen, and not at all while closed (a closed pane watches no folders). The app passes its `usePane()` result and the pane's content.
  * Differences between the apps are props: `testId` (Drift, Harbour and Yard `compact-pane`, Lighthouse `floating-pane`), `ignore` (what a press may land on without closing: the rail, and Lighthouse's menus), `stopEscape` (Lighthouse keeps its open story open), `followSelector` (what a click closes the pane on; an empty string never).
- * Used by: the app shell.
+ * It sits at 62 px, on the left edge of AppFrame's card (the rail stands on the canvas beside it), so it covers the card's corner.
+ * Used by: AppFrame and the app shell.
  */
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import type { PaneState } from './usePane';
@@ -80,7 +81,7 @@ export function FloatingPane({ pane, children, testId = 'compact-pane', ignore =
       onPointerEnter={pane.hover.onPointerEnter}
       onPointerLeave={pane.hover.onPointerLeave}
       onClick={(event) => followSelector && (event.target as HTMLElement).closest(followSelector) && pane.close()}
-      className={`fixed bottom-[10px] left-[82px] top-[10px] z-30 w-[230px] overflow-hidden rounded-[var(--radius-card)] border border-[var(--line)] bg-[var(--paper)] shadow-[var(--shadow-float)] transition-[transform,opacity] duration-[var(--dur-gentle)] ease-[var(--spring)] motion-reduce:transition-none ${
+      className={`fixed bottom-[10px] left-[62px] top-[10px] z-30 w-[230px] overflow-hidden rounded-[var(--radius-card)] border border-[var(--line)] bg-[var(--paper)] shadow-[var(--shadow-float)] transition-[transform,opacity] duration-[var(--dur-gentle)] ease-[var(--spring)] motion-reduce:transition-none ${
         shown ? 'translate-x-0 opacity-100' : 'pointer-events-none -translate-x-3 opacity-0'
       } ${className}`}
     >
