@@ -3,6 +3,7 @@
 ## Unreleased
 
 ### Added
+- `AppFrame` `paneHeading` and `PaneHeading` (shell): the pane's heading (the section's name and the pane's actions) as a row with the docked bar's height, colour and hairline at the top of the pane, docked or floating, so one bar runs across the whole card. Apps drop the heading from their pane and the section from their breadcrumb while the pane docks; before, the pane's heading and the bar's first crumb said the same thing side by side. `FRAME_PANE_HEAD` is the row's class.
 - `AppFrame` (shell): the suite's desktop frame as one part. The rail stands on the canvas; one card holds the docked pane as its first column (an `aside`, 230 px), then the stage (the app's `main`, `SidePanel` and `DockedBar` in a positioned box, so the bar spans the stage and the panel only). A pane that does not dock floats over the stage through `FloatingPane`. It replaces the two cards (rail and pane in a sidebar card, stage beside it) each app built by hand. `FRAME_CARD` and `FRAME_PANE_WIDTH` are its card classes and pane width.
 - `RailFoot` (shell): the rail's foot in one order for every suite app, top to bottom: `sync`, `settings`, then `account` last. Pass it as the Rail's `footer`.
 - `Modal` `titleStyle="heading"`: the title as a plain 24 to 26 px heading instead of the small kicker; the default is unchanged.

@@ -1,12 +1,12 @@
 /**
  * @file AppFrame.test.tsx
- * @description AppFrame: the rail stands on the canvas outside the card, the docked pane is the card's first column (an `aside` with its label) before the positioned stage box, a pane that does not dock floats and leaves the card to the stage, a screen without a pane has no aside, the frame sets `--rail-surface` for the rail, and axe. Also the two defaults that follow the frame: the floating pane at 62 px and the rail's icons on `--rail-surface`.
+ * @description AppFrame: the pane's heading row (in line with the bar, docked and floating, above the pane's content; none without `paneHeading`), the rail stands on the canvas outside the card, the docked pane is the card's first column (an `aside` with its label) before the positioned stage box, a pane that does not dock floats and leaves the card to the stage, a screen without a pane has no aside, the frame sets `--rail-surface` for the rail, and axe. Also the two defaults that follow the frame: the floating pane at 62 px and the rail's icons on `--rail-surface`.
  */
 import { describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { axeViolations } from '../test/axe';
 import { renderInRouter } from '../test/router';
-import { AppFrame, FRAME_PANE_WIDTH } from './AppFrame';
+import { AppFrame, FRAME_PANE_WIDTH, PaneHeading } from './AppFrame';
 import { FloatingPane } from './FloatingPane';
 import { Rail } from './Rail';
 import type { PaneState } from './usePane';
@@ -55,6 +55,45 @@ describe('AppFrame', () => {
     expect(screen.getByTestId('float')).toHaveTextContent('Folders');
     const card = screen.getByTestId('app-frame').querySelector('[data-frame-card]') as HTMLElement;
     expect(card.firstElementChild?.hasAttribute('data-frame-stage')).toBe(true);
+  });
+
+  it('draws the pane heading as a bar-high row above the docked pane content', async () => {
+    render(
+      <AppFrame rail={RAIL} pane={<p>Folders</p>} paneHeading={<PaneHeading title="Mail" actions={<button type="button">Write a mail</button>} />} paneState={paneState()} paneLabel="Mail">
+        {STAGE}
+      </AppFrame>,
+    );
+    const pane = screen.getByRole('complementary', { name: 'Mail' });
+    const head = pane.querySelector('[data-frame-pane-head]') as HTMLElement;
+    expect(head).toBeTruthy();
+    expect(head.className).toContain('h-[var(--bar-height)]');
+    expect(head.className).toContain('border-b');
+    expect(within(head).getByRole('heading', { level: 2, name: 'Mail' })).toBeInTheDocument();
+    expect(within(head).getByRole('button', { name: 'Write a mail' })).toBeInTheDocument();
+    // The heading comes before the content.
+    expect(head.compareDocumentPosition(screen.getByText('Folders')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(await axeViolations()).toEqual([]);
+  });
+
+  it('carries the pane heading into the floating pane', () => {
+    render(
+      <AppFrame rail={RAIL} pane={<p>Folders</p>} paneHeading={<PaneHeading title="Mail" />} paneState={paneState({ docked: false, floating: true, open: true })} floating={{ testId: 'float' }}>
+        {STAGE}
+      </AppFrame>,
+    );
+    const float = screen.getByTestId('float');
+    // Hidden from the tree until its slide-in frame has run.
+    expect(within(float).getByRole('heading', { level: 2, name: 'Mail', hidden: true })).toBeInTheDocument();
+    expect(float.querySelector('[data-frame-pane-head]')).toBeTruthy();
+  });
+
+  it('draws no heading row without a heading', () => {
+    render(
+      <AppFrame rail={RAIL} pane={<p>Folders</p>} paneState={paneState()} paneLabel="Mail">
+        {STAGE}
+      </AppFrame>,
+    );
+    expect(screen.getByRole('complementary', { name: 'Mail' }).querySelector('[data-frame-pane-head]')).toBeNull();
   });
 
   it('has no pane on a screen without one', () => {

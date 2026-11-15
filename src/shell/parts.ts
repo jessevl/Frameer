@@ -7,7 +7,7 @@ export { Rail, RailLink, RAIL_ACTIVE, type RailProps, type RailSection } from '.
 export { RailFoot, type RailFootProps } from './RailFoot';
 export { DockedBar, type DockedBarPanel, type DockedBarProps } from './DockedBar';
 export { FloatingPane, type FloatingPaneProps } from './FloatingPane';
-export { AppFrame, FRAME_CARD, FRAME_PANE_WIDTH, type AppFrameProps } from './AppFrame';
+export { AppFrame, FRAME_CARD, FRAME_PANE_HEAD, FRAME_PANE_WIDTH, PaneHeading, type AppFrameProps, type PaneHeadingProps } from './AppFrame';
 export { HOVER_CLOSE_MS, HOVER_OPEN_MS, paneMode, usePane, usePaneFromStore, type PaneStoreKeys, type PaneControls, type PaneHover, type PaneOptions, type PaneState } from './usePane';
 
 export { PANEL_WIDTH, PANEL_OVERLAY_BELOW, PANEL_WIDTH_WIDE, PanelHeading, PanelSlide, SidePanel, SidePanelHeading, usePanelOverlay, usePanelWidth, type PanelHeadingProps, type SidePanelProps } from './SidePanel';
