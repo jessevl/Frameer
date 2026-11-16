@@ -311,7 +311,77 @@ export class Stage {
   }
 
   box(x: number, y: number, z: number, w: number, d: number, h: number, col: string | Material, o: { flat?: boolean } = {}): void {
-    this.K.box(x, y, z, w, d, h, this.M(col), o);
+    const pre = this.K.pre;
+    if (!pre) {
+      this.K.box(x, y, z, w, d, h, this.M(col), o);
+      return;
+    }
+    // Turned: a quarter turn is still a box along the axes; any other angle is drawn as a prism.
+    const pts = [pre(x, y), pre(x + w, y), pre(x + w, y + d), pre(x, y + d)];
+    const xs = pts.map((p) => p[0]);
+    const ys = pts.map((p) => p[1]);
+    const aligned = pts.every((p, i) => {
+      const q = pts[(i + 1) % 4];
+      return Math.abs(p[0] - q[0]) < 1e-6 || Math.abs(p[1] - q[1]) < 1e-6;
+    });
+    this.K.pre = null;
+    try {
+      if (aligned) this.K.box(Math.min(...xs), Math.min(...ys), z, Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys), h, this.M(col), o);
+      else this.prism(pts, z, h, this.M(col), { flat: o.flat });
+    } finally {
+      this.K.pre = pre;
+    }
+  }
+
+  /**
+   * Draws what `fn` draws moved: turned by `deg` degrees about the origin, then shifted to (dx, dy). A piece made for
+   * the back wall y = 0 (x along it) lands on a wall from (dx, dy) in the direction `deg`, the room on its left
+   * as the plan is drawn (its inside where (0, 1) turns to).
+   */
+  moved(dx: number, dy: number, deg: number, fn: () => void): void {
+    const a = ((deg || 0) * Math.PI) / 180;
+    const r = (v: number) => (Math.abs(v) < 1e-12 ? 0 : Math.abs(Math.abs(v) - 1) < 1e-12 ? Math.sign(v) : v);
+    const cos = r(Math.cos(a));
+    const sin = r(Math.sin(a));
+    const outer = this.K.pre;
+    this.K.pre = (x: number, y: number) => {
+      const q: readonly [number, number] = [dx + x * cos - y * sin, dy + x * sin + y * cos];
+      return outer ? outer(q[0], q[1]) : q;
+    };
+    try {
+      fn();
+    } finally {
+      this.K.pre = outer;
+    }
+  }
+
+  /**
+   * Draws what `fn` draws turned by `deg` degrees about (px, py) in plan (clockwise as the plan is drawn, x right and
+   * y down), inside any turn already in force. Things `fn` queues are drawn turned too.
+   */
+  turned(px: number, py: number, deg: number, fn: () => void): void {
+    if (!deg || !Number.isFinite(deg)) {
+      fn();
+      return;
+    }
+    const a = (deg * Math.PI) / 180;
+    // Snap the quarter turns so boxes stay exactly on the axes.
+    const r = (v: number) => (Math.abs(v) < 1e-12 ? 0 : Math.abs(Math.abs(v) - 1) < 1e-12 ? Math.sign(v) : v);
+    const cos = r(Math.cos(a));
+    const sin = r(Math.sin(a));
+    const outer = this.K.pre;
+    const rot = (x: number, y: number): readonly [number, number] => {
+      const dx = x - px;
+      const dy = y - py;
+      const q: readonly [number, number] = [px + dx * cos - dy * sin, py + dx * sin + dy * cos];
+      return outer ? outer(q[0], q[1]) : q;
+    };
+    this.K.pre = rot;
+    try {
+      fn();
+    } finally {
+      this.K.pre = outer;
+    }
   }
 
   cyl(x: number, y: number, z: number, r: number, h: number, col: string | Material, o: { open?: boolean; topFill?: string } = {}): void {
@@ -332,6 +402,18 @@ export class Stage {
 
   /** An upright prism on a convex plan: the faces turned to the viewer, shaded by where they face, then the top. */
   prism(pts: readonly Pt2[], z: number, h: number, col: string | Material, o: PrismOpts = {}): void {
+    const pre = this.K.pre;
+    if (pre) {
+      // Turned: turn the plan once, then draw it as it stands.
+      const turned = pts.map((p) => pre(p[0], p[1]));
+      this.K.pre = null;
+      try {
+        this.prism(turned, z, h, col, o);
+      } finally {
+        this.K.pre = pre;
+      }
+      return;
+    }
     const m = this.M(col);
     const c = this.c;
     const n = pts.length;
@@ -344,6 +426,21 @@ export class Stage {
     cx /= n;
     cy /= n;
     const faces: { a: Pt2; b: Pt2; nx: number; ny: number; k: number }[] = [];
+    // Outward normals from the winding, so a plan with a notch (an L) gets the right faces too; for a convex plan
+    // this is the same as pointing away from the middle.
+    let area2 = 0;
+    let pos = false;
+    let neg = false;
+    for (let i = 0; i < n; i++) {
+      const a = pts[i];
+      const b = pts[(i + 1) % n];
+      const c2 = pts[(i + 2) % n];
+      area2 += a[0] * b[1] - b[0] * a[1];
+      const cr = (b[0] - a[0]) * (c2[1] - b[1]) - (b[1] - a[1]) * (c2[0] - b[0]);
+      if (cr > 1e-9) pos = true;
+      else if (cr < -1e-9) neg = true;
+    }
+    const convexFallback = !(pos && neg) || Math.abs(area2) < 1e-12;
     for (let i = 0; i < n; i++) {
       const a = pts[i];
       const b = pts[(i + 1) % n];
@@ -351,7 +448,7 @@ export class Stage {
       let ny = -(b[0] - a[0]);
       const mx = (a[0] + b[0]) / 2;
       const my = (a[1] + b[1]) / 2;
-      if (nx * (mx - cx) + ny * (my - cy) < 0) {
+      if (convexFallback ? nx * (mx - cx) + ny * (my - cy) < 0 : area2 < 0) {
         nx = -nx;
         ny = -ny;
       }
@@ -512,7 +609,25 @@ export class Stage {
 
   /** Queues a thing at its plan position (plus a bias); flush draws the queue back to front. */
   add(x: number, y: number, fn: () => void, bias = 0): void {
-    this.items.push({ k: x + y + bias, fn });
+    const pre = this.K.pre;
+    if (!pre) {
+      this.items.push({ k: x + y + bias, fn });
+      return;
+    }
+    // Queued while turned: sorted where it ends up, drawn turned.
+    const [tx, ty] = pre(x, y);
+    this.items.push({
+      k: tx + ty + bias,
+      fn: () => {
+        const outer = this.K.pre;
+        this.K.pre = pre;
+        try {
+          fn();
+        } finally {
+          this.K.pre = outer;
+        }
+      },
+    });
   }
 
   /** Draws the queue back to front; things queued while drawing follow in a later round. */

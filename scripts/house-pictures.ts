@@ -46,6 +46,8 @@ const JOBS: Record<string, unknown> = {
   'desk-b-day': { desk: {}, time: 'day', s: 110, style: 'clay' },
   'yard-g-day': { yard: {}, time: 'day', s: 62 },
   'yard-g-night': { yard: {}, time: 'night', s: 62 },
+  'outline-day': { outline: { selected: 'hall', handles: true }, time: 'day', s: 60 },
+  'outline-night': { outline: {}, time: 'night', s: 60 },
   ...Object.fromEntries(STYLES.map((st) => [`var-${st}-day`, { home: 'cooking', show: ['ground'], plot: true, time: 'day', s: 46, style: st }])),
 };
 
@@ -55,8 +57,9 @@ import { homeScene } from './src/clay/house/examples/home';
 import { carScene, batteryScene, heatScene, trayScene } from './src/clay/house/examples/small';
 import { deskScene } from './src/clay/house/examples/desk';
 import { yardScene } from './src/clay/house/examples/yard';
+import { outlineScene } from './src/clay/house/examples/outline';
 window.render = (j) => {
-  const scene = j.home ? { house: homeScene(j.home, { show: j.show, only: j.only, plot: j.plot, step: j.step, selected: j.selected, handles: j.handles, grid: j.grid }) }
+  const scene = j.outline ? { house: outlineScene(j.outline) } : j.home ? { house: homeScene(j.home, { show: j.show, only: j.only, plot: j.plot, step: j.step, selected: j.selected, handles: j.handles, grid: j.grid }) }
     : j.car ? { closeup: carScene(j.car, j.time) } : j.battery ? { closeup: batteryScene(j.battery) } : j.heat ? { closeup: heatScene(j.heat) }
     : j.tray ? { closeup: trayScene(j.tray) } : j.desk ? { closeup: deskScene(j.desk) } : { closeup: yardScene(j.yard) };
   const p = drawScene(scene, { style: j.style ?? 'half', time: j.time, s: j.s, pad: j.pad, dpr: 2 });

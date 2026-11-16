@@ -80,8 +80,16 @@ export class Clay {
     readonly pal: ClayPalette,
   ) {}
 
+  /**
+   * A plan transform applied to every point before it is projected (a thing turned about its middle), or null.
+   * Shapes that are the same from every side (cylinders, spheres, discs) turn with it; a box drawn by `box` does not
+   * know it is turned, so a stage that turns things draws its boxes as prisms instead.
+   */
+  pre: ((x: number, y: number) => readonly [number, number]) | null = null;
+
   /** Screen position of a point. */
   p(x: number, y: number, z: number): [number, number] {
+    if (this.pre) [x, y] = this.pre(x, y);
     return [this.ox + (x - y) * COS30 * this.s, this.oy + (x + y) * 0.5 * this.s - z * this.s];
   }
 

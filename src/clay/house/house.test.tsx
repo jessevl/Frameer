@@ -9,6 +9,9 @@ import { deskScene } from './examples/desk';
 import { HOME_STATES, homeScene, type HomeStateName } from './examples/home';
 import { TRAY_PIECES, batteryScene, carScene, heatScene, trayScene } from './examples/small';
 import { yardScene } from './examples/yard';
+import { OUTLINE_OPENINGS, outlineFloor, outlineScene } from './examples/outline';
+import { isOutlineFloor } from './house';
+import { walls } from './outline';
 import { HousePicture } from './HousePicture';
 import { ITEM_KINDS, type Item } from './items';
 import type { CanvasMaker } from './light';
@@ -197,6 +200,63 @@ describe('the house', () => {
   });
 });
 
+describe('a house from outlines', () => {
+  it('splits walls into shared partitions, tall back walls and low front walls, with their openings', () => {
+    const f = outlineFloor();
+    expect(isOutlineFloor(f)).toBe(true);
+    const segs = walls(
+      f.rooms.map((r) => r.outline ?? []),
+      OUTLINE_OPENINGS,
+    );
+    const shared = segs.filter((q) => q.other !== null);
+    // The living room and the hall share x = 3.2 from 2.6 to 5.4; the kitchen and the living room x = 4.6 from 0 to 2.6.
+    expect(shared.length).toBeGreaterThanOrEqual(4);
+    expect(shared.filter((q) => q.back)).toHaveLength(shared.length / 2);
+    // The living room's walls on x = 0 and y = 0 are tall; the angled corner and the walls facing the garden are low.
+    const tall = segs.filter((q) => q.tall);
+    expect(tall.some((q) => q.a[1] === 0 && q.b[1] === 0)).toBe(true);
+    expect(tall.some((q) => Math.abs(q.nx + 0.7071) < 0.01)).toBe(false);
+    expect(segs.filter((q) => !q.back && q.other === null).length).toBeGreaterThan(3);
+    // Every opening sits in a wall.
+    const found = new Set(segs.flatMap((q) => q.openings.map((o) => o.i)));
+    expect(found.size).toBe(OUTLINE_OPENINGS.length);
+  });
+
+  it('draws an L, its openings and turned things, in light and dark, and marks its rooms inside them', () => {
+    const day = draw({ house: outlineScene() });
+    const night = draw({ house: outlineScene({ selected: 'hall', handles: true }) }, { time: 'night', dark: true });
+    expect(day.fills).toBeGreaterThan(200);
+    expect(night.fills).toBeGreaterThan(200);
+    for (const id of ['living', 'kitchen', 'hall']) expect(day.pic.marks[`room:${id}`]).toBeDefined();
+    expect(night.pic.marks.selEx).toBeDefined();
+    // Without its openings and turns, the picture is a different one.
+    const plain = outlineFloor();
+    const bare = draw({ house: { floors: [{ ...plain, openings: [], rooms: plain.rooms.map((r) => ({ ...r, items: (r.items ?? []).map((i) => ({ ...i, turn: 0 })) })) }] } });
+    expect(bare.rec.calls.join('\n')).not.toBe(day.rec.calls.join('\n'));
+  });
+
+  it('turns a thing a quarter as a box and any other way as a prism, and things on it with it', () => {
+    const at = (turn: number) =>
+      draw({ closeup: { extent: { x0: -0.5, y0: -0.5, x1: 2.5, y1: 2.5, zt: 1 }, items: [{ kind: 'table', x: 0, y: 0, w: 2, d: 1, h: 0.4, turn, on: [{ kind: 'mug', x: 1.8, y: 0.2 }] }] } });
+    const none = at(0);
+    const quarter = at(90);
+    const angled = at(30);
+    expect(quarter.rec.calls.join()).not.toBe(none.rec.calls.join());
+    expect(angled.rec.calls.join()).not.toBe(quarter.rec.calls.join());
+    expect(at(360).fills).toBe(none.fills);
+  });
+
+  it('hangs a back-wall piece on any wall when moved there', () => {
+    const wall = (moved?: { x: number; y: number; turn: number }) =>
+      draw({ house: { floors: [{ ...outlineFloor(), openings: [], rooms: [{ ...outlineFloor().rooms[0], items: [{ kind: 'frame', wall: 'y', from: 0.2, z: 0.6, w: 0.5, h: 0.4, art: 'sun', ...(moved ? { moved } : {}) }] }] }] } });
+    const home = wall();
+    // The angled wall of the L from (0, 4.6) to (0.8, 5.4), seen from inside.
+    const angled = wall({ x: 0.8, y: 5.4, turn: -135 });
+    expect(angled.rec.calls.join()).not.toBe(home.rec.calls.join());
+    expect(angled.fills).toBe(home.fills);
+  });
+});
+
 describe('close-ups', () => {
   const scenes: [string, ClayScene][] = [
     ['desk', { closeup: deskScene({ lamp: true }) }],
@@ -251,6 +311,7 @@ describe('the examples', () => {
       walk(scene.plot?.front);
     }
     for (const s of [carScene('waiting'), batteryScene([0.5, 0.5]), heatScene({ running: true, tank: 1, vent: 1 }), ...TRAY_PIECES.map(trayScene)]) walk(s.items);
+    for (const r of outlineFloor().rooms) walk(r.items);
     const missing = ITEM_KINDS.filter((k) => !used.has(k));
     expect(missing.sort()).toEqual(['clock', 'container', 'towels']);
   });

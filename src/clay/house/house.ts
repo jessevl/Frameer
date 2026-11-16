@@ -1,11 +1,12 @@
 /**
  * @file house.ts
- * @description A house picture from a plain model: floors of rooms (each with a floor kind, a wall paint, openings in its cut walls, the pieces on its back walls and its items with their live state), drawn as a cut-away dollhouse on a plinth: the two back walls painted per room with a skirting board, low cut partitions, low cut front walls with glass where there is a window or a garden door, and things back to front, room by room, each room's light held inside it. Floors stack with an offset; one room can be drawn alone (`only`); the first floor can stand in its plot (lawn, drive, terrace, garden things); a room can be selected (a coral outline, with corner handles for a builder) over a dotted grid. The picture goes through the light pass, the grain and gets the soft shadow it rests on, and reports anchors (`marks`) for callouts.
+ * @description A house picture from a plain model: floors of rooms (rectangles, or any outline: then the walls follow the rooms and doors, windows and passages are cut into them) (each with a floor kind, a wall paint, openings in its cut walls, the pieces on its back walls and its items with their live state), drawn as a cut-away dollhouse on a plinth: the two back walls painted per room with a skirting board, low cut partitions, low cut front walls with glass where there is a window or a garden door, and things back to front, room by room, each room's light held inside it. Floors stack with an offset; one room can be drawn alone (`only`); the first floor can stand in its plot (lawn, drive, terrace, garden things); a room can be selected (a coral outline, with corner handles for a builder) over a dotted grid. The picture goes through the light pass, the grain and gets the soft shadow it rests on, and reports anchors (`marks`) for callouts.
  * Ported from hearth-concept/clay2/house.js (floorFill, drawFloor, the plot, picture); the reference home's rooms and states are data in examples/home.ts.
  * Used by: scene.ts (renderHouse), HousePicture, the examples and tests.
  */
 import { colorsFor, dk, lt, type Colors, type Paint } from './colors';
 import { placeItems, type Item } from './items';
+import { along, centroid, grown, innerPoint, oriented, solidRuns, walls as wallSegs, type WallSeg } from './outline';
 import { domCanvas, grade, grain, needsLightPass, postOnly, type CanvasMaker } from './light';
 import { C30, Stage, TAU, envFor, hsh, rr, type Pt2, type TimeOfDay } from './stage';
 import { DEFAULT_STYLE, makeStyle, type Style, type StyleName } from './styles';
@@ -43,6 +44,11 @@ export interface HouseRoom {
   gapY?: readonly [number, number];
   /** Boxes [x, y, w, d, h] that stand above the cut walls, so the room's light still reaches their faces. */
   tall?: readonly (readonly [number, number, number, number, number])[];
+  /**
+   * The room's outline in plan, any number of corners, any order of winding (an L, a U, an angled wall); x, y, w and d
+   * are then its bounds. A floor with an outline room is drawn from outlines: see `HouseFloor`.
+   */
+  outline?: readonly Pt2[];
   /** Pieces on the back walls (windows, frames, a TV on the wall is an item). */
   walls?: readonly Item[];
   items?: readonly Item[];
@@ -52,14 +58,43 @@ export interface HouseRoom {
 /** A stretch of a front edge: a low wall, glass (a window or a garden door) or an opening. */
 export type FrontEdge = readonly [number, number, 'wall' | 'glass' | 'door'];
 
+/**
+ * A door, window or passage in a wall of an outline floor: the stretch of wall it takes (two points on the wall, in
+ * plan) and what it is. Heights are in scene units like the walls (WALL_H high).
+ */
+export interface Opening {
+  a: Pt2;
+  b: Pt2;
+  /** `door` a door leaf, `glass` a glass door or a window to the floor, `window` a window over a sill, `passage` an opening without a door. */
+  kind: 'door' | 'window' | 'glass' | 'passage';
+  /** Windows: the sill, 0.42 by default. */
+  sill?: number;
+  /** The top of the opening: 1.12 by default (WALL_H for a passage). */
+  head?: number;
+  /** Doors: hinged (the default), sliding or double. */
+  style?: 'hinged' | 'sliding' | 'double';
+  /** Hinged doors: the end the leaf turns on, and the side it opens to (1: the side the wall's normal of a→b's left points to). */
+  hinge?: 'a' | 'b';
+  side?: 1 | -1;
+  /** The door's colour (the front door stands out). */
+  col?: Paint;
+}
+
 export interface HouseFloor {
   id: string;
   /** Size along x and y. */
   w: number;
   d: number;
   rooms: readonly HouseRoom[];
-  /** The cut front walls: along the edge x = w (`x`, by y) and y = d (`y`, by x). */
+  /** The cut front walls: along the edge x = w (`x`, by y) and y = d (`y`, by x). Not used by an outline floor. */
   front?: { x: readonly FrontEdge[]; y: readonly FrontEdge[] };
+  /**
+   * Doors, windows and passages of an outline floor. A floor is drawn from outlines when any of its rooms has an
+   * `outline` or it has openings: its walls follow the rooms (a wall two rooms share is a low cut partition, an
+   * outside wall facing away is full height unless part of the floor lies behind it, one facing the viewer is low),
+   * and the openings are cut into them. `front`, `gapX` and `gapY` are then not used.
+   */
+  openings?: readonly Opening[];
 }
 
 export interface Rect {
@@ -138,7 +173,7 @@ const WOOD_FLOORS: Record<FloorKind, (C: Colors, st: Stage) => string> = {
   concrete: (C) => C.concrete,
 };
 
-function floorFill(st: Stage, r: HouseRoom): void {
+function floorFill(st: Stage, r: HouseRoom, noBackShade = false): void {
   const C = st.col;
   const c = st.c;
   const { x, y, w, d } = r;
@@ -192,11 +227,13 @@ function floorFill(st: Stage, r: HouseRoom): void {
     }
   }
   // A little darker toward the back walls.
-  if (r.y < 0.01) {
+  if (noBackShade) {
+    // An outline room shades nothing: its walls are not where the rectangle's are.
+  } else if (r.y < 0.01) {
     c.fillStyle = st.K.grad([x, y, 0], [x, y + 0.7, 0], 'rgba(74,50,30,.16)', 'rgba(74,50,30,0)');
     c.fill(st.path([[x, y, 0], [x + w, y, 0], [x + w, y + 0.7, 0], [x, y + 0.7, 0]]));
   }
-  if (r.x < 0.01) {
+  if (r.x < 0.01 && !noBackShade) {
     c.fillStyle = st.K.grad([x, y, 0], [x + 0.7, y, 0], 'rgba(74,50,30,.16)', 'rgba(74,50,30,0)');
     c.fill(st.path([[x, y, 0], [x + 0.7, y, 0], [x + 0.7, y + d, 0], [x, y + d, 0]]));
   }
@@ -263,6 +300,10 @@ function plotGround(st: Stage, p: Plot): void {
 }
 
 function drawFloor(st: Stage, floor: HouseFloor, scene: HouseScene, plot: Plot | null): void {
+  if (isOutlineFloor(floor)) {
+    drawOutlineFloor(st, floor, scene, plot);
+    return;
+  }
   const C = st.col;
   const c = st.c;
   const only = scene.only ? (floor.rooms.find((r) => r.id === scene.only) ?? null) : null;
@@ -407,6 +448,315 @@ function drawFloor(st: Stage, floor: HouseFloor, scene: HouseScene, plot: Plot |
   }
 }
 
+// ---------- floors drawn from room outlines ----------
+
+/** Door and window heights in scene units (WALL_H is a storey). */
+export const DOOR_H = 1.12;
+export const SILL_H = 0.42;
+const FRONT_H = 0.2;
+
+/** Whether a floor is drawn from its rooms' outlines. */
+export function isOutlineFloor(f: HouseFloor): boolean {
+  return Boolean(f.openings?.length) || f.rooms.some((r) => r.outline && r.outline.length >= 3);
+}
+
+/** A room's outline: its own, else its rectangle. */
+export function outlineOf(r: HouseRoom): Pt2[] {
+  if (r.outline && r.outline.length >= 3) return r.outline.slice();
+  return [
+    [r.x, r.y],
+    [r.x + r.w, r.y],
+    [r.x + r.w, r.y + r.d],
+    [r.x, r.y + r.d],
+  ];
+}
+
+/** The floor of a room of any outline: its finish, clipped to it. */
+function floorFillOutline(st: Stage, r: HouseRoom, poly: readonly Pt2[]): void {
+  const xs = poly.map((p) => p[0]);
+  const ys = poly.map((p) => p[1]);
+  const box: HouseRoom = { ...r, x: Math.min(...xs), y: Math.min(...ys), w: Math.max(...xs) - Math.min(...xs), d: Math.max(...ys) - Math.min(...ys) };
+  const c = st.c;
+  c.save();
+  c.clip(st.path(poly.map((p) => [p[0], p[1], 0] as const)));
+  // The rectangle's fill and pattern over the bounds, kept to the outline; no darkening toward walls that are not there.
+  floorFill(st, box, true);
+  c.restore();
+}
+
+/** Where a room's light may reach: its floor and its walls up to their heights. */
+function outlineClip(st: Stage, poly: readonly Pt2[], segs: readonly WallSeg[], tall: readonly (readonly [number, number, number, number, number])[] | undefined): Path2D {
+  const p = new Path2D();
+  p.addPath(st.path(poly.map((q) => [q[0], q[1], 0] as const)));
+  p.addPath(st.path(poly.map((q) => [q[0], q[1], PART_H] as const)));
+  for (const s of segs) {
+    const h = s.tall ? WALL_H + 0.1 : PART_H + 0.02;
+    p.addPath(
+      st.path([
+        [s.a[0], s.a[1], 0],
+        [s.b[0], s.b[1], 0],
+        [s.b[0], s.b[1], h],
+        [s.a[0], s.a[1], h],
+      ]),
+    );
+  }
+  for (const b of tall ?? []) p.addPath(st.path(boxHex(b[0], b[1], b[2], b[3], b[4])));
+  return p;
+}
+
+/** A slab of wall along a stretch of a segment, from z0 to z1, `t` thick: outward from the room, or centred (a partition). */
+function slab(st: Stage, s: WallSeg, t0: number, t1: number, z0: number, z1: number, thick: number, centred: boolean, m: string | { t: string; l: string; r: string; e: string }): void {
+  if (z1 - z0 <= 0.001 || t1 - t0 <= 1e-6) return;
+  const a = along(s, t0);
+  const b = along(s, t1);
+  const k0 = centred ? -thick / 2 : 0;
+  const k1 = centred ? thick / 2 : thick;
+  st.prism(
+    [
+      [a[0] + s.nx * k0, a[1] + s.ny * k0],
+      [b[0] + s.nx * k0, b[1] + s.ny * k0],
+      [b[0] + s.nx * k1, b[1] + s.ny * k1],
+      [a[0] + s.nx * k1, a[1] + s.ny * k1],
+    ],
+    z0,
+    z1 - z0,
+    m,
+    { edge: 0.5 },
+  );
+}
+
+/** The paint on a tall wall's inside, with its skirting, over a stretch. */
+function paintInside(st: Stage, s: WallSeg, t0: number, t1: number, z0: number, z1: number, col: string): void {
+  const a = along(s, t0);
+  const b = along(s, t1);
+  const off = -0.004;
+  const ax = a[0] + s.nx * off;
+  const ay = a[1] + s.ny * off;
+  const bx = b[0] + s.nx * off;
+  const by = b[1] + s.ny * off;
+  // Lit like the back walls of a rectangle: the wall along x is the darker one.
+  const shade = Math.abs(s.nx) > Math.abs(s.ny) ? dk(col, 0.085) : col;
+  st.fill(
+    [
+      [ax, ay, z0],
+      [bx, by, z0],
+      [bx, by, z1],
+      [ax, ay, z1],
+    ],
+    st.K.grad([ax, ay, z1], [ax, ay, z0], lt(shade, 0.1), dk(shade, 0.05)),
+    false,
+  );
+  if (z0 < 0.07)
+    st.fill(
+      [
+        [ax, ay, z0],
+        [bx, by, z0],
+        [bx, by, 0.07],
+        [ax, ay, 0.07],
+      ],
+      st.col.cut,
+    );
+}
+
+/** A wall with its openings: solid stretches, and per opening a lintel, a sill, glass or a door. */
+function wallWithOpenings(st: Stage, s: WallSeg, h: number, thick: number, centred: boolean, openings: readonly Opening[], paint: string | null): void {
+  const C = st.col;
+  const part = { t: C.cut, l: C.wall, r: dk(C.wall, 0.1), e: '#FFFFFF' };
+  const glassM = { t: 'rgba(255,255,255,.9)', l: 'rgba(196,224,236,.5)', r: 'rgba(176,208,224,.5)', e: '#FFFFFF' };
+  const tall = h > PART_H + 0.05;
+  for (const [t0, t1] of solidRuns(s)) {
+    slab(st, s, t0, t1, 0, h, thick, centred, part);
+    if (paint) paintInside(st, s, t0, t1, 0, h, paint);
+  }
+  for (const o of s.openings) {
+    const op = openings[o.i];
+    if (!op) continue;
+    const head = Math.min(h, op.head ?? (op.kind === 'passage' ? WALL_H : DOOR_H));
+    const posts = () => {
+      const len = Math.hypot(s.b[0] - s.a[0], s.b[1] - s.a[1]) || 1;
+      const dt = 0.05 / len;
+      slab(st, s, o.t0, Math.min(o.t1, o.t0 + dt), 0, tall ? head : h + 0.18, thick, centred, part);
+      slab(st, s, Math.max(o.t0, o.t1 - dt), o.t1, 0, tall ? head : h + 0.18, thick, centred, part);
+    };
+    if (op.kind === 'window') {
+      const sill = Math.min(op.sill ?? SILL_H, head - 0.1);
+      if (tall) {
+        slab(st, s, o.t0, o.t1, 0, sill, thick, centred, part);
+        slab(st, s, o.t0, o.t1, head, h, thick, centred, part);
+        if (paint) {
+          paintInside(st, s, o.t0, o.t1, 0, sill, paint);
+          paintInside(st, s, o.t0, o.t1, head, h, paint);
+        }
+        slab(st, s, o.t0, o.t1, sill, head, 0.035, false, glassM);
+      } else {
+        slab(st, s, o.t0, o.t1, 0, h, thick, centred, part);
+        slab(st, s, o.t0, o.t1, h, h + 0.16, 0.035, centred, glassM);
+        posts();
+      }
+      continue;
+    }
+    if (op.kind === 'glass') {
+      if (tall) {
+        slab(st, s, o.t0, o.t1, head, h, thick, centred, part);
+        if (paint) paintInside(st, s, o.t0, o.t1, head, h, paint);
+        slab(st, s, o.t0, o.t1, 0, head, 0.035, false, glassM);
+      } else {
+        slab(st, s, o.t0, o.t1, 0, h + 0.16, 0.035, centred, glassM);
+        posts();
+      }
+      continue;
+    }
+    // A door or a passage: open below its head; a lintel above it on a tall wall.
+    if (tall) {
+      slab(st, s, o.t0, o.t1, head, h, thick, centred, part);
+      if (paint) paintInside(st, s, o.t0, o.t1, head, h, paint);
+    }
+    if (op.kind === 'door' && tall) doorLeaves(st, s, o.t0, o.t1, op, head);
+  }
+}
+
+/** A door's leaves standing closed in a tall wall (sliding ones a little to the side). */
+function doorLeaves(st: Stage, s: WallSeg, t0: number, t1: number, op: Opening, head: number): void {
+  const col = st.paint(op.col, st.col.oak);
+  const style = op.style ?? 'hinged';
+  if (style === 'double') {
+    const m = (t0 + t1) / 2;
+    slab(st, s, t0 + 0.004, m - 0.004, 0.01, head - 0.01, 0.04, false, col);
+    slab(st, s, m + 0.004, t1 - 0.004, 0.01, head - 0.01, 0.04, false, col);
+    return;
+  }
+  slab(st, s, t0 + 0.004, t1 - 0.004, 0.01, head - 0.01, 0.04, false, col);
+  // A handle on the side away from the hinge.
+  const len = Math.hypot(s.b[0] - s.a[0], s.b[1] - s.a[1]) || 1;
+  const th = op.hinge === 'b' ? t0 + 0.12 / len : t1 - 0.12 / len;
+  const p = along(s, th);
+  st.line([p[0] - s.nx * 0.005, p[1] - s.ny * 0.005, head * 0.48], [p[0] - s.nx * 0.005, p[1] - s.ny * 0.005, head * 0.52], st.col.ink, Math.max(1, st.s / 30));
+}
+
+/** What a door does on the floor: the arc a hinged leaf sweeps, the track of a sliding one; a threshold under every door. */
+function doorOnFloor(st: Stage, s: WallSeg, op: Opening, t0: number, t1: number): void {
+  const a = along(s, t0);
+  const b = along(s, t1);
+  const thin = Math.max(0.6, st.s / 70);
+  const ink = 'rgba(59,54,51,.45)';
+  // Which way the leaf swings: `side` 1 is the left of a→b (into the room whose wall it is, when its normal points right).
+  const lx = -(b[1] - a[1]);
+  const ly = b[0] - a[0];
+  const L = Math.hypot(lx, ly) || 1;
+  const sd = op.side ?? -1;
+  const ux = (lx / L) * sd;
+  const uy = (ly / L) * sd;
+  const style = op.style ?? 'hinged';
+  if (style === 'sliding') {
+    st.line([a[0] + ux * 0.06, a[1] + uy * 0.06, 0.004], [b[0] + ux * 0.06 + (b[0] - a[0]) * 0.5, b[1] + uy * 0.06 + (b[1] - a[1]) * 0.5, 0.004], ink, thin);
+    return;
+  }
+  const leaves: [Pt2, Pt2][] = style === 'double' ? [[a, [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2]], [b, [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2]]] : op.hinge === 'b' ? [[b, a]] : [[a, b]];
+  for (const [hinge, tip] of leaves) {
+    const r = Math.hypot(tip[0] - hinge[0], tip[1] - hinge[1]);
+    const ex = (tip[0] - hinge[0]) / (r || 1);
+    const ey = (tip[1] - hinge[1]) / (r || 1);
+    const pts: [number, number, number][] = [];
+    for (let i = 0; i <= 12; i++) {
+      const t = (i / 12) * (Math.PI / 2);
+      pts.push([hinge[0] + (ex * Math.cos(t) + ux * Math.sin(t)) * r, hinge[1] + (ey * Math.cos(t) + uy * Math.sin(t)) * r, 0.004]);
+    }
+    st.pline(pts, ink, thin);
+    st.line([hinge[0], hinge[1], 0.004], [hinge[0] + ux * r, hinge[1] + uy * r, 0.004], ink, thin);
+  }
+}
+
+/** A floor drawn from its rooms' outlines, with its openings. */
+function drawOutlineFloor(st: Stage, floor: HouseFloor, scene: HouseScene, plot: Plot | null): void {
+  const C = st.col;
+  const c = st.c;
+  const only = scene.only ? (floor.rooms.find((r) => r.id === scene.only) ?? null) : null;
+  const rooms = only ? [only] : floor.rooms.slice();
+  const polys = rooms.map((r) => oriented(outlineOf(r)));
+  const openings = floor.openings ?? [];
+  const segs = wallSegs(polys, openings);
+  const order = rooms.map((_, i) => i).sort((i, j) => (rooms[i].x + rooms[i].y) - (rooms[j].x + rooms[j].y));
+  if (plot) {
+    plotGround(st, plot);
+    const g = st.lowered(0.3);
+    placeItems(g, plot.behind ?? []);
+    g.flush();
+  }
+  // The plinth under every room, grown past the walls; back to front so the front ones cover the seams.
+  for (const i of order) st.prism(grown(polys[i], WALL_T + 0.08), -0.3, 0.3, C.plinth, { edge: 0.5 });
+  const all = new Path2D();
+  polys.forEach((p) => all.addPath(st.path(p.map((q) => [q[0], q[1], 0] as const))));
+  st.floorClip = all;
+  for (const i of order) floorFillOutline(st, rooms[i], polys[i]);
+  // Doors on the floor: the arc or track and the threshold.
+  for (const s of segs) {
+    if (s.other !== null && !s.back) continue;
+    for (const o of s.openings) {
+      const op = openings[o.i];
+      if (op?.kind === 'door') doorOnFloor(st, s, op, o.t0, o.t1);
+    }
+  }
+  // The tall walls first: nothing of the floor is behind them.
+  const paints = rooms.map((r) => st.x(st.paint(r.wall, C.wall)));
+  for (const s of segs.filter((q) => q.tall).sort((p, q) => p.a[0] + p.a[1] - (q.a[0] + q.a[1]))) wallWithOpenings(st, s, WALL_H, WALL_T, false, openings, paints[s.room]);
+  for (const i of order) {
+    const r = rooms[i];
+    if (!r.outline && (r.x < 0.01 || r.y < 0.01)) {
+      st.roomClip = outlineClip(st, polys[i], segs.filter((q) => q.room === i), r.tall);
+      placeItems(st, r.walls ?? []);
+    }
+  }
+  // Rooms back to front: their partitions and low back walls, their things, then their low front walls.
+  for (const i of order) {
+    const r = rooms[i];
+    const mine = segs.filter((q) => q.room === i);
+    st.roomClip = outlineClip(st, polys[i], mine, r.tall);
+    for (const s of mine) {
+      if (s.tall || !s.back) continue;
+      // A shared wall is drawn by the room it is the back of; an outside wall facing away is a low cut wall here.
+      if (s.other !== null) wallWithOpenings(st, s, PART_H, 0.1, true, openings, null);
+      else wallWithOpenings(st, s, PART_H, WALL_T, false, openings, null);
+    }
+    placeItems(st, r.items ?? []);
+    markAll(st, r.marks);
+    st.flush();
+    const [mx, my] = r.outline ? innerPoint(polys[i]) : centroid(polys[i]);
+    st.mark('room:' + r.id, mx, my, 0);
+    for (const s of mine) if (!s.back && s.other === null) wallWithOpenings(st, s, FRONT_H, WALL_T, false, openings, null);
+  }
+  st.roomClip = null;
+  const selIndex = scene.selected ? rooms.findIndex((q) => q.id === scene.selected) : -1;
+  if (selIndex >= 0) {
+    const poly = polys[selIndex];
+    c.save();
+    c.strokeStyle = C.coral;
+    c.lineWidth = 3;
+    c.lineJoin = 'round';
+    c.stroke(st.path(poly.map((p) => [p[0], p[1], 0.02] as const)));
+    if (scene.handles)
+      for (const [a, b] of poly) {
+        const [hx, hy] = st.P(a, b, 0.02);
+        c.beginPath();
+        c.arc(hx, hy, 6.5, 0, TAU);
+        c.fillStyle = '#fff';
+        c.fill();
+        c.lineWidth = 2.5;
+        c.stroke();
+      }
+    c.restore();
+    const xs = poly.map((p) => p[0]);
+    const ys = poly.map((p) => p[1]);
+    st.mark('selEx', Math.max(...xs), (Math.min(...ys) + Math.max(...ys)) / 2, 0);
+    st.mark('selNx', (Math.min(...xs) + Math.max(...xs)) / 2, Math.min(...ys), 0);
+  }
+  if (plot) {
+    const g = st.lowered(0.3);
+    placeItems(g, plot.front ?? []);
+    markAll(g, plot.marks);
+    g.flush();
+  }
+}
+
 interface Shown {
   floors: HouseFloor[];
   /** The area drawn of each floor (a room alone, or the whole floor). */
@@ -494,7 +844,12 @@ export function drawHouse(scene: HouseScene, o: PictureOptions = {}): Picture {
     drawFloor(st, floor, scene, plot);
     st.mark('floor:' + floor.id, area.x, area.y + area.d, 0);
     const base: Pt2[] = plot ? rr(plot.lawn.x + 0.3, plot.lawn.y + 0.3, plot.lawn.w - 0.3, plot.lawn.d - 0.3, 0.6) : rr(area.x + 0.1, area.y + 0.1, area.w + 0.5, area.d + 0.5, 0.3);
-    shadows.push(st.path(base.map((p) => [p[0], p[1], plot ? -0.5 : -0.34])));
+    if (!plot && !scene.only && isOutlineFloor(floor)) {
+      // The shadow follows the rooms: a house that is not a rectangle leaves its corners open.
+      const p = new Path2D();
+      for (const r of floor.rooms) p.addPath(st.path(grown(outlineOf(r), 0.3).map((q) => [q[0] + 0.1, q[1] + 0.1, -0.34] as const)));
+      shadows.push(p);
+    } else shadows.push(st.path(base.map((p) => [p[0], p[1], plot ? -0.5 : -0.34])));
   });
   const st = first as Stage | null;
   if (!st) return { canvas: cv, w: wpx, h: hpx, s, marks: {} };

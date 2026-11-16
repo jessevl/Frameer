@@ -1,6 +1,6 @@
 /**
  * @file items.ts
- * @description The things in a scene as plain data. An item is `{ kind, ...props }`: where it stands (scene units; x runs down to the right, y down to the left, z up, the back walls at x = 0 and y = 0), what it looks like (colours as material names or hex) and its live state (a lamp's level and colour, a screen's state, who sits where, a fan's level, a battery's charge; `lit` and `running` switch things on). Things on a surface (a lamp on a sideboard, a mug on a table) go in their parent's `on` and stand on its top. `placeItems` draws a list; a scene never calls the objects directly unless it adds its own.
+ * @description The things in a scene as plain data. An item is `{ kind, turn?, ...props }`: where it stands (scene units; x runs down to the right, y down to the left, z up, the back walls at x = 0 and y = 0), what it looks like (colours as material names or hex) and its live state (a lamp's level and colour, a screen's state, who sits where, a fan's level, a battery's charge; `lit` and `running` switch things on). Things on a surface (a lamp on a sideboard, a mug on a table) go in their parent's `on` and stand on its top. `placeItems` draws a list; a scene never calls the objects directly unless it adds its own.
  * Used by: house.ts, closeup.ts, the examples, HousePicture.
  */
 import type { Point3 } from '../clay';
@@ -14,7 +14,7 @@ import { bin, bollard, car, container, frontDoor, gardenSeat, gardenTree, heatPu
 import { person, personNow, type Person } from './objects/people';
 import { plant, type PlantKind } from './objects/plants';
 import { basket, bath, bathTowel, bed, bookcaseX, bookcaseY, dresserX, dresserY, dryingRack, loo, nightstand, shower, stairs, stairwell, teddy, teepee, toyBlocks, vanity, wardrobe, washer, type Sleeper } from './objects/rooms';
-import { battery, inverter, tank, ventBox } from './objects/utility';
+import { battery, boiler, inverter, radiator, tank, ventBox } from './objects/utility';
 import { backsplash, bunting, clockY, frameX, frameY, mirrorX, mirrorY, shelfX, shelfY, thermostatY, tiledWallY, towelsY, ventY, windowX, windowY, type ArtKind } from './objects/wall';
 import type { LightState, Stage } from './stage';
 
@@ -128,6 +128,8 @@ export interface ItemMap {
   inverter: At;
   tank: At & { heat?: number };
   ventBox: At & { level?: number };
+  radiator: At & { w?: number; warm?: number };
+  boiler: At & { on?: boolean };
   // outdoors
   shrub: At & { k?: number; col?: Paint };
   gardenTree: At & { k?: number };
@@ -162,8 +164,22 @@ export interface ItemMap {
   wallStub: Area & Biased & { h: number };
 }
 
-/** One thing in a scene. */
-export type Item = { [K in keyof ItemMap]: { kind: K } & ItemMap[K] }[keyof ItemMap];
+/**
+ * One thing in a scene. `turn` turns it about its middle (an area's centre, else its place) by that many degrees,
+ * clockwise as the plan is drawn; things on it turn with it. Pieces on the back walls do not turn.
+ */
+export type Item = { [K in keyof ItemMap]: { kind: K; turn?: number; moved?: Moved } & ItemMap[K] }[keyof ItemMap];
+
+/**
+ * Where a thing is drawn when not where its props say: turned by `turn` degrees about the origin, then shifted to
+ * (x, y). A back-wall piece (made for the wall y = 0) moved to a wall's start and turned to its direction hangs on
+ * that wall, whatever wall of an outline room it is.
+ */
+export interface Moved {
+  x: number;
+  y: number;
+  turn?: number;
+}
 
 /** The kinds of items. */
 export type ItemKind = keyof ItemMap;
@@ -277,6 +293,8 @@ const DEFS: { [K in keyof ItemMap]: Def<ItemMap[K]> } = {
   inverter: (st, it) => inverter(st, it.x, it.y),
   tank: (st, it) => tank(st, it.x, it.y, it.heat),
   ventBox: (st, it) => ventBox(st, it.x, it.y, it.level),
+  radiator: (st, it) => radiator(st, it.x, it.y, it.w, it.warm),
+  boiler: (st, it, cx) => boiler(st, it.x, it.y, zOf(it, cx) || 0.6, it.on),
   shrub: (st, it) => shrub(st, it.x, it.y, it.k, it.col),
   gardenTree: (st, it) => gardenTree(st, it.x, it.y, it.k),
   bollard: (st, it) => bollard(st, it.x, it.y, it.lit),
@@ -322,6 +340,17 @@ export function placeItems(st: Stage, items: readonly Item[], at: { z?: number; 
   const cx: Ctx = { z: at.z ?? 0, now: !!at.now };
   for (const it of items) {
     if (!(it.kind in DEFS)) continue;
-    place(st, it, cx);
+    if (it.moved) {
+      const m = it.moved;
+      st.moved(m.x, m.y, m.turn ?? 0, () => placeItems(st, [{ ...it, moved: undefined } as Item], at));
+      continue;
+    }
+    const turn = it.turn;
+    const pos = it as { x?: unknown; y?: unknown; w?: unknown; d?: unknown };
+    if (turn && typeof pos.x === 'number' && typeof pos.y === 'number') {
+      const px = pos.x + (typeof pos.w === 'number' ? pos.w / 2 : 0);
+      const py = pos.y + (typeof pos.d === 'number' ? pos.d / 2 : 0);
+      st.turned(px, py, turn, () => place(st, it, cx));
+    } else place(st, it, cx);
   }
 }

@@ -1,6 +1,6 @@
 /**
  * @file utility.ts
- * @description The plant room of the house pictures: a battery pack with a column of five lights for its charge, an inverter, the hot water tank with a coral bar for how hot it is, and the ventilation box whose three lights and moving air show its level (0 low, 1 medium, 2 high).
+ * @description The plant room of the house pictures: a battery pack with a column of five lights for its charge, an inverter, the hot water tank with a coral bar for how hot it is, and the ventilation box whose three lights and moving air show its level (0 low, 1 medium, 2 high), a panel radiator and a wall-hung boiler.
  * Ported from hearth-concept/clay2/things-b.js (the plant room).
  * Used by: items.ts.
  */
@@ -109,5 +109,34 @@ export function ventBox(st: Stage, x: number, y: number, level = 0): void {
       air(st, x + 0.18, y + 0.2, h + 0.36, 0.8, 1);
       if (level > 1) air(st, x + 0.44, y + 0.2, h + 0.4, 0.9, 1);
     }
+  });
+}
+
+/** A panel radiator standing against a wall, w long along x, its fins showing; `warm` (0 to 1) blushes it. */
+export function radiator(st: Stage, x: number, y: number, w = 0.9, warm = 0): void {
+  st.add(x + w / 2, y + 0.06, () => {
+    const C = st.col;
+    const h = 0.42;
+    const z = 0.08;
+    const col = warm > 0 ? lt(C.coralLight, 0.6 - warm * 0.35) : C.white;
+    st.shadowR(x, y, w, 0.1, { h: 0.3, a: 0.14, r: 0.02 });
+    st.box(x + 0.04, y + 0.02, 0, 0.03, 0.03, z, C.steel);
+    st.box(x + w - 0.07, y + 0.02, 0, 0.03, 0.03, z, C.steel);
+    st.rbox(x, y, z, w, 0.1, h, 0.02, col, { soft: 0.15 });
+    const yy = y + 0.101;
+    for (let xx = x + 0.06; xx < x + w - 0.03; xx += 0.06) st.line([xx, yy, z + 0.04], [xx, yy, z + h - 0.04], '#D9D4CC', Math.max(0.6, st.s / 60), 0.7);
+  });
+}
+
+/** A boiler hung on a wall at height z: a white box with a small display, pipes below it. */
+export function boiler(st: Stage, x: number, y: number, z = 0.6, on = false): void {
+  st.add(x + 0.22, y + 0.15, () => {
+    const C = st.col;
+    const yy = y + 0.301;
+    for (const px of [x + 0.1, x + 0.18, x + 0.26, x + 0.34]) st.box(px, y + 0.12, 0, 0.025, 0.025, z, C.steel);
+    st.rbox(x, y, z, 0.44, 0.3, 0.62, 0.04, C.white, { soft: 0.2 });
+    st.fill(quadY(x + 0.12, x + 0.32, z + 0.38, z + 0.48, yy), C.ink);
+    const p = st.fill(quadY(x + 0.15, x + 0.24, z + 0.41, z + 0.45, yy + 0.001), on ? C.coral : '#7F9373');
+    if (on) st.emit(p, '#FFFFFF');
   });
 }
