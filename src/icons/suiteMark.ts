@@ -41,8 +41,8 @@ function poly(pts: readonly (readonly [number, number, number])[]): string {
   return (
     pts
       .map(([x, y, r], i) => {
-        const [px, py] = pts[(i + n - 1) % n];
-        const [nx, ny] = pts[(i + 1) % n];
+        const [px, py] = pts[(i + n - 1) % n]!;
+        const [nx, ny] = pts[(i + 1) % n]!;
         const toward = (ax: number, ay: number) => {
           const l = Math.hypot(ax - x, ay - y);
           return [x + ((ax - x) / l) * r, y + ((ay - y) / l) * r].map((v) => +v.toFixed(1));
