@@ -19,7 +19,7 @@ export function carScene(car: 'home' | 'waiting' | 'charging', time: TimeOfDay =
       { kind: 'shrub', x: 0.15, y: 0.25, k: 0.9, col: 'leafDark' },
       { kind: 'car', x: 1.15, y: 0.35, state: car, cable: car !== 'home' ? [0.35, 4.05] : null },
       { kind: 'wallbox', x: 0.35, y: 4.05, state: car === 'home' ? 'idle' : car },
-      { kind: 'lantern', x: 0.05, y: 2.6, on: time !== 'day' },
+      { kind: 'lantern', x: 0.05, y: 2.6, lit: time !== 'day' },
     ],
   };
 }

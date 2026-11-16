@@ -1,0 +1,21 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`deterministic output > matches the stored fingerprints in every style 1`] = `
+{
+  "car waiting": "1178 calls, 046d1665",
+  "desk night": "1874 calls, 52ee1aa4",
+  "first floor night": "13883 calls, 207670c4",
+  "ground cooking dusk": "17645 calls, ded278ef",
+  "ground in birch": "16825 calls, 8712b23f",
+  "ground in blush": "16825 calls, 7cde55c9",
+  "ground in clay": "16765 calls, e911c935",
+  "ground in clayoak": "16805 calls, 143d3e5e",
+  "ground in half": "17277 calls, 99482b3c",
+  "ground in lantern": "16925 calls, a32a4a56",
+  "ground in rich": "20309 calls, be0d8c5e",
+  "ground in stone": "17377 calls, 6c6ef788",
+  "ground in stoneclay": "16765 calls, f1bd69b8",
+  "home evening night": "40454 calls, 42a2398f",
+  "yard day": "5144 calls, 0f2cc41a",
+}
+`;

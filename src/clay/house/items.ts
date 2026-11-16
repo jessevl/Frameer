@@ -1,6 +1,6 @@
 /**
  * @file items.ts
- * @description The things in a scene as plain data. An item is `{ kind, ...props }`: where it stands (scene units; x runs down to the right, y down to the left, z up, the back walls at x = 0 and y = 0), what it looks like (colours as material names or hex) and its live state (a lamp's level and colour, a screen's state, who sits where, a fan's level, a battery's charge). Things on a surface (a lamp on a sideboard, a mug on a table) go in their parent's `on` and stand on its top. `placeItems` draws a list; a scene never calls the objects directly unless it adds its own.
+ * @description The things in a scene as plain data. An item is `{ kind, ...props }`: where it stands (scene units; x runs down to the right, y down to the left, z up, the back walls at x = 0 and y = 0), what it looks like (colours as material names or hex) and its live state (a lamp's level and colour, a screen's state, who sits where, a fan's level, a battery's charge; `lit` and `running` switch things on). Things on a surface (a lamp on a sideboard, a mug on a table) go in their parent's `on` and stand on its top. `placeItems` draws a list; a scene never calls the objects directly unless it adds its own.
  * Used by: house.ts, closeup.ts, the examples, HousePicture.
  */
 import type { Point3 } from '../clay';
@@ -90,9 +90,9 @@ export interface ItemMap {
   wallDots: { dots: readonly (readonly [number, number, number])[]; col?: Paint };
   // screens and sound
   tv: { wall: Wall; from: number; to: number; z0: number; z1: number; state?: ScreenState };
-  monitor: At & Biased & { w?: number; on?: boolean };
+  monitor: At & Biased & { w?: number; lit?: boolean };
   speaker: At & Biased & { w?: number; d?: number; h?: number; col?: Paint; playing?: boolean; k?: number };
-  laptop: At & Biased & { on?: boolean };
+  laptop: At & Biased & { lit?: boolean };
   // kitchen
   cabinets: Area & Holds & Biased & { facing: 'y' | 'x'; col?: Paint; top?: Paint; h?: number; doors?: number; dishwasher?: { x0: number; x1: number; running?: boolean } };
   island: Area & Holds & { col?: Paint; top?: Paint };
@@ -118,7 +118,7 @@ export interface ItemMap {
   bathTowel: { x0: number; x1: number; y: number; col?: Paint };
   vanity: At & { w: number; col?: Paint };
   loo: At & { side?: 'W' | 'N' };
-  shower: Area & { on?: boolean };
+  shower: Area & { running?: boolean };
   washer: At & Holds & { running?: boolean };
   dryingRack: At;
   stairs: Area & Biased & { n?: number; step?: number; tread?: Paint };
@@ -131,14 +131,14 @@ export interface ItemMap {
   // outdoors
   shrub: At & { k?: number; col?: Paint };
   gardenTree: At & { k?: number };
-  bollard: At & { on?: boolean };
-  lantern: At & { on?: boolean };
+  bollard: At & { lit?: boolean };
+  lantern: At & { lit?: boolean };
   bin: At & { col?: Paint };
   heatPump: At & { running?: boolean };
   wallbox: At & { state?: ChargeState };
   car: At & { col?: Paint; state?: 'home' | 'waiting' | 'charging'; cable?: readonly [number, number] | null };
   gardenSeat: At & { col?: Paint; cushion?: Paint };
-  stringLights: { x0: number; x1: number; y: number; on?: boolean; h?: number; bulbs?: number };
+  stringLights: { x0: number; x1: number; y: number; lit?: boolean; h?: number; bulbs?: number };
   frontDoor: At & { col?: Paint; mat?: Paint };
   container: At & Biased & { col: Paint; label?: boolean };
   // pieces and primitives
@@ -237,9 +237,9 @@ const DEFS: { [K in keyof ItemMap]: Def<ItemMap[K]> } = {
   pinboard: (st, it) => pinboardY(st, it.x0, it.x1, it.z0, it.z1, it.notes),
   wallDots: (st, it) => dotsX(st, it.dots, it.col),
   tv: (st, it) => (it.wall === 'y' ? tvY : tvX)(st, it.from, it.to, it.z0, it.z1, it.state),
-  monitor: (st, it, cx) => small(st, cx, it.x, it.y, it.bias, () => monitor(st, it.x, it.y, zOf(it, cx), it.w, it.on)),
+  monitor: (st, it, cx) => small(st, cx, it.x, it.y, it.bias, () => monitor(st, it.x, it.y, zOf(it, cx), it.w, it.lit)),
   speaker: (st, it, cx) => small(st, cx, it.x, it.y, it.bias, () => speaker(st, it.x, it.y, zOf(it, cx), it)),
-  laptop: (st, it, cx) => small(st, cx, it.x, it.y, it.bias, () => laptop(st, it.x, it.y, zOf(it, cx), it.on)),
+  laptop: (st, it, cx) => small(st, cx, it.x, it.y, it.bias, () => laptop(st, it.x, it.y, zOf(it, cx), it.lit)),
   cabinets: (st, it) => {
     const dw = it.dishwasher;
     const o = { col: it.col, top: it.top, h: it.h, doors: it.doors, on: onOf(st, it.on), bias: it.bias, fronts: dw ? (yy: number, h: number) => dishwasher(st, dw.x0, dw.x1, yy, h, dw.running) : undefined };
@@ -268,7 +268,7 @@ const DEFS: { [K in keyof ItemMap]: Def<ItemMap[K]> } = {
   bathTowel: (st, it) => bathTowel(st, it.x0, it.x1, it.y, it.col),
   vanity: (st, it) => vanity(st, it.x, it.y, it.w, it),
   loo: (st, it) => loo(st, it.x, it.y, it.side),
-  shower: (st, it) => shower(st, it.x, it.y, it.w, it.d, it),
+  shower: (st, it) => shower(st, it.x, it.y, it.w, it.d, { on: it.running }),
   washer: (st, it) => washer(st, it.x, it.y, { running: it.running, on: onOf(st, it.on) }),
   dryingRack: (st, it) => dryingRack(st, it.x, it.y),
   stairs: (st, it) => stairs(st, it.x, it.y, it.w, it.d, it),
@@ -279,14 +279,14 @@ const DEFS: { [K in keyof ItemMap]: Def<ItemMap[K]> } = {
   ventBox: (st, it) => ventBox(st, it.x, it.y, it.level),
   shrub: (st, it) => shrub(st, it.x, it.y, it.k, it.col),
   gardenTree: (st, it) => gardenTree(st, it.x, it.y, it.k),
-  bollard: (st, it) => bollard(st, it.x, it.y, it.on),
-  lantern: (st, it) => lantern(st, it.x, it.y, it.on),
+  bollard: (st, it) => bollard(st, it.x, it.y, it.lit),
+  lantern: (st, it) => lantern(st, it.x, it.y, it.lit),
   bin: (st, it) => bin(st, it.x, it.y, it.col),
   heatPump: (st, it) => heatPump(st, it.x, it.y, it.running),
   wallbox: (st, it) => wallbox(st, it.x, it.y, it.state),
   car: (st, it) => car(st, it.x, it.y, it),
   gardenSeat: (st, it) => gardenSeat(st, it.x, it.y, it),
-  stringLights: (st, it) => stringLights(st, it.x0, it.x1, it.y, it.on, it),
+  stringLights: (st, it) => stringLights(st, it.x0, it.x1, it.y, it.lit, it),
   frontDoor: (st, it, cx) => frontDoor(st, it.x, it.y, zOf(it, cx), it),
   container: (st, it, cx) => small(st, cx, it.x + 0.62, it.y + 0.25, it.bias, () => container(st, it.x, it.y, zOf(it, cx), it.col, it)),
   sideboard: (st, it) => (it.facing === 'y' ? sideboardY : sideboardX)(st, it.x, it.y, it.w, it.d, it.h, { col: it.col, doors: it.doors, on: onOf(st, it.on), bias: it.bias }),

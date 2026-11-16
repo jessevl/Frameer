@@ -3,7 +3,7 @@
  * @description A house or close-up clay picture in its box: draws the scene on Frameer's `ClayCanvas`, fitted and centred, at the device's pixel ratio, in the theme of where it is (coral from the tokens, the dark theme's dimmer light), and draws again when the scene, the style, the time of day, the size or the theme changes. `live` keeps the frame loop running for a scene that moves (its `draw` reads the frame time); with reduced motion it stays a still. `onMarks` reports where named things are, in the box's CSS pixels, when they move. The canvas is decoration (`aria-hidden`); wrap it in a `PictureBox` with a `label` when it stands for a screen.
  * Used by: the apps' house and close-up pictures (Hearth first; the other apps after D-3).
  */
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { ClayCanvas, type ClayDraw } from '../ClayCanvas';
 import { drawScene, type ClayScene } from './scene';
 import type { TimeOfDay } from './stage';
@@ -26,7 +26,9 @@ export interface HousePictureProps {
 export function HousePicture({ scene, style, time, pad, live = false, className, onMarks }: HousePictureProps) {
   const lastMarks = useRef('');
   const marksRef = useRef(onMarks);
-  marksRef.current = onMarks;
+  useEffect(() => {
+    marksRef.current = onMarks;
+  }, [onMarks]);
   const draw = useCallback<ClayDraw>(
     (ctx, f) => {
       const dpr = f.w ? ctx.canvas.width / f.w : 1;
