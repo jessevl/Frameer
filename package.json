@@ -47,6 +47,10 @@
       "import": "./dist/clay/index.js",
       "types": "./dist/clay/index.d.ts"
     },
+    "./clay/house": {
+      "import": "./dist/clay/house/index.js",
+      "types": "./dist/clay/house/index.d.ts"
+    },
     "./build": {
       "import": "./dist/build/index.js",
       "types": "./dist/build/index.d.ts"

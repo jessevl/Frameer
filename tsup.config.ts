@@ -12,6 +12,7 @@ export default defineConfig({
     'contexts/index': 'src/contexts/index.ts',
     'icons/index': 'src/icons/index.ts',
     'clay/index': 'src/clay/index.ts',
+    'clay/house/index': 'src/clay/house/index.ts',
     'shell/index': 'src/shell/index.ts',
     'build/index': 'src/build/index.ts',
   },
