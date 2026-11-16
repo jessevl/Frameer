@@ -1,6 +1,6 @@
 /**
  * @file pieces.ts
- * @description Smaller pieces for the house pictures that the concept drew inline in its rooms, here as named, generic objects: low sideboards along either back wall, a round side table, a cupboard, a chest, a bench, a coat rack, an umbrella stand, shoes, a stack of boxes, a tall mirror, a pinboard with notes, a waste-paper bin, a printer, an orb on a stand, coloured dots on a wall, a light over a mirror, a light strip under a shelf, a bare pool of light for hidden spots, and the primitives a scene may use for anything else: a rounded block, a ball, a pipe and a stub of cut wall.
+ * @description Smaller pieces for the house pictures that the concept drew inline in its rooms, here as named, generic objects: low sideboards along either back wall, a round side table, a cupboard, a chest, a bench, a coat rack, an umbrella stand, shoes, a stack of boxes, a tall mirror, a pinboard with notes, a waste-paper bin, a printer, an orb on a stand, coloured dots on a wall, a light over a mirror, a light strip under a shelf, a bare pool of light for hidden spots, and the primitives a scene may use for anything else: a rounded block, a ball, a cylinder, a pipe and a stub of cut wall.
  * Ported from the inline drawings in hearth-concept/clay2/house.js (FURNISH) and extras.js (heat).
  * Used by: items.ts.
  */
@@ -207,6 +207,11 @@ export function block(st: Stage, x: number, y: number, z: number, w: number, d: 
 export function ball(st: Stage, x: number, y: number, z: number, r: number, col: string): void {
   if (!z) st.shadowC(x, y, r, { h: 0.15, a: 0.16 });
   st.sph(x, y, z + r, r, col);
+}
+
+/** An upright cylinder (a vase, a candle holder, a tin). */
+export function cylinder(st: Stage, x: number, y: number, z: number, r: number, h: number, col: string): void {
+  st.cyl(x, y, z, r, h, col);
 }
 
 /** A pipe or cable through points. */

@@ -5,7 +5,7 @@
  */
 import type { Point3 } from '../clay';
 import type { Paint } from './colors';
-import { block, ball, bench, boxStack, chest, coatRack, cupboard, dotsX, lightStripY, mirrorLightY, orb, paperBin, pinboardY, pipe, printer, shoes, sideTable, sideboardX, sideboardY, spot, tallMirrorX, umbrellaStand, wallStub } from './objects/pieces';
+import { block, ball, bench, cylinder, boxStack, chest, coatRack, cupboard, dotsX, lightStripY, mirrorLightY, orb, paperBin, pinboardY, pipe, printer, shoes, sideTable, sideboardX, sideboardY, spot, tallMirrorX, umbrellaStand, wallStub } from './objects/pieces';
 import { armchair, beanbag, books, bowl, chair, mug, pouf, remote, roundRug, roundTable, rug, sofaBack, sofaN, sofaW, stool, table, type ChairDir, type On, type RugOpts, type Seated } from './objects/furniture';
 import { board, cabX, cabY, coffee, dishwasher, fridge, hob, island, jars, ovenTower, sink, upperY } from './objects/kitchen';
 import { candle, floorLamp, lightBox, pendant, tableLamp, wallLightX } from './objects/light';
@@ -157,6 +157,7 @@ export interface ItemMap {
   orb: At & Biased & { col?: Paint; r?: number; stand?: Paint };
   block: Area & Biased & { h: number; col: Paint; r?: number; soft?: boolean | number; flat?: boolean; shadow?: boolean };
   ball: At & Biased & { r: number; col: Paint };
+  cylinder: At & Biased & { r: number; h: number; col: Paint };
   pipe: Biased & { pts: readonly Point3[]; col: Paint; w?: number; at?: readonly [number, number] };
   wallStub: Area & Biased & { h: number };
 }
@@ -303,6 +304,7 @@ const DEFS: { [K in keyof ItemMap]: Def<ItemMap[K]> } = {
   orb: (st, it, cx) => small(st, cx, it.x, it.y, it.bias, () => orb(st, it.x, it.y, zOf(it, cx), it)),
   block: (st, it, cx) => small(st, cx, it.x + it.w / 2, it.y + it.d / 2, it.bias, () => block(st, it.x, it.y, zOf(it, cx), it.w, it.d, it.h, st.paint(it.col, st.col.linen), it)),
   ball: (st, it, cx) => small(st, cx, it.x, it.y, it.bias, () => ball(st, it.x, it.y, zOf(it, cx), it.r, st.paint(it.col, st.col.blue))),
+  cylinder: (st, it, cx) => small(st, cx, it.x, it.y, it.bias, () => cylinder(st, it.x, it.y, zOf(it, cx), it.r, it.h, st.paint(it.col, st.col.cream))),
   pipe: (st, it, cx) => small(st, cx, it.at?.[0] ?? it.pts[0][0], it.at?.[1] ?? it.pts[0][1], it.bias, () => pipe(st, it.pts, st.paint(it.col, st.col.ink), it.w)),
   wallStub: (st, it, cx) => small(st, cx, it.x + it.w / 2, it.y + it.d / 2, it.bias, () => wallStub(st, it.x, it.y, it.w, it.d, it.h)),
 };
