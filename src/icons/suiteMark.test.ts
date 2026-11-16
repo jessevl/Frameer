@@ -51,3 +51,12 @@ describe('suiteMarkSvg', () => {
     expect(suiteVariantForSize(38)).toBe('paper');
   });
 });
+
+describe('suiteIconFiles', () => {
+  it('lists every svg and png an app ships', async () => {
+    const { suiteIconSvgs, suiteIconPngs } = await import('./suiteIconFiles.ts');
+    expect(Object.keys(suiteIconSvgs('yard'))).toContain('favicon.svg');
+    const names = suiteIconPngs('yard').map(([f]) => f);
+    expect(names).toEqual(expect.arrayContaining(['icon-16.png', 'icon-32.png', 'favicon.png', 'icon-48.png', 'icon-512.png', 'icon-maskable-192.png', 'icon-dark-512.png']));
+  });
+});
