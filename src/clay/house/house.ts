@@ -421,8 +421,8 @@ function shown(scene: HouseScene): Shown {
   return { floors, area };
 }
 
-/** The picture's extent at scale 1, without padding: left, right, top, bottom (screen units around the origin). */
-export function houseExtent(scene: HouseScene): { l: number; r: number; t: number; b: number } {
+/** The picture's extent at scale s (1: scene units), without padding: left, right, top, bottom around the origin. */
+export function houseExtent(scene: HouseScene, s = 1): { l: number; r: number; t: number; b: number } {
   const { floors, area } = shown(scene);
   const step = scene.step ?? [0, 0];
   let l = 1e9;
@@ -437,10 +437,10 @@ export function houseExtent(scene: HouseScene): { l: number; r: number; t: numbe
     const x1 = pl && L ? L.x + L.w + 0.1 : (scene.only ? area.w : f.w) + 0.3;
     const y1 = pl && L ? L.y + L.d + 0.1 : (scene.only ? area.d : f.d) + 0.3;
     const e = { l: (x0 - y1) * C30, r: (x1 - y0) * C30, t: (x0 + y0) / 2 - WALL_H - 0.1, b: (x1 + y1) / 2 + (pl ? 0.5 : 0.36) };
-    l = Math.min(l, e.l + i * step[0]);
-    r = Math.max(r, e.r + i * step[0]);
-    t = Math.min(t, e.t - i * step[1]);
-    b = Math.max(b, e.b - i * step[1]);
+    l = Math.min(l, e.l * s + i * step[0] * s);
+    r = Math.max(r, e.r * s + i * step[0] * s);
+    t = Math.min(t, e.t * s - i * step[1] * s);
+    b = Math.max(b, e.b * s - i * step[1] * s);
   });
   return { l, r, t, b };
 }
@@ -454,21 +454,24 @@ export function drawHouse(scene: HouseScene, o: PictureOptions = {}): Picture {
   const dpr = o.dpr ?? 2;
   const make = o.canvas ?? domCanvas;
   const pad = o.pad ?? 14;
-  const ext = houseExtent(scene);
+  const unit = houseExtent(scene);
   const g = scene.grid ? 1.1 : 0;
   let s = o.s ?? 30;
-  if (o.fit) s = Math.max(0.01, Math.min((o.fit.w - pad * 2) / (ext.r - ext.l + g * 2), (o.fit.h - pad * 2) / (ext.b - ext.t + g)));
-  const wpx = o.fit ? o.fit.w : Math.ceil((ext.r - ext.l) * s + pad * 2 + g * s * 2);
-  const hpx = o.fit ? o.fit.h : Math.ceil((ext.b - ext.t) * s + pad * 2 + g * s);
+  if (o.fit) s = Math.max(0.01, Math.min((o.fit.w - pad * 2) / (unit.r - unit.l + g * 2), (o.fit.h - pad * 2) / (unit.b - unit.t + g)));
+  // In pixels, in the concept's order of rounding, so a picture at a given scale has the concept's size.
+  const ext = houseExtent(scene, s);
+  const gp = g * s;
+  const wpx = o.fit ? o.fit.w : Math.ceil(ext.r - ext.l + pad * 2 + gp * 2);
+  const hpx = o.fit ? o.fit.h : Math.ceil(ext.b - ext.t + pad * 2 + gp);
   const cv = make(Math.round(wpx * dpr), Math.round(hpx * dpr));
   const c = cv.getContext('2d');
   if (!c) return { canvas: cv, w: wpx, h: hpx, s, marks: {} };
   c.scale(dpr, dpr);
   // Centred in a fitted box; otherwise padded from the top left.
-  const spareX = o.fit ? (wpx - (ext.r - ext.l + g * 2) * s - pad * 2) / 2 : 0;
-  const spareY = o.fit ? (hpx - (ext.b - ext.t + g) * s - pad * 2) / 2 : 0;
-  const ox = pad + g * s - ext.l * s + spareX;
-  const oy = pad + g * s * 0.5 - ext.t * s + spareY;
+  const spareX = o.fit ? (wpx - (ext.r - ext.l + gp * 2) - pad * 2) / 2 : 0;
+  const spareY = o.fit ? (hpx - (ext.b - ext.t + gp) - pad * 2) / 2 : 0;
+  const ox = pad + gp - ext.l + spareX;
+  const oy = pad + gp * 0.5 - ext.t + spareY;
   const { floors, area } = shown(scene);
   const step = scene.step ?? [0, 0];
   const shadows: Path2D[] = [];

@@ -69,11 +69,14 @@ const AMBIENT: Record<TimeOfDay, { light: RGB; dark: RGB }> = {
   day: { light: [255, 255, 255], dark: [118, 112, 128] },
 };
 
-/** The light for a time of day, style and theme. A style may set its own night (a dark model needs more). */
-export function envFor(time: TimeOfDay, style: Style, o: { dark?: boolean; candles?: boolean; t?: number } = {}): Env {
+/**
+ * The light for a time of day, style and theme. A style may set its own night for a house (a dark model needs more);
+ * close-ups keep the plain night (`styleNight: false`), as the concept drew them.
+ */
+export function envFor(time: TimeOfDay, style: Style, o: { dark?: boolean; candles?: boolean; t?: number; styleNight?: boolean } = {}): Env {
   const dark = !!o.dark;
   let ambient = dark ? AMBIENT[time].dark : AMBIENT[time].light;
-  if (time === 'night' && style.ambient && !dark) ambient = style.ambient;
+  if (time === 'night' && style.ambient && !dark && o.styleNight !== false) ambient = style.ambient;
   return { time, night: time === 'night', dusk: time === 'dusk', ambient, dark, candles: !!o.candles, t: o.t ?? 0 };
 }
 
