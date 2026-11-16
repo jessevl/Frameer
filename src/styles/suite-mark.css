@@ -1,0 +1,31 @@
+/*
+ * @file suite-mark.css
+ * @description The moving part of the suite marks (icons/suiteMark.ts): inside a hovered or focused link or button the mark's `m1` part (and `m2`, a beat later) moves its own way, and while a mark's wrapper says it is busy (`data-working`, `data-syncing`, `data-spinning`) it moves on its own. One gesture per app: slide (Drift's lines), glow (Lighthouse's lamp, Hearth's light), enter (Harbour's boat), lift (Yard's ribs), nudge (Reel's play mark). Reduced motion switches all of it off.
+ * Used by: every suite app's mark CSS (imported next to motion.css).
+ */
+.sm .m1, .sm .m2 { transform-box: fill-box; transform-origin: center; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .sm .m1, .sm .m2 { transition: transform 500ms var(--spring), opacity 500ms var(--ease-out); }
+  :is(a, button, .icon-hv):is(:hover, :focus-visible) .sm-slide :is(.m1, .m2) { transform: translateX(-1.4px); }
+  :is(a, button, .icon-hv):is(:hover, :focus-visible) .sm-slide .m2 { transition-delay: 120ms; }
+  :is(a, button, .icon-hv):is(:hover, :focus-visible) .sm-glow .m1 { transform: scale(1.45); }
+  :is(a, button, .icon-hv):is(:hover, :focus-visible) .sm-enter .m1 { transform: translateX(1.8px); }
+  :is(a, button, .icon-hv):is(:hover, :focus-visible) .sm-lift .m1 { transform: translateY(-1.2px); }
+  :is(a, button, .icon-hv):is(:hover, :focus-visible) .sm-nudge .m1 { transform: translateX(.9px); }
+
+  :is([data-working='true'], [data-syncing='true'], [data-spinning]) .sm .m1 { animation: sm-slide 1.4s var(--ease-in-out) infinite; }
+  :is([data-working='true'], [data-syncing='true'], [data-spinning]) .sm .m2 { animation: sm-slide 1.4s var(--ease-in-out) .15s infinite; }
+  :is([data-working='true'], [data-syncing='true'], [data-spinning]) .sm-glow .m1 { animation-name: sm-glow; }
+  :is([data-working='true'], [data-syncing='true'], [data-spinning]) .sm-enter .m1 { animation-name: sm-enter; }
+  :is([data-working='true'], [data-syncing='true'], [data-spinning]) .sm-lift .m1 { animation-name: sm-lift; }
+  :is([data-working='true'], [data-syncing='true'], [data-spinning]) .sm-nudge .m1 { animation-name: sm-nudge; }
+}
+@keyframes sm-slide { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(-1.4px); } }
+@keyframes sm-glow { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.45); opacity: .75; } }
+@keyframes sm-enter { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(1.8px); } }
+@keyframes sm-lift { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-1.2px); } }
+@keyframes sm-nudge { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(.9px); } }
+@media (prefers-reduced-motion: reduce) {
+  .sm .m1, .sm .m2 { transform: none !important; transition: none !important; animation: none !important; }
+}
