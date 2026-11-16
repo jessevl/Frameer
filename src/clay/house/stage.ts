@@ -217,7 +217,8 @@ export class Stage {
   /** A scene's paint (a material's name or a hex) as hex, before the style. */
   paint(p: Paint | undefined, fallback: string): string {
     if (!p) return fallback;
-    return p.startsWith('#') ? p : (this.col[p as keyof Colors] ?? fallback);
+    if (p.startsWith('#')) return p;
+    return p in this.col ? this.col[p as keyof Colors] : fallback;
   }
 
   /** A line width that follows the scale. */

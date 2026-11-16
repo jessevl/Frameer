@@ -67,8 +67,8 @@ export type MaterialName = keyof typeof BASE_COLORS;
 /** The materials in use: every name to a `#RRGGBB` hex. */
 export type Colors = Record<MaterialName, string>;
 
-/** A colour in a scene: a material's name or a `#RRGGBB` hex. */
-export type Paint = MaterialName | `#${string}`;
+/** A colour in a scene: a material's name or a `#RRGGBB` hex (an unknown name falls back to the object's own colour). */
+export type Paint = MaterialName | (string & Record<never, never>);
 
 /** A light's colour, 0 to 255 per channel. */
 export type RGB = readonly [number, number, number];
