@@ -128,7 +128,7 @@ export interface SuiteMarkOptions {
 /** One variant of one app's mark as an SVG document (512 grid). `prefix` keeps gradient ids apart when several are inlined in one page. */
 export function suiteMarkSvg(app: SuiteApp, variant: SuiteVariant, prefix = 'sm', { size = 512, label }: SuiteMarkOptions = {}): string {
   const def = SUITE_MARKS[app];
-  const name = label ?? def.name;
+  const name = (label ?? def.name).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const p = `${prefix}_`;
   const named = name ? ` role="img" aria-label="${name}"` : ' aria-hidden="true"';
   const open = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 512 512" fill="none" class="sm sm-${def.motion}"${named}>`;

@@ -46,6 +46,12 @@ describe('suiteMarkSvg', () => {
     expect(svg).toContain('class="fp"');
   });
 
+  it('escapes the label so it cannot add markup', () => {
+    const svg = suiteMarkSvg('reel', 'paper', 'x', { label: 'x" onload="alert(1)"><script>' });
+    expect(svg).not.toContain('<script>');
+    expect(svg).toContain('aria-label="x&quot; onload=&quot;alert(1)&quot;&gt;&lt;script&gt;"');
+  });
+
   it('picks the glass card from 48 px and the flat card below', () => {
     expect(suiteVariantForSize(48)).toBe('full');
     expect(suiteVariantForSize(38)).toBe('paper');
