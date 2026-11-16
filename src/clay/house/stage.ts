@@ -48,6 +48,13 @@ export function circ(x: number, y: number, r: number, n = 20): Pt2[] {
 /** The time of day a picture is lit for. */
 export type TimeOfDay = 'day' | 'dusk' | 'night';
 
+/** The time of day for an hour (0 to 24): night from 20:30 to 06:00, dusk until 08:00 and from 17:00, day between. From Lido's envAt. */
+export function timeOfDay(hour: number): TimeOfDay {
+  if (hour >= 20.5 || hour < 6) return 'night';
+  if (hour >= 17 || hour < 8) return 'dusk';
+  return 'day';
+}
+
 /** The light a picture is drawn in. */
 export interface Env {
   time: TimeOfDay;

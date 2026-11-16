@@ -13,7 +13,7 @@ import { HousePicture } from './HousePicture';
 import { ITEM_KINDS, type Item } from './items';
 import type { CanvasMaker } from './light';
 import { drawScene, type ClayScene } from './scene';
-import type { TimeOfDay } from './stage';
+import { timeOfDay, type TimeOfDay } from './stage';
 import { DEFAULT_STYLE, PROTECTED, STYLE_NAMES, makeStyle } from './styles';
 
 const r2 = (v: unknown): unknown => (typeof v === 'number' ? Math.round(v * 100) / 100 : v);
@@ -135,6 +135,12 @@ describe('styles', () => {
     const themed = colorsFor({ coral: '#D9604F', coralLight: 'var(--x)', coralDeep: '#B04030' });
     expect(themed.coral).toBe('#D9604F');
     expect(themed.coralLight).toMatch(/^#[0-9A-F]{6}$/);
+  });
+});
+
+describe('time of day', () => {
+  it('follows the hour', () => {
+    expect([3, 6, 7.9, 8, 12, 16.9, 17, 20.4, 20.5, 23].map(timeOfDay)).toEqual(['night', 'dusk', 'dusk', 'day', 'day', 'day', 'dusk', 'dusk', 'night', 'night']);
   });
 });
 
