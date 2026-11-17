@@ -78,6 +78,9 @@ export interface Opening {
   side?: 1 | -1;
   /** The door's colour (the front door stands out). */
   col?: Paint;
+  /** Windows in a tall wall: curtains beside them, and how many panes. */
+  curtain?: Paint;
+  panes?: number;
 }
 
 export interface HouseFloor {
@@ -564,11 +567,33 @@ function wallWithOpenings(st: Stage, s: WallSeg, h: number, thick: number, centr
   const part = { t: C.cut, l: C.wall, r: dk(C.wall, 0.1), e: '#FFFFFF' };
   const glassM = { t: 'rgba(255,255,255,.9)', l: 'rgba(196,224,236,.5)', r: 'rgba(176,208,224,.5)', e: '#FFFFFF' };
   const tall = h > PART_H + 0.05;
-  for (const [t0, t1] of solidRuns(s)) {
+  // A window in a tall wall is drawn on the wall, as a rectangle floor draws its back-wall windows: the wall stays
+  // whole behind it and the window shows the sky of the hour, its frame, its sill and its curtains.
+  const hung = tall ? s.openings.filter((o) => openings[o.i]?.kind === 'window') : [];
+  const cut = { openings: s.openings.filter((o) => !hung.includes(o)) };
+  for (const [t0, t1] of solidRuns(cut)) {
     slab(st, s, t0, t1, 0, h, thick, centred, part);
     if (paint) paintInside(st, s, t0, t1, 0, h, paint);
   }
-  for (const o of s.openings) {
+  if (hung.length) {
+    const len = Math.hypot(s.b[0] - s.a[0], s.b[1] - s.a[1]) || 1;
+    // The wall's own frame: x along it with the room on (0, 1)'s side, the inside face at y = 0.
+    const ux = -s.ny;
+    const uy = s.nx;
+    const forward = ux * (s.b[0] - s.a[0]) + uy * (s.b[1] - s.a[1]) > 0;
+    const start = forward ? s.a : s.b;
+    const turn = (Math.atan2(uy, ux) * 180) / Math.PI;
+    for (const o of hung) {
+      const op = openings[o.i];
+      if (!op) continue;
+      const head = Math.min(h - 0.08, op.head ?? DOOR_H);
+      const sill = Math.min(op.sill ?? SILL_H, head - 0.1);
+      const from = (forward ? o.t0 : 1 - o.t1) * len;
+      const to = (forward ? o.t1 : 1 - o.t0) * len;
+      placeItems(st, [{ kind: 'window', wall: 'y', from: from + 0.06, to: to - 0.06, z0: sill, z1: head, ...(op.curtain ? { curtain: op.curtain } : {}), ...(op.panes ? { panes: op.panes } : {}), moved: { x: start[0], y: start[1], turn } }]);
+    }
+  }
+  for (const o of cut.openings) {
     const op = openings[o.i];
     if (!op) continue;
     const head = Math.min(h, op.head ?? (op.kind === 'passage' ? WALL_H : DOOR_H));

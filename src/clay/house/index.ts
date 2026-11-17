@@ -8,6 +8,7 @@ export * from './stage';
 export * from './light';
 export * from './items';
 export * from './house';
+export * from './outline';
 export * from './closeup';
 export * from './scene';
 export * from './HousePicture';
