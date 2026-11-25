@@ -1,6 +1,6 @@
 /**
  * @file parts.ts
- * @description The shell parts of v0.4, generic and configurable: the desktop frame (AppFrame), the rail, the docked bar, the floating pane, the side panel with its stage store, `PanelContent` and stack, the breadcrumb, the phone header, tab bar and view switch, the stage tools, the status line (`StageStatus`), the signed-out frame (`AuthShell`, `AuthArt`, `FormError`, `ServerStatusChip`), and what they share (`usePane`, `stageScroll`). Sections, crumbs, pane contents, marks and sync objects stay in each app as props and slots; so do routes, the app's own stores and the coral rules. Re-exported by index.ts.
+ * @description The shell parts of v0.4, generic and configurable: the desktop frame (AppFrame), the rail, the docked bar, the floating pane, the side panel with its stage store, `PanelContent` and stack, the breadcrumb, the phone header, tab bar and view switch, the stage tools, the status line (`StageStatus`), the signed-out frame (`AuthShell`, `AuthArt`, `FormError`, `ServerStatusChip`) and its shared parts (`AuthBrand`, `AuthMarkTile`, `AuthEmailInput`, `KeepSignedIn`, `AuthHint`, `AuthLink`, `serverStatusLine`), and what they share (`usePane`, `stageScroll`). Sections, crumbs, pane contents, marks and sync objects stay in each app as props and slots; so do routes, the app's own stores and the coral rules. Re-exported by index.ts.
  * Used by: index.ts.
  */
 export { Rail, RailLink, RAIL_ACTIVE, type RailProps, type RailSection } from './Rail';
@@ -17,6 +17,7 @@ export { PANEL_PARAM, panelSearch, parsePanelStack, poppedSearch, pushedSearch }
 export { usePanelStack, type PanelStack } from './usePanelStack';
 export { StageStatus, StageStatusButton, type StageStatusProps } from './StageStatus';
 export { AuthShell, AuthArt, FormError, ServerStatusChip, type AuthShellProps, type AuthArtProps, type AuthTile } from './AuthShell';
+export { AuthBrand, AuthMarkTile, AuthEmailInput, KeepSignedIn, AuthHint, AuthLink, serverStatusLine, type ServerStatusInput } from './AuthParts';
 export { STAGE_SCROLL, scrollStageToTop, stageScroll } from './stageScroll';
 
 export { PillHeader, type Crumb, type CrumbContext, type PillHeaderProps } from './PillHeader';
