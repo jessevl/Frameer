@@ -64,7 +64,7 @@ export const KeepSignedIn: React.FC<{ checked: boolean; onChange: (checked: bool
 
 /** A centred line under the button. `small` for the quiet note ("Forgot your password? …"), the default size for a line with a link. */
 export const AuthHint: React.FC<{ children: React.ReactNode; small?: boolean }> = ({ children, small = false }) => (
-  <p className={cn('m-0 text-center text-[var(--ink-2)]', small ? 'text-xs' : 'text-sm')}>{children}</p>
+  <p className={cn('text-center text-[var(--ink-2)]', small ? 'text-xs' : 'text-sm')}>{children}</p>
 );
 
 /** A link-styled button for an AuthHint ("Ask for an invite"). */
